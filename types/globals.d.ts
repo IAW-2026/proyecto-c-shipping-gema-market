@@ -1,4 +1,5 @@
-import { UserRole } from "@/app/lib/definitions/auth";
+// types/globals.d.ts (CORREGIDO)
+import { UserRole } from "@/lib/definitions/auth";
 
 declare global {
   interface CustomJwtSessionClaims {

@@ -61,8 +61,8 @@ export function Header({ title, subtitle, action, className }: HeaderProps) {
 // 3. Contenedor de Contenido (Lienzo en blanco)
 export function Content({ children, className }: { children: ReactNode; className?: string }) {
     return (
-        <main className={cn("flex-1", className)}>
+        <section className={cn("flex-1", className)}>
             {children}
-        </main>
+        </section>
     );
 }

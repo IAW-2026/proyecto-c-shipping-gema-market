@@ -1,4 +1,4 @@
-import { Card } from "@/components/ui/card";
+import { MetricCard } from "@/components/ui/metric-card";
 
 interface EarningsMetricsProps {
     metrics: {
@@ -11,26 +11,20 @@ interface EarningsMetricsProps {
 export function EarningsMetrics({ metrics }: EarningsMetricsProps) {
     return (
         <div className="grid gap-4 mb-6 grid-cols-1 sm:grid-cols-3">
-            <Card padding="lg">
-                <div className="text-xs text-ink-3">Este mes</div>
-                <div className="text-[26px] font-bold text-ink">
-                    ${metrics.monthTotal.toLocaleString("es-AR")}
-                </div>
-            </Card>
+            <MetricCard
+                title="Este mes"
+                value={`$${metrics.monthTotal.toLocaleString("es-AR")}`}
+            />
 
-            <Card padding="lg">
-                <div className="text-xs text-ink-3">Viajes del mes</div>
-                <div className="text-[26px] font-bold text-ink">
-                    {metrics.monthTrips}
-                </div>
-            </Card>
+            <MetricCard
+                title="Viajes del mes"
+                value={metrics.monthTrips}
+            />
 
-            <Card padding="lg">
-                <div className="text-xs text-ink-3">Promedio / viaje</div>
-                <div className="text-[26px] font-bold text-ink">
-                    ${metrics.averagePerTrip.toLocaleString("es-AR")}
-                </div>
-            </Card>
+            <MetricCard
+                title="Promedio / viaje"
+                value={`$${metrics.averagePerTrip.toLocaleString("es-AR")}`}
+            />
         </div>
     );
 }

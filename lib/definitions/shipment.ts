@@ -2,13 +2,8 @@ import { z } from "zod";
 
 // --- 1. ESQUEMAS BASE ---
 
-export const ShippingStatusSchema = z.enum([
-    'pending_pickup',
-    'in_transit',
-    'delivered',
-    'failed',
-    'cancelled'
-]);
+import { SHIPMENT_STATUSES, ShipmentStatus } from "../shared/shipment-constants";
+export const ShippingStatusSchema = z.enum(SHIPMENT_STATUSES);
 
 export const AddressSchema = z.object({
     street: z.string().min(1, "La calle es obligatoria"),

@@ -8,10 +8,10 @@ export async function getShipmentDetails(shippingId: string): Promise<Shipment |
     const mockShipment: Shipment = {
         // ID actualizado con el prefijo shp_ y el ULID de 26 caracteres
         shippingId: "shp_01HGW89XN5Z8XF2H7P9K7X1234",
-        orderId: "OR-2841",
-        buyerId: "BUY-987123",
-        sellerId: "SEL-456789",
-        logisticsId: "LOG-123456",
+        orderId: "ord_02KLY01ZN7B0ZH4J5R1M9Z3456",
+        buyerId: "usr_02KLY01ZN7B0ZH4J9R1M9Z3456",
+        sellerId: "usr_02KLY81ZN7B0ZH4J9R1M9Z3456",
+        logisticsId: "usr_07KLY01ZN7B0ZH4J9R1M9Z3456",
         status: "in_transit",
         trackingCode: "TRK-9821",
         pickupAddress: {

@@ -1,14 +1,14 @@
-//(operator)/available/shipment-card.tsx
-
+import React from "react";
 import { Card } from "@/components/ui/card";
 import { MapPin } from "lucide-react";
-import { WeightTag, TimeTag, DistanceTag } from "./available_shipment_tags";
+import { WeightTag, TimeTag, DistanceTag } from "./available-shipment-tags";
 import { ShipmentOffer } from "@/lib/definitions/shipment";
-import { ViewDetailsButton, TakeShipmentButton } from "./button-actions";
+import { ViewDetailsButton, TakeShipmentButton } from "./available-actions";
 
 interface ShipmentCardProps {
     offer: ShipmentOffer;
 }
+
 export function AvailableShipmentCard({ offer }: ShipmentCardProps) {
     return (
         <Card className="p-5 flex flex-col gap-5 bg-paper">

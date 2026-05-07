@@ -7,7 +7,6 @@ import { HistoryHeader } from "./_components/history-header";
 import { HistoryTabs } from "./_components/history-tabs";
 import { HistoryTable } from "./_components/history-table";
 import { getShipmentHistory } from "@/lib/db/queries/shipments.queries"; // Importamos la nueva función
-import { auth } from "@clerk/nextjs/server"; // Para obtener el ID del usuario actual
 
 export const metadata: Metadata = {
     title: "Historial | UniHousing Shipping",
@@ -15,18 +14,14 @@ export const metadata: Metadata = {
 };
 
 // 1. Definición del Mock Data 
-export default async function HistoryPage({
-    searchParams
-}: {
-    searchParams: { [key: string]: string | undefined }
+export default async function HistoryPage(props: {
+    searchParams: Promise<{ [key: string]: string | undefined }>
 }) {
-    await requireRole([ROLES.LOGISTICS, ROLES.ADMIN]);
-
-    // 1. Obtenemos el ID del usuario (Clerk) para pasarlo a la query
-    const { userId } = await auth();
+    const searchParams = await props.searchParams;
+    const { userId } = await requireRole([ROLES.LOGISTICS, ROLES.ADMIN]);
 
     // 2. Obtenemos los envíos usando la nueva función
-    const allShipments = await getShipmentHistory(userId || "guest");
+    const allShipments = await getShipmentHistory(userId);
 
     // 3. Extracción de filtros
     const currentStatus = searchParams.status || "todos";

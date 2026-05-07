@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { ShippingStatusSchema } from "../definitions/shipment";
 
 // Validación para el endpoint POST /api/shipping/envios
 export const createShipmentSchema = z.object({
@@ -9,6 +10,13 @@ export const createShipmentSchema = z.object({
 
 // Validación para actualizaciones de estado internas
 export const updateStatusSchema = z.object({
-    status: z.enum(['pending_pickup', 'in_transit', 'delivered', 'failed', 'cancelled']),
+    status: ShippingStatusSchema,
     notes: z.string().optional(),
+});
+
+// Validación para cotizaciones externas
+export const quoteRequestSchema = z.object({
+    origin_zip: z.string().min(4),
+    destination_zip: z.string().min(4),
+    weight_kg: z.number().positive(),
 });

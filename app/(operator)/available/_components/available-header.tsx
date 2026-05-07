@@ -1,5 +1,5 @@
 import { Header } from "../../_components/page-layout";
-import { HeaderActions } from "./button-actions";
+import { HeaderActions } from "./available-actions";
 
 
 export function AvailableHeader() {

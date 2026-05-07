@@ -5,7 +5,7 @@ import { DashboardHeader } from "./_components/dashboard-header";
 import { ActiveShipmentsList } from "./_components/active-shipments-list";
 import { Metadata } from "next";
 import { ROLES } from "@/lib/shared/auth-constants";
-import { MetricsGrid } from "./_components/metricsGrid";
+import { MetricsGrid } from "./_components/metrics-grid";
 
 
 export const metadata: Metadata = {

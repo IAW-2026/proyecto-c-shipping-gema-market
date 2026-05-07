@@ -1,9 +1,11 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { Filter, RefreshCcw, ArrowRight, Check } from "lucide-react";
+import { Filter, RefreshCcw, ArrowRight, Check, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
+import { takeShipmentAction } from "@/lib/actions/shipment.actions";
+import { useState } from "react";
 
 export function HeaderActions() {
     const router = useRouter();
@@ -41,20 +43,38 @@ export function ViewDetailsButton({ shippingId }: { shippingId: string }) {
         </Link>
     );
 }
+
 export function TakeShipmentButton({ shippingId }: { shippingId: string }) {
-    const handleTakeShipment = () => {
-        // Aquí irá la lógica de la Server Action en la Etapa 3
-        console.log(`Intentando tomar el envío: ${shippingId}`);
-        alert(`Funcionalidad 'Tomar envío' en desarrollo para el ID: ${shippingId}`);
+    const [isPending, setIsPending] = useState(false);
+
+    const handleTakeShipment = async () => {
+        setIsPending(true);
+        try {
+            const result = await takeShipmentAction(shippingId);
+            if (result.success) {
+                alert(result.message);
+            } else {
+                alert(`Error: ${result.error}`);
+            }
+        } catch (error) {
+            alert("Error crítico al intentar tomar el envío");
+        } finally {
+            setIsPending(false);
+        }
     };
 
     return (
         <button
             onClick={handleTakeShipment}
-            className="flex-1 bg-clay text-paper h-11 rounded-full text-xs font-bold hover:bg-cocoa transition-all flex items-center justify-center gap-2 active:scale-[0.98]"
+            disabled={isPending}
+            className="flex-1 bg-clay text-paper h-11 rounded-full text-xs font-bold hover:bg-cocoa transition-all flex items-center justify-center gap-2 active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed"
         >
-            <Check size={14} />
-            Tomar envío
+            {isPending ? (
+                <Loader2 size={14} className="animate-spin" />
+            ) : (
+                <Check size={14} />
+            )}
+            {isPending ? "Tomando..." : "Tomar envío"}
         </button>
     );
 }

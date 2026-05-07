@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { LoginForm } from "./LoginForm";
-import { SignUpForm } from "./SingUpForm";
+import { SignUpForm } from "./SignUpForm";
 import { ResetPasswordForm } from "./ResetPasswordForm";
 
 export function AuthContainer() {
