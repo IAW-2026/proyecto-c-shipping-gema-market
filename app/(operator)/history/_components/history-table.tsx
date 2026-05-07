@@ -4,22 +4,15 @@ import {
 import { ShipmentStatusBadge } from "../../_components/shipment-status-badge"
 import { ChevronRight } from "lucide-react"
 import Link from "next/link"
+import { ShipmentSummary } from "@/lib/definitions/shipment"
 
-interface ShipmentHistoryItem {
-    id: string
-    order: string
-    to: string
-    status: any
-    price: number
-}
-
-export function HistoryTable({ shipments }: { shipments: ShipmentHistoryItem[] }) {
+export function HistoryTable({ shipments }: { shipments: ShipmentSummary[] }) {
     return (
         <div className="bg-paper border border-line rounded-r3 overflow-hidden shadow-sm">
             <Table>
                 <TableHeader>
                     <TableRow>
-                        <TableHead>Tracking</TableHead>
+                        <TableHead>ID envío</TableHead>
                         <TableHead>Pedido</TableHead>
                         <TableHead>Destino</TableHead>
                         <TableHead>Estado</TableHead>
@@ -29,10 +22,16 @@ export function HistoryTable({ shipments }: { shipments: ShipmentHistoryItem[] }
                 </TableHeader>
                 <TableBody>
                     {shipments.map((s) => (
-                        <TableRow key={s.id}>
-                            <TableCell className="text-ink font-mono font-medium">{s.id}</TableCell>
-                            <TableCell className="font-mono text-ink-3">{s.order}</TableCell>
-                            <TableCell className="text-ink-2 truncate max-w-[200px]">{s.to}</TableCell>
+                        <TableRow key={s.shippingId}>
+                            <TableCell className="text-ink-3 font-mono font-medium">{s.shippingId}</TableCell>
+                            <TableCell className="font-mono text-ink-3">{s.orderId}</TableCell>
+
+                            {/* Corrección 1: Acceder al objeto deliveryAddress */}
+                            <TableCell className="text-ink-2 truncate max-w-[200px]">
+                                {s.deliveryAddress.street} {s.deliveryAddress.number}
+                                {s.deliveryAddress.floor ? `, ${s.deliveryAddress.floor}°${s.deliveryAddress.apartment || ''}` : ''}
+                            </TableCell>
+
                             <TableCell>
                                 <ShipmentStatusBadge status={s.status} />
                             </TableCell>
@@ -40,8 +39,9 @@ export function HistoryTable({ shipments }: { shipments: ShipmentHistoryItem[] }
                                 ${s.price.toLocaleString('es-AR')}
                             </TableCell>
                             <TableCell className="text-right">
-                                <Link href={`/shipment/${s.id}`}>
-                                    <ChevronRight size={18} className="text-ink-3 group-hover:text-clay inline" />
+                                {/* Corrección 2: Usar s.shippingId en lugar de s.id */}
+                                <Link href={`/shipments/${s.shippingId}`} className="group">
+                                    <ChevronRight size={18} className="text-ink-3 group-hover:text-clay inline transition-colors" />
                                 </Link>
                             </TableCell>
                         </TableRow>

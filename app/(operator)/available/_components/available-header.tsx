@@ -1,6 +1,5 @@
-import Link from "next/link";
 import { Header } from "../../_components/page-layout";
-import { AvailableActions } from "./button-actions";
+import { HeaderActions } from "./button-actions";
 
 
 export function AvailableHeader() {
@@ -8,7 +7,7 @@ export function AvailableHeader() {
         <Header
             title={"Envios por tomar"}
             subtitle="Disponibles"
-            action={<AvailableActions />}
+            action={<HeaderActions />}
         />
     );
 }

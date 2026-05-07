@@ -1,19 +1,18 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { Filter, RefreshCcw } from "lucide-react";
+import { Filter, RefreshCcw, ArrowRight, Check } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import Link from "next/link";
 
-export function AvailableActions() {
+export function HeaderActions() {
     const router = useRouter();
 
     const handleRefresh = () => {
-        // Obliga a Next.js a re-ejecutar las consultas a la base de datos en los Server Components
         router.refresh();
     };
 
     const handleFilter = () => {
-        // En la Etapa 3, aquí modificaremos los searchParams de la URL (ej: ?zona=centro)
         console.log("Abrir modal de filtros");
     };
 
@@ -28,5 +27,34 @@ export function AvailableActions() {
                 Refrescar
             </Button>
         </div>
+    );
+}
+
+export function ViewDetailsButton({ shippingId }: { shippingId: string }) {
+    return (
+        <Link
+            href={`/shipments/${shippingId}`}
+            className="flex-1 bg-paper text-ink h-11 rounded-full text-xs font-bold hover:bg-cream transition-all flex items-center justify-center gap-2 active:scale-[0.98] group"
+        >
+            Ver detalles
+            <ArrowRight size={14} className="group-hover:translate-x-1 transition-transform" />
+        </Link>
+    );
+}
+export function TakeShipmentButton({ shippingId }: { shippingId: string }) {
+    const handleTakeShipment = () => {
+        // Aquí irá la lógica de la Server Action en la Etapa 3
+        console.log(`Intentando tomar el envío: ${shippingId}`);
+        alert(`Funcionalidad 'Tomar envío' en desarrollo para el ID: ${shippingId}`);
+    };
+
+    return (
+        <button
+            onClick={handleTakeShipment}
+            className="flex-1 bg-clay text-paper h-11 rounded-full text-xs font-bold hover:bg-cocoa transition-all flex items-center justify-center gap-2 active:scale-[0.98]"
+        >
+            <Check size={14} />
+            Tomar envío
+        </button>
     );
 }

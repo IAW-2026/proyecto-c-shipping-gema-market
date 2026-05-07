@@ -31,7 +31,7 @@ export function Header({ title, subtitle, action, className }: HeaderProps) {
                             {subtitle}
                         </div>
                     )}
-                    <h1 className="m-0 text-[26px] font-semibold tracking-[-0.02em] text-ink">
+                    <h1 className="m-0 text-[26px] font-sans font-bold tracking-[-0.02em] text-ink">
                         {title}
                     </h1>
                 </div>

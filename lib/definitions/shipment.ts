@@ -1,6 +1,7 @@
 import { z } from "zod";
 
-// 1. Esquemas Base
+// --- 1. ESQUEMAS BASE ---
+
 export const ShippingStatusSchema = z.enum([
     'pending_pickup',
     'in_transit',
@@ -17,32 +18,45 @@ export const AddressSchema = z.object({
     apartment: z.string().optional(),
 });
 
-// 2. Esquema Principal del Dominio (Alineado 100% al modelo de BD)
+// --- 2. ESQUEMA PRINCIPAL DEL DOMINIO ---
+// Alineado 100% al modelo de base de datos
+const UserIdSchema = z.string()
+    .length(30, "El ID debe tener 30 caracteres")
+    .startsWith("usr_", "El ID debe empezar con usr_");
+
 export const ShipmentSchema = z.object({
-    id: z.string().length(26, "El ID debe ser un ULID válido"), // ULID
-    orderId: z.string(), // FK lógica a Buyer App
-    buyerId: z.string(),
-    sellerId: z.string(),
-    logisticsId: z.string().nullable(), // FK al usuario operador
+    shippingId: z.string()
+        .length(30, "El ID debe tener 30 caracteres")
+        .startsWith("shp_", "El ID debe empezar con shp_"),
+    orderId: z.string()
+        .length(30, "El ID debe tener 30 caracteres")
+        .startsWith("ord_", "El ID debe empezar con ord_"),
+    buyerId: UserIdSchema,
+    sellerId: UserIdSchema,
+    logisticsId: UserIdSchema,
     status: ShippingStatusSchema,
     trackingCode: z.string(),
-    pickupAddress: AddressSchema, // Se almacenará como JSON en PostgreSQL
-    deliveryAddress: AddressSchema, // Se almacenará como JSON en PostgreSQL
-    price: z.number().positive(),
+    pickupAddress: AddressSchema,
+    deliveryAddress: AddressSchema,
+    price: z.number().positive("El precio debe ser un valor positivo"),
     pickedUpAt: z.date().nullable(),
     deliveredAt: z.date().nullable(),
-    createdAt: z.date().optional(), // Autogenerado por BD
+    createdAt: z.date().optional(),
 });
 
-// 3. Inferencia de Tipos (Reemplaza tus interfaces manuales)
+// --- 3. INFERENCIA DE TIPOS ---
+
 export type ShippingStatus = z.infer<typeof ShippingStatusSchema>;
 export type Address = z.infer<typeof AddressSchema>;
 export type Shipment = z.infer<typeof ShipmentSchema>;
 
-// 4. Esquemas para DTOs (Data Transfer Objects)
-// DTO para las vistas de lista (ShipmentSummary)
+// --- 4. DTOs (DATA TRANSFER OBJECTS) ---
+
+/**
+ * ShipmentSummary: Para vistas de listas generales.
+ */
 export const ShipmentSummarySchema = ShipmentSchema.pick({
-    id: true,
+    shippingId: true,
     orderId: true,
     trackingCode: true,
     status: true,
@@ -54,9 +68,11 @@ export const ShipmentSummarySchema = ShipmentSchema.pick({
 
 export type ShipmentSummary = z.infer<typeof ShipmentSummarySchema>;
 
-// DTO para validar el POST que recibiremos de la Seller App al crear un envío
+/**
+ * CreateShipmentPayload: Validación para el POST recibido desde Seller App.
+ */
 export const CreateShipmentPayloadSchema = ShipmentSchema.omit({
-    id: true,
+    shippingId: true,
     logisticsId: true,
     status: true,
     trackingCode: true,
@@ -66,3 +82,21 @@ export const CreateShipmentPayloadSchema = ShipmentSchema.omit({
 });
 
 export type CreateShipmentPayload = z.infer<typeof CreateShipmentPayloadSchema>;
+
+/**
+ * ShipmentOffer: Representa la oferta visual para el repartidor.
+ * Reutiliza las validaciones de ID y direcciones del esquema principal
+ * y extiende con metadatos logísticos calculados.
+ */
+export const ShipmentOfferSchema = ShipmentSchema.pick({
+    shippingId: true,
+    price: true,
+    pickupAddress: true,
+    deliveryAddress: true,
+}).extend({
+    weight: z.string().min(1, "El peso es requerido"),
+    distance: z.string().min(1, "La distancia es requerida"),
+    estimatedTime: z.string().min(1, "El tiempo estimado es requerido"),
+});
+
+export type ShipmentOffer = z.infer<typeof ShipmentOfferSchema>;
