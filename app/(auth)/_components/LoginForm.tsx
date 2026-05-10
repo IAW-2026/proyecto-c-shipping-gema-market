@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { useSignIn } from "@clerk/nextjs";
 import { loginSchema, LoginFormData } from "../../../lib/validations/auth";
 
-import { Eye, EyeOff } from "lucide-react";
+import { Eye, EyeOff, Loader2 } from "lucide-react";
 
 export function LoginForm({ onToggleMode, onToggleResetPassword }: { onToggleMode?: () => void, onToggleResetPassword?: () => void }) {
     const { fetchStatus, signIn } = useSignIn();
@@ -102,12 +102,18 @@ export function LoginForm({ onToggleMode, onToggleResetPassword }: { onToggleMod
 
             </div>
 
+
             <button
                 type="submit"
                 disabled={isLoading}
                 className="w-full h-[52px] mt-2 inline-flex items-center justify-center rounded-full font-medium tracking-[-0.01em] bg-[#936639] text-[#faf8f3] hover:bg-[#7f4f24] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             >
-                {isLoading ? "Validando..." : "Ingresar"}
+                {isLoading ? (
+                    <span className="flex items-center gap-2">
+                        <Loader2 className="h-4 w-4 animate-spin" />
+                        Validando...
+                    </span>
+                ) : "Ingresar"}
             </button>
 
             {onToggleMode && (

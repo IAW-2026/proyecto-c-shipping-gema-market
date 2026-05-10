@@ -1,6 +1,6 @@
 import { Metadata } from "next";
 import { requireRole } from "@/lib/auth/rbac";
-import { ROLES } from "@/lib/shared/auth-constants";
+import { ROLES } from "@/lib/definitions/auth";
 import { HistoryFilters } from "./_components/history-filters";
 import { PageWrapper, Content } from "../_components/page-layout";
 import { HistoryHeader } from "./_components/history-header";
@@ -18,7 +18,7 @@ export default async function HistoryPage(props: {
     searchParams: Promise<{ [key: string]: string | undefined }>
 }) {
     const searchParams = await props.searchParams;
-    const { userId } = await requireRole([ROLES.LOGISTICS, ROLES.ADMIN]);
+    const { userId } = await requireRole([ROLES.LOGISTICS, ROLES.SHIPPING_ADMIN]);
 
     // 2. Obtenemos los envíos usando la nueva función
     const allShipments = await getShipmentHistory(userId);

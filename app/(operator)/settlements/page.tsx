@@ -4,7 +4,7 @@ import { SettlementsHeader } from "./_components/settlements-header";
 import { EarningsMetrics } from "./_components/earnings-metrics";
 import { EarningsList, Settlement } from "./_components/earnings-list";
 import { requireRole } from "@/lib/auth/rbac";
-import { ROLES } from "@/lib/shared/auth-constants";
+import { ROLES } from "@/lib/definitions/auth";
 
 export const metadata: Metadata = {
     title: "Liquidaciones | UniHousing Shipping",
@@ -27,7 +27,7 @@ const MOCK_SETTLEMENTS: Settlement[] = [
 
 export default async function SettlementsPage() {
     // 1. Verificación de Identidad y Roles (Security Layer)
-    await requireRole([ROLES.LOGISTICS, ROLES.ADMIN]);
+    await requireRole([ROLES.LOGISTICS, ROLES.SHIPPING_ADMIN]);
     return (
         <PageWrapper>
             <SettlementsHeader />

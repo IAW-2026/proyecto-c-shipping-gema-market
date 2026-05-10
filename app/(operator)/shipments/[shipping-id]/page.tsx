@@ -2,7 +2,7 @@ import { Metadata } from "next";
 import { notFound, redirect } from "next/navigation";
 import { auth } from "@clerk/nextjs/server";
 import { getShipmentDetails } from "@/lib/db/queries/shipments.queries";
-import { ROLES, UserRole } from "@/lib/shared/auth-constants";
+import { ROLES, UserRole } from "@/lib/definitions/auth";
 import { PageWrapper, Content } from "../../_components/page-layout";
 import { ShipmentDetailsHeader } from "./_components/shipment-details-header";
 import { ShipmentMapPlaceholder } from "./_components/shipment-map-placeholder";
@@ -31,7 +31,7 @@ export default async function ShipmentDetailPage({ params }: ShipmentDetailPageP
     const metadata = sessionClaims?.metadata as { role?: UserRole } | undefined;
     const userRole = metadata?.role;
 
-    if (userRole !== ROLES.LOGISTICS && userRole !== ROLES.ADMIN) {
+    if (userRole !== ROLES.LOGISTICS && userRole !== ROLES.SHIPPING_ADMIN) {
         redirect("/unauthorized");
     }
 

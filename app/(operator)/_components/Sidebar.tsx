@@ -19,7 +19,7 @@ export function OperatorSidebar() {
                 </div>
                 <div>
                     <div className="text-sm font-semibold text-ink-3">UniHousing</div>
-                    <div className="text-[10.5px] text-ink-3 font-mono">Shipping</div>
+                    <div className="text-xs text-ink-3 font-mono">Shipping</div>
                 </div>
             </div>
 
@@ -48,7 +48,7 @@ export function OperatorSidebar() {
                         <>
                             <UserButton />
                             <div className="min-w-0">
-                                <div className="text-[13px] font-semibold truncate text-ink-3">
+                                <div className="text-sm font-semibold truncate text-ink-3">
                                     {user?.firstName || "Operador"}
                                 </div>
                                 <div className="text-[11px] text-ink-3">Repartidor · Activo</div>

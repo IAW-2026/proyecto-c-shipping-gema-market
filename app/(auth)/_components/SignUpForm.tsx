@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { useSignUp } from "@clerk/nextjs";
 import { signUpSchema, verifyCodeSchema, SignUpFormData } from "../../../lib/validations/auth";
 
-import { Eye, EyeOff } from "lucide-react";
+import { Eye, EyeOff, Loader2 } from "lucide-react";
 
 export function SignUpForm({ onToggleMode }: { onToggleMode?: () => void }) {
     const { fetchStatus, signUp } = useSignUp();
@@ -145,12 +145,18 @@ export function SignUpForm({ onToggleMode }: { onToggleMode?: () => void }) {
                         </div>
                     </label>
 
+
                     <button
                         type="submit"
                         disabled={isFetching}
                         className="w-full h-[52px] mt-2 inline-flex items-center justify-center rounded-full font-medium tracking-[-0.01em] bg-[#936639] text-[#faf8f3] hover:bg-[#7f4f24] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                     >
-                        {isFetching ? "Procesando solicitud..." : "Crear cuenta"}
+                        {isFetching ? (
+                            <span className="flex items-center gap-2">
+                                <Loader2 className="h-4 w-4 animate-spin" />
+                                Procesando solicitud...
+                            </span>
+                        ) : "Crear cuenta"}
                     </button>
 
                     {onToggleMode && (
@@ -183,7 +189,12 @@ export function SignUpForm({ onToggleMode }: { onToggleMode?: () => void }) {
                         disabled={isFetching}
                         className="w-full h-[52px] mt-2 inline-flex items-center justify-center rounded-full font-medium tracking-[-0.01em] bg-[#936639] text-[#faf8f3] hover:bg-[#7f4f24] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                     >
-                        {isFetching ? "Verificando token..." : "Completar Registro"}
+                        {isFetching ? (
+                            <span className="flex items-center gap-2">
+                                <Loader2 className="h-4 w-4 animate-spin" />
+                                Verificando token...
+                            </span>
+                        ) : "Completar Registro"}
                     </button>
                 </form>
             )}

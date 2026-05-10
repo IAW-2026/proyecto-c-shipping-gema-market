@@ -19,8 +19,8 @@ export function ShipmentMapPlaceholder({ distance, status }: ShipmentMapPlacehol
                     <p className="text-sm font-medium text-slate-500 mb-2">Map Placeholder</p>
                     <p className="text-xs text-slate-400">Futura integración de librería de mapas</p>
                 </div>
-                
-                <div className="absolute top-4 left-4 px-3 py-1.5 bg-paper/95 rounded-full text-xs font-mono shadow-sm">
+
+                <div className="absolute top-4 left-4 px-3 py-1.5 bg-paper/95 rounded-full text-xs font-mono shadow-sm text-ink-2">
                     {formattedDistance}
                 </div>
                 <div className="absolute top-4 right-4">

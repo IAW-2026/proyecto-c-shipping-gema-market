@@ -1,7 +1,7 @@
 "use server";
 
 import { requireRole } from "@/lib/auth/rbac";
-import { ROLES } from "@/lib/shared/auth-constants";
+import { ROLES } from "@/lib/definitions/auth";
 import { TakeShipmentSchema } from "@/lib/validations/shipment";
 import { revalidatePath } from "next/cache";
 
@@ -10,7 +10,7 @@ import { revalidatePath } from "next/cache";
  */
 export async function takeShipmentAction(shipmentId: string) {
     // 1. Verificación de identidad y rol (Defense in Depth)
-    const { userId } = await requireRole([ROLES.LOGISTICS, ROLES.ADMIN]);
+    const { userId } = await requireRole([ROLES.LOGISTICS, ROLES.SHIPPING_ADMIN]);
 
     // 2. Validación de datos
     const parsed = TakeShipmentSchema.safeParse({ shipmentId });
@@ -44,7 +44,7 @@ export async function takeShipmentAction(shipmentId: string) {
  * Server Action para exportar datos (Placeholder para lógica futura)
  */
 export async function exportShipmentsAction() {
-    const { userId } = await requireRole([ROLES.LOGISTICS, ROLES.ADMIN]);
+    const { userId } = await requireRole([ROLES.LOGISTICS, ROLES.SHIPPING_ADMIN]);
     console.log(`[ACTION] Usuario ${userId} solicitando exportación`);
     return { success: true };
 }

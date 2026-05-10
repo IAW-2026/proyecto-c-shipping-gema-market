@@ -1,9 +1,8 @@
-// lib/definitions/auth.ts (CORREGIDO)
-import { UserRole } from "../shared/auth-constants";
-
-// Re-exportar para mantener compatibilidad de imports existentes
-export type { UserRole };
-
+export const ROLES = {
+    SHIPPING_ADMIN: "shipping_admin",
+    LOGISTICS: "logistics",
+} as const;
+export type UserRole = typeof ROLES[keyof typeof ROLES];
 export interface UserSessionClaims {
     metadata?: {
         role?: UserRole;

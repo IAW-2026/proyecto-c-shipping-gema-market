@@ -1,5 +1,5 @@
 import { requireRole } from "@/lib/auth/rbac";
-import { ROLES } from "@/lib/shared/auth-constants";
+import { ROLES } from "@/lib/definitions/auth";
 import { getShipmentOffers } from "@/lib/db/queries/shipments.queries";
 import { PageWrapper, Content } from "../_components/page-layout";
 import { AvailableHeader } from "./_components/available-header";
@@ -12,7 +12,7 @@ export const metadata: Metadata = {
 };
 export default async function AvailablePage() {
     // 1. Protección de ruta (RBAC)
-    await requireRole([ROLES.LOGISTICS, ROLES.ADMIN]);
+    await requireRole([ROLES.LOGISTICS, ROLES.SHIPPING_ADMIN]);
 
     // 2. Data Fetching (Mock)
     const offers = await getShipmentOffers();
