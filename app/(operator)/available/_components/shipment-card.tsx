@@ -52,6 +52,7 @@ function Cuerpo({ offer }: { offer: ShipmentOffer }) {
                         <p className="text-[10px] font-bold text-ink-3 uppercase leading-none mb-1">Origen</p>
                         <p className="text-[13px] text-ink font-medium truncate">
                             {p.street} {p.number}
+                            {p.floor ? `, ${p.floor}°${p.apartment || ''}` : ''}
                         </p>
                     </div>
                 </div>
@@ -64,6 +65,7 @@ function Cuerpo({ offer }: { offer: ShipmentOffer }) {
                         <p className="text-[10px] font-bold text-ink-3 uppercase leading-none mb-1">Destino</p>
                         <p className="text-[13px] text-ink font-medium truncate">
                             {d.street} {d.number}
+                            {d.floor ? `, ${d.floor}°${d.apartment || ''}` : ''}
                         </p>
                     </div>
                 </div>

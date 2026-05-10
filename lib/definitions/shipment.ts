@@ -27,6 +27,7 @@ export const ShipmentSchema = z.object({
         .length(30, "El ID debe tener 30 caracteres")
         .startsWith("ord_", "El ID debe empezar con ord_"),
     buyerId: UserIdSchema,
+    buyerName: z.string().min(1, "El nombre del comprador es obligatorio"),
     sellerId: UserIdSchema,
     logisticsId: UserIdSchema,
     status: ShippingStatusSchema,
@@ -37,6 +38,15 @@ export const ShipmentSchema = z.object({
     pickedUpAt: z.date().nullable(),
     deliveredAt: z.date().nullable(),
     createdAt: z.date().optional(),
+    
+    // Atributos físicos (Snapshot del Pedido)
+    weight: z.number().describe("Peso en kg"),
+    height: z.number().int().positive().describe("Altura en cm"),
+    width: z.number().int().positive().describe("Ancho en cm"),
+    depth: z.number().int().positive().describe("Profundidad en cm"),
+    
+    // Atributo logístico (Snapshot de API de mapas)
+    distance: z.number().optional().describe("Distancia calculada en km"),
 });
 
 // --- 3. INFERENCIA DE TIPOS ---
@@ -88,9 +98,12 @@ export const ShipmentOfferSchema = ShipmentSchema.pick({
     price: true,
     pickupAddress: true,
     deliveryAddress: true,
+    weight: true,
+    height: true,
+    width: true,
+    depth: true,
+    distance: true,
 }).extend({
-    weight: z.string().min(1, "El peso es requerido"),
-    distance: z.string().min(1, "La distancia es requerida"),
     estimatedTime: z.string().min(1, "El tiempo estimado es requerido"),
 });
 

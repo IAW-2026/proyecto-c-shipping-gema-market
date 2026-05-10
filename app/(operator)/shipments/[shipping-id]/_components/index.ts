@@ -1,0 +1,10 @@
+import { MapPin, Phone, Check, Tag, Home } from "lucide-react";
+import { ShipmentMapPlaceholder } from "./_components/shipment-map-placeholder";
+import { RouteInfo } from "./_components/route-info";
+import { PaymentInfo } from "./_components/payment-info";
+import { BuyerInfo } from "./_components/buyer-info";
+import { PackageInfo } from "./_components/package-info";
+import { Card } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { ShipmentStatusBadge } from "../../_components/shipment-status-badge";
+import { Address } from "@/lib/definitions/shipment";
