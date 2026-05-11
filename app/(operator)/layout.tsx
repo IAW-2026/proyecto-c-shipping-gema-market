@@ -2,7 +2,7 @@
 import { ReactNode } from "react";
 import { auth } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
-import { ROLES, UserRole } from "@/lib/shared/auth-constants";
+import { ROLES, UserRole } from "@/lib/definitions/auth";
 import { OperatorSidebar } from "./_components/Sidebar";
 import { MobileNav } from "./_components/MobileNav";
 
@@ -12,12 +12,13 @@ export default async function OperatorLayout({ children }: { children: ReactNode
     const { userId, sessionClaims } = await auth();
 
     if (!userId) {
-        redirect("/sign-in");
+        redirect("/login");
     }
 
-    const userRole = (sessionClaims?.metadata as any)?.role as UserRole;
+    const claims = sessionClaims as unknown as { metadata?: { role?: typeof ROLES[keyof typeof ROLES] } };
+    const userRole = claims?.metadata?.role;
 
-    if (userRole !== ROLES.LOGISTICS && userRole !== ROLES.ADMIN) {
+    if (!userRole || (userRole !== ROLES.LOGISTICS && userRole !== ROLES.SHIPPING_ADMIN)) {
         // Si un comprador intenta entrar a la ruta de operadores, lo expulsamos
         redirect("/unauthorized");
     }

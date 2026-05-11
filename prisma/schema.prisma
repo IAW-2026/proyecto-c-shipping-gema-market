@@ -1,0 +1,75 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Get a free hosted Postgres database in seconds: `npx create-db`
+
+generator client {
+  provider = "prisma-client"
+  output   = "../lib/generated/prisma"
+}
+
+datasource db {
+  provider  = "postgresql"
+}
+
+// 1. Usuario: Cache sincronizado de Clerk
+model Usuario {
+  id            String   @id // Generado en código: 'usr_' + ulid()
+  clerk_user_id String   @unique // Fuente de verdad global
+  email         String
+  full_name     String
+  role          String   @default("logistics") // Solo roles relevantes para esta app
+  created_at    DateTime @default(now())
+
+  // Relaciones internas
+  envios Envio[]
+}
+
+// 2. Cotización: Datos previos al envío
+model Cotizacion {
+  id                    String   @id // Generado en código: 'qte_' + ulid()
+  product_id            String // FK lógica -> Seller App
+  status                String   @default("available") // available, reserved, confirmed
+  reserved_for_order_id String? // FK lógica -> Buyer App
+  package_details       Json // { "weight": 2.5, "width": 20, "height": 10, "depth": 30, "unit": "kg/cm" }
+  origin_address        Json // Datos de calle, nro, etc.
+  destination_address   Json
+  price                 Decimal  @db.Decimal(10, 2)
+  currency              String   @default("ARS")
+  estimated_days        Int
+  valid_until           DateTime
+  created_at            DateTime @default(now())
+}
+
+// 3. Envio: Entidad maestra de logística
+model Envio {
+  id               String    @id // Generado en código: 'shp_' + ulid()
+  order_id         String    @unique // FK lógica -> Buyer App
+  quote_id         String    // FK lógica para trazar el origen del envío
+  buyer_id         String // FK lógica
+  receiver_name    String // Nombre de quien recibe
+  receiver_phone   String // Teléfono de contacto para la entrega
+  seller_id        String // FK lógica
+  logistics_id     String? // FK física -> Usuario local (fletero)
+  weight           Decimal   @db.Decimal(10, 2)
+  dimensions       Json // { "width": 20, "height": 10, "depth": 30 }
+  pickup_address   Json
+  delivery_address Json
+  tracking_code    String    @unique
+  status           String    @default("pending_pickup") // pending_pickup, in_transit, delivered, failed, cancelled
+  price            Decimal   @db.Decimal(10, 2)
+  picked_up_at     DateTime?
+  delivered_at     DateTime?
+  created_at       DateTime  @default(now())
+
+  // Relación con el fletero asignado
+  operador Usuario? @relation(fields: [logistics_id], references: [id])
+}
+
+// 4. Tarifa: Configuración de precios
+model Tarifa {
+  id           String  @id // Generado en código: 'trf_' + ulid()
+  weight_range Json // Ejemplo: { "min": 0, "max": 20 }
+  volume_range Json // Ejemplo: { "min": 0, "max": 1 }
+  price_per_km Decimal @db.Decimal(10, 2)
+}

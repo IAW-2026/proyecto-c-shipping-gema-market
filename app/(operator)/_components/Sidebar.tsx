@@ -5,11 +5,11 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Truck, ArrowLeft } from "lucide-react";
 import { UserButton, useUser } from "@clerk/nextjs";
-import { OPERATOR_NAV } from "../../../config/operator-nav";
+import { OPERATOR_NAV } from "@/config/operator-nav";
 
 export function OperatorSidebar() {
     const pathname = usePathname();
-    const { user } = useUser();
+    const { user, isLoaded } = useUser();
 
     return (
         <aside className="hidden lgx:flex lgx:flex-col lgx:fixed lgx:left-0 lgx:top-0 lgx:bottom-0 lgx:z-[60] w-[240px] bg-paper border-r border-line px-3.5 py-5 shrink-0 sticky top-0 h-screen">
@@ -19,7 +19,7 @@ export function OperatorSidebar() {
                 </div>
                 <div>
                     <div className="text-sm font-semibold text-ink-3">UniHousing</div>
-                    <div className="text-[10.5px] text-ink-3 font-mono">Shipping</div>
+                    <div className="text-xs text-ink-3 font-mono">Shipping</div>
                 </div>
             </div>
 
@@ -43,13 +43,20 @@ export function OperatorSidebar() {
             </nav>
 
             <div className="mt-auto p-3 bg-bone rounded-r2">
-                <div className="flex items-center gap-2.5 mb-2">
-                    <div className="min-w-0">
-                        <div className="text-[13px] font-semibold truncate text-ink-3">
-                            {user?.firstName || "Operador"}
-                        </div>
-                        <div className="text-[11px] text-ink-3">Repartidor · Activo</div>
-                    </div>
+                <div className="flex items-center gap-2.5 mb-2 min-h-[40px]">
+                    {isLoaded ? (
+                        <>
+                            <UserButton />
+                            <div className="min-w-0">
+                                <div className="text-sm font-semibold truncate text-ink-3">
+                                    {user?.firstName || "Operador"}
+                                </div>
+                                <div className="text-[11px] text-ink-3">Repartidor · Activo</div>
+                            </div>
+                        </>
+                    ) : (
+                        <div className="w-full h-10 animate-pulse bg-line/50 rounded-lg" />
+                    )}
                 </div>
                 <Link href="/" className="text-[11px] text-ink-3 flex items-center gap-1 hover:text-ink">
                     <ArrowLeft size={11} /> Volver al hub

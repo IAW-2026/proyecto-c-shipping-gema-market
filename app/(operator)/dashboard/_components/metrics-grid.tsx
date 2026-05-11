@@ -1,4 +1,4 @@
-import { MetricCard } from "./metric-card";
+import { MetricCard } from "@/components/ui/metric-card";
 import { DashboardMetrics } from "@/lib/definitions/dashboard-metrics"
 
 export function MetricsGrid({ metrics }: { metrics: DashboardMetrics }) {
