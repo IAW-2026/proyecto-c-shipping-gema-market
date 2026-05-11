@@ -242,14 +242,14 @@ export type TarifaScalarWhereWithAggregatesInput = {
 }
 
 export type TarifaCreateInput = {
-  id?: string
+  id: string
   weight_range: Prisma.JsonNullValueInput | runtime.InputJsonValue
   volume_range: Prisma.JsonNullValueInput | runtime.InputJsonValue
   price_per_km: runtime.Decimal | runtime.DecimalJsLike | number | string
 }
 
 export type TarifaUncheckedCreateInput = {
-  id?: string
+  id: string
   weight_range: Prisma.JsonNullValueInput | runtime.InputJsonValue
   volume_range: Prisma.JsonNullValueInput | runtime.InputJsonValue
   price_per_km: runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -270,7 +270,7 @@ export type TarifaUncheckedUpdateInput = {
 }
 
 export type TarifaCreateManyInput = {
-  id?: string
+  id: string
   weight_range: Prisma.JsonNullValueInput | runtime.InputJsonValue
   volume_range: Prisma.JsonNullValueInput | runtime.InputJsonValue
   price_per_km: runtime.Decimal | runtime.DecimalJsLike | number | string

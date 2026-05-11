@@ -39,6 +39,7 @@ export type EnvioSumAggregateOutputType = {
 export type EnvioMinAggregateOutputType = {
   id: string | null
   order_id: string | null
+  quote_id: string | null
   buyer_id: string | null
   receiver_name: string | null
   receiver_phone: string | null
@@ -56,6 +57,7 @@ export type EnvioMinAggregateOutputType = {
 export type EnvioMaxAggregateOutputType = {
   id: string | null
   order_id: string | null
+  quote_id: string | null
   buyer_id: string | null
   receiver_name: string | null
   receiver_phone: string | null
@@ -73,6 +75,7 @@ export type EnvioMaxAggregateOutputType = {
 export type EnvioCountAggregateOutputType = {
   id: number
   order_id: number
+  quote_id: number
   buyer_id: number
   receiver_name: number
   receiver_phone: number
@@ -105,6 +108,7 @@ export type EnvioSumAggregateInputType = {
 export type EnvioMinAggregateInputType = {
   id?: true
   order_id?: true
+  quote_id?: true
   buyer_id?: true
   receiver_name?: true
   receiver_phone?: true
@@ -122,6 +126,7 @@ export type EnvioMinAggregateInputType = {
 export type EnvioMaxAggregateInputType = {
   id?: true
   order_id?: true
+  quote_id?: true
   buyer_id?: true
   receiver_name?: true
   receiver_phone?: true
@@ -139,6 +144,7 @@ export type EnvioMaxAggregateInputType = {
 export type EnvioCountAggregateInputType = {
   id?: true
   order_id?: true
+  quote_id?: true
   buyer_id?: true
   receiver_name?: true
   receiver_phone?: true
@@ -246,6 +252,7 @@ export type EnvioGroupByArgs<ExtArgs extends runtime.Types.Extensions.InternalAr
 export type EnvioGroupByOutputType = {
   id: string
   order_id: string
+  quote_id: string
   buyer_id: string
   receiver_name: string
   receiver_phone: string
@@ -289,6 +296,7 @@ export type EnvioWhereInput = {
   NOT?: Prisma.EnvioWhereInput | Prisma.EnvioWhereInput[]
   id?: Prisma.StringFilter<"Envio"> | string
   order_id?: Prisma.StringFilter<"Envio"> | string
+  quote_id?: Prisma.StringFilter<"Envio"> | string
   buyer_id?: Prisma.StringFilter<"Envio"> | string
   receiver_name?: Prisma.StringFilter<"Envio"> | string
   receiver_phone?: Prisma.StringFilter<"Envio"> | string
@@ -310,6 +318,7 @@ export type EnvioWhereInput = {
 export type EnvioOrderByWithRelationInput = {
   id?: Prisma.SortOrder
   order_id?: Prisma.SortOrder
+  quote_id?: Prisma.SortOrder
   buyer_id?: Prisma.SortOrder
   receiver_name?: Prisma.SortOrder
   receiver_phone?: Prisma.SortOrder
@@ -335,6 +344,7 @@ export type EnvioWhereUniqueInput = Prisma.AtLeast<{
   AND?: Prisma.EnvioWhereInput | Prisma.EnvioWhereInput[]
   OR?: Prisma.EnvioWhereInput[]
   NOT?: Prisma.EnvioWhereInput | Prisma.EnvioWhereInput[]
+  quote_id?: Prisma.StringFilter<"Envio"> | string
   buyer_id?: Prisma.StringFilter<"Envio"> | string
   receiver_name?: Prisma.StringFilter<"Envio"> | string
   receiver_phone?: Prisma.StringFilter<"Envio"> | string
@@ -355,6 +365,7 @@ export type EnvioWhereUniqueInput = Prisma.AtLeast<{
 export type EnvioOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
   order_id?: Prisma.SortOrder
+  quote_id?: Prisma.SortOrder
   buyer_id?: Prisma.SortOrder
   receiver_name?: Prisma.SortOrder
   receiver_phone?: Prisma.SortOrder
@@ -383,6 +394,7 @@ export type EnvioScalarWhereWithAggregatesInput = {
   NOT?: Prisma.EnvioScalarWhereWithAggregatesInput | Prisma.EnvioScalarWhereWithAggregatesInput[]
   id?: Prisma.StringWithAggregatesFilter<"Envio"> | string
   order_id?: Prisma.StringWithAggregatesFilter<"Envio"> | string
+  quote_id?: Prisma.StringWithAggregatesFilter<"Envio"> | string
   buyer_id?: Prisma.StringWithAggregatesFilter<"Envio"> | string
   receiver_name?: Prisma.StringWithAggregatesFilter<"Envio"> | string
   receiver_phone?: Prisma.StringWithAggregatesFilter<"Envio"> | string
@@ -401,8 +413,9 @@ export type EnvioScalarWhereWithAggregatesInput = {
 }
 
 export type EnvioCreateInput = {
-  id?: string
+  id: string
   order_id: string
+  quote_id: string
   buyer_id: string
   receiver_name: string
   receiver_phone: string
@@ -421,8 +434,9 @@ export type EnvioCreateInput = {
 }
 
 export type EnvioUncheckedCreateInput = {
-  id?: string
+  id: string
   order_id: string
+  quote_id: string
   buyer_id: string
   receiver_name: string
   receiver_phone: string
@@ -443,6 +457,7 @@ export type EnvioUncheckedCreateInput = {
 export type EnvioUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   order_id?: Prisma.StringFieldUpdateOperationsInput | string
+  quote_id?: Prisma.StringFieldUpdateOperationsInput | string
   buyer_id?: Prisma.StringFieldUpdateOperationsInput | string
   receiver_name?: Prisma.StringFieldUpdateOperationsInput | string
   receiver_phone?: Prisma.StringFieldUpdateOperationsInput | string
@@ -463,6 +478,7 @@ export type EnvioUpdateInput = {
 export type EnvioUncheckedUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   order_id?: Prisma.StringFieldUpdateOperationsInput | string
+  quote_id?: Prisma.StringFieldUpdateOperationsInput | string
   buyer_id?: Prisma.StringFieldUpdateOperationsInput | string
   receiver_name?: Prisma.StringFieldUpdateOperationsInput | string
   receiver_phone?: Prisma.StringFieldUpdateOperationsInput | string
@@ -481,8 +497,9 @@ export type EnvioUncheckedUpdateInput = {
 }
 
 export type EnvioCreateManyInput = {
-  id?: string
+  id: string
   order_id: string
+  quote_id: string
   buyer_id: string
   receiver_name: string
   receiver_phone: string
@@ -503,6 +520,7 @@ export type EnvioCreateManyInput = {
 export type EnvioUpdateManyMutationInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   order_id?: Prisma.StringFieldUpdateOperationsInput | string
+  quote_id?: Prisma.StringFieldUpdateOperationsInput | string
   buyer_id?: Prisma.StringFieldUpdateOperationsInput | string
   receiver_name?: Prisma.StringFieldUpdateOperationsInput | string
   receiver_phone?: Prisma.StringFieldUpdateOperationsInput | string
@@ -522,6 +540,7 @@ export type EnvioUpdateManyMutationInput = {
 export type EnvioUncheckedUpdateManyInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   order_id?: Prisma.StringFieldUpdateOperationsInput | string
+  quote_id?: Prisma.StringFieldUpdateOperationsInput | string
   buyer_id?: Prisma.StringFieldUpdateOperationsInput | string
   receiver_name?: Prisma.StringFieldUpdateOperationsInput | string
   receiver_phone?: Prisma.StringFieldUpdateOperationsInput | string
@@ -552,6 +571,7 @@ export type EnvioOrderByRelationAggregateInput = {
 export type EnvioCountOrderByAggregateInput = {
   id?: Prisma.SortOrder
   order_id?: Prisma.SortOrder
+  quote_id?: Prisma.SortOrder
   buyer_id?: Prisma.SortOrder
   receiver_name?: Prisma.SortOrder
   receiver_phone?: Prisma.SortOrder
@@ -577,6 +597,7 @@ export type EnvioAvgOrderByAggregateInput = {
 export type EnvioMaxOrderByAggregateInput = {
   id?: Prisma.SortOrder
   order_id?: Prisma.SortOrder
+  quote_id?: Prisma.SortOrder
   buyer_id?: Prisma.SortOrder
   receiver_name?: Prisma.SortOrder
   receiver_phone?: Prisma.SortOrder
@@ -594,6 +615,7 @@ export type EnvioMaxOrderByAggregateInput = {
 export type EnvioMinOrderByAggregateInput = {
   id?: Prisma.SortOrder
   order_id?: Prisma.SortOrder
+  quote_id?: Prisma.SortOrder
   buyer_id?: Prisma.SortOrder
   receiver_name?: Prisma.SortOrder
   receiver_phone?: Prisma.SortOrder
@@ -660,8 +682,9 @@ export type NullableDateTimeFieldUpdateOperationsInput = {
 }
 
 export type EnvioCreateWithoutOperadorInput = {
-  id?: string
+  id: string
   order_id: string
+  quote_id: string
   buyer_id: string
   receiver_name: string
   receiver_phone: string
@@ -679,8 +702,9 @@ export type EnvioCreateWithoutOperadorInput = {
 }
 
 export type EnvioUncheckedCreateWithoutOperadorInput = {
-  id?: string
+  id: string
   order_id: string
+  quote_id: string
   buyer_id: string
   receiver_name: string
   receiver_phone: string
@@ -729,6 +753,7 @@ export type EnvioScalarWhereInput = {
   NOT?: Prisma.EnvioScalarWhereInput | Prisma.EnvioScalarWhereInput[]
   id?: Prisma.StringFilter<"Envio"> | string
   order_id?: Prisma.StringFilter<"Envio"> | string
+  quote_id?: Prisma.StringFilter<"Envio"> | string
   buyer_id?: Prisma.StringFilter<"Envio"> | string
   receiver_name?: Prisma.StringFilter<"Envio"> | string
   receiver_phone?: Prisma.StringFilter<"Envio"> | string
@@ -747,8 +772,9 @@ export type EnvioScalarWhereInput = {
 }
 
 export type EnvioCreateManyOperadorInput = {
-  id?: string
+  id: string
   order_id: string
+  quote_id: string
   buyer_id: string
   receiver_name: string
   receiver_phone: string
@@ -768,6 +794,7 @@ export type EnvioCreateManyOperadorInput = {
 export type EnvioUpdateWithoutOperadorInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   order_id?: Prisma.StringFieldUpdateOperationsInput | string
+  quote_id?: Prisma.StringFieldUpdateOperationsInput | string
   buyer_id?: Prisma.StringFieldUpdateOperationsInput | string
   receiver_name?: Prisma.StringFieldUpdateOperationsInput | string
   receiver_phone?: Prisma.StringFieldUpdateOperationsInput | string
@@ -787,6 +814,7 @@ export type EnvioUpdateWithoutOperadorInput = {
 export type EnvioUncheckedUpdateWithoutOperadorInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   order_id?: Prisma.StringFieldUpdateOperationsInput | string
+  quote_id?: Prisma.StringFieldUpdateOperationsInput | string
   buyer_id?: Prisma.StringFieldUpdateOperationsInput | string
   receiver_name?: Prisma.StringFieldUpdateOperationsInput | string
   receiver_phone?: Prisma.StringFieldUpdateOperationsInput | string
@@ -806,6 +834,7 @@ export type EnvioUncheckedUpdateWithoutOperadorInput = {
 export type EnvioUncheckedUpdateManyWithoutOperadorInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   order_id?: Prisma.StringFieldUpdateOperationsInput | string
+  quote_id?: Prisma.StringFieldUpdateOperationsInput | string
   buyer_id?: Prisma.StringFieldUpdateOperationsInput | string
   receiver_name?: Prisma.StringFieldUpdateOperationsInput | string
   receiver_phone?: Prisma.StringFieldUpdateOperationsInput | string
@@ -827,6 +856,7 @@ export type EnvioUncheckedUpdateManyWithoutOperadorInput = {
 export type EnvioSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
   order_id?: boolean
+  quote_id?: boolean
   buyer_id?: boolean
   receiver_name?: boolean
   receiver_phone?: boolean
@@ -848,6 +878,7 @@ export type EnvioSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = 
 export type EnvioSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
   order_id?: boolean
+  quote_id?: boolean
   buyer_id?: boolean
   receiver_name?: boolean
   receiver_phone?: boolean
@@ -869,6 +900,7 @@ export type EnvioSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensi
 export type EnvioSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
   order_id?: boolean
+  quote_id?: boolean
   buyer_id?: boolean
   receiver_name?: boolean
   receiver_phone?: boolean
@@ -890,6 +922,7 @@ export type EnvioSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensi
 export type EnvioSelectScalar = {
   id?: boolean
   order_id?: boolean
+  quote_id?: boolean
   buyer_id?: boolean
   receiver_name?: boolean
   receiver_phone?: boolean
@@ -907,7 +940,7 @@ export type EnvioSelectScalar = {
   created_at?: boolean
 }
 
-export type EnvioOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "order_id" | "buyer_id" | "receiver_name" | "receiver_phone" | "seller_id" | "logistics_id" | "weight" | "dimensions" | "pickup_address" | "delivery_address" | "tracking_code" | "status" | "price" | "picked_up_at" | "delivered_at" | "created_at", ExtArgs["result"]["envio"]>
+export type EnvioOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "order_id" | "quote_id" | "buyer_id" | "receiver_name" | "receiver_phone" | "seller_id" | "logistics_id" | "weight" | "dimensions" | "pickup_address" | "delivery_address" | "tracking_code" | "status" | "price" | "picked_up_at" | "delivered_at" | "created_at", ExtArgs["result"]["envio"]>
 export type EnvioInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   operador?: boolean | Prisma.Envio$operadorArgs<ExtArgs>
 }
@@ -926,6 +959,7 @@ export type $EnvioPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs 
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
     order_id: string
+    quote_id: string
     buyer_id: string
     receiver_name: string
     receiver_phone: string
@@ -1367,6 +1401,7 @@ export interface Prisma__EnvioClient<T, Null = never, ExtArgs extends runtime.Ty
 export interface EnvioFieldRefs {
   readonly id: Prisma.FieldRef<"Envio", 'String'>
   readonly order_id: Prisma.FieldRef<"Envio", 'String'>
+  readonly quote_id: Prisma.FieldRef<"Envio", 'String'>
   readonly buyer_id: Prisma.FieldRef<"Envio", 'String'>
   readonly receiver_name: Prisma.FieldRef<"Envio", 'String'>
   readonly receiver_phone: Prisma.FieldRef<"Envio", 'String'>

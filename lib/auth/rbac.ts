@@ -8,21 +8,34 @@ import { redirect } from "next/navigation";
  * Lanza una excepción o redirige si no tiene acceso.
  */
 export async function requireRole(allowedRoles: UserRole[]) {
-    const { userId, sessionClaims } = await auth();
-
-    if (!userId) {
-        // Si la llamada ocurre durante el renderizado de una página, redirige.
-        // Si ocurre dentro de un Server Action, lanzará un error capturable.
-        redirect("/login");
+    // 1. Soporte para Bypass en desarrollo (para evitar errores de sesión)
+    if (process.env.BYPASS_RBAC === "true") {
+        console.log("[RBAC] Bypassing role check");
+        return { userId: "mock_user", role: allowedRoles[0] };
     }
 
-    // Usamos una variable de entorno para hacer bypass 
-    const claims = sessionClaims as UserSessionClaims;
-    const userRole = claims?.metadata?.role;
+    try {
+        const { userId, sessionClaims } = await auth();
 
-    if (!userRole || !allowedRoles.includes(userRole)) {
-        redirect("/unauthorized"); // Ruta de acceso denegado
+        if (!userId) {
+            console.log("[RBAC] No userId found, redirecting to login");
+            redirect("/login");
+        }
+
+        const claims = sessionClaims as UserSessionClaims;
+        const userRole = claims?.metadata?.role;
+
+        if (!userRole || !allowedRoles.includes(userRole)) {
+            console.log(`[RBAC] User ${userId} has role ${userRole}, but needs ${allowedRoles.join(", ")}`);
+            redirect("/unauthorized");
+        }
+
+        return { userId, role: userRole };
+    } catch (error) {
+        if (error instanceof Error && error.message.includes("NEXT_REDIRECT")) {
+            throw error; // Re-lanzar redirecciones de Next.js
+        }
+        console.error("[RBAC] Error in requireRole:", error);
+        throw error;
     }
-
-    return { userId, role: userRole };
 }

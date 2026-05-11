@@ -1,58 +1,39 @@
+import { Suspense } from "react";
 import { Metadata } from "next";
 import { requireRole } from "@/lib/auth/rbac";
 import { ROLES } from "@/lib/definitions/auth";
 import { HistoryFilters } from "./_components/history-filters";
 import { PageWrapper, Content } from "../_components/page-layout";
 import { HistoryHeader } from "./_components/history-header";
-import { HistoryTabs } from "./_components/history-tabs";
-import { HistoryTable } from "./_components/history-table";
-import { getShipmentHistory } from "@/lib/db/queries/shipments.queries"; // Importamos la nueva función
+import { HistoryData } from "./_components/history-data";
+import { HistoryTableSkeleton } from "./_components/skeletons/history-table-skeleton";
 
 export const metadata: Metadata = {
     title: "Historial | UniHousing Shipping",
     description: "Registro histórico de envíos gestionados. Consulta detallada de estados anteriores, confirmaciones de entrega y trazabilidad completa de órdenes finalizadas.",
 };
 
-// 1. Definición del Mock Data 
 export default async function HistoryPage(props: {
     searchParams: Promise<{ [key: string]: string | undefined }>
 }) {
     const searchParams = await props.searchParams;
     const { userId } = await requireRole([ROLES.LOGISTICS, ROLES.SHIPPING_ADMIN]);
 
-    // 2. Obtenemos los envíos usando la nueva función
-    const allShipments = await getShipmentHistory(userId);
-
-    // 3. Extracción de filtros
     const currentStatus = searchParams.status || "todos";
     const searchQuery = searchParams.search?.toLowerCase() || "";
-
-    // 4. Lógica de filtrado (Simulación de DB)
-    const filteredShipments = allShipments.filter((s) => {
-        const matchesStatus = currentStatus === "todos" || s.status === currentStatus;
-        const matchesSearch =
-            s.shippingId.toLowerCase().includes(searchQuery) ||
-            s.deliveryAddress.street.toLowerCase().includes(searchQuery);
-        return matchesStatus && matchesSearch;
-    });
-
-    // 5. Conteos para Tabs
-    const counts = {
-        all: allShipments.length,
-        active: allShipments.filter(s => s.status !== "delivered").length,
-        delivered: allShipments.filter(s => s.status === "delivered").length,
-        issues: 0
-    };
 
     return (
         <PageWrapper>
             <HistoryHeader />
             <Content className="p-4 lgx:p-7">
                 <HistoryFilters />
-                <HistoryTabs counts={counts} />
-                <div className="mt-4">
-                    <HistoryTable shipments={filteredShipments} />
-                </div>
+                <Suspense fallback={<HistoryTableSkeleton />} key={`${currentStatus}-${searchQuery}`}>
+                    <HistoryData
+                        userId={userId}
+                        currentStatus={currentStatus}
+                        searchQuery={searchQuery}
+                    />
+                </Suspense>
             </Content>
         </PageWrapper>
     );

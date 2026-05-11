@@ -338,7 +338,7 @@ export type CotizacionScalarWhereWithAggregatesInput = {
 }
 
 export type CotizacionCreateInput = {
-  id?: string
+  id: string
   product_id: string
   status?: string
   reserved_for_order_id?: string | null
@@ -353,7 +353,7 @@ export type CotizacionCreateInput = {
 }
 
 export type CotizacionUncheckedCreateInput = {
-  id?: string
+  id: string
   product_id: string
   status?: string
   reserved_for_order_id?: string | null
@@ -398,7 +398,7 @@ export type CotizacionUncheckedUpdateInput = {
 }
 
 export type CotizacionCreateManyInput = {
-  id?: string
+  id: string
   product_id: string
   status?: string
   reserved_for_order_id?: string | null
