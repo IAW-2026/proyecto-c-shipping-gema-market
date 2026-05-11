@@ -1,43 +1,42 @@
+import React from "react";
 import { Card } from "@/components/ui/card";
-import { MapPin, Check, Clock, ArrowRight } from "lucide-react";
-import { WeightTag, TimeTag, DistanceTag } from "./available_shipment_tags";
+import { MapPin } from "lucide-react";
+import { WeightTag, TimeTag, DistanceTag } from "./available-shipment-tags";
+import { ShipmentOffer } from "@/lib/definitions/shipment";
+import { ViewDetailsButton, TakeShipmentButton } from "./available-actions";
 
-// Parámetros hardcodeados para previsualización estética
-const mockData = {
-    trackingCode: "TRK-9820",
-    orderId: "OR-2840",
-    price: 4500,
-    pickup: "Av. Alem 1253",
-    delivery: "12 de Octubre 1050",
-    distance: "5.1 km",
-    weight: "8 kg",
-    time: "15 min"
-};
-export function AvailableShipmentCard() {
+interface ShipmentCardProps {
+    offer: ShipmentOffer;
+}
+
+export function AvailableShipmentCard({ offer }: ShipmentCardProps) {
     return (
         <Card className="p-5 flex flex-col gap-5 bg-paper">
-            <Cabecera />
-            <Cuerpo />
-            <Pie />
+            <Cabecera offer={offer} />
+            <Cuerpo offer={offer} />
+            <Pie offer={offer} />
         </Card>
     );
 }
 
-function Cabecera() {
+function Cabecera({ offer }: { offer: ShipmentOffer }) {
     return (
         <div className="flex justify-between items-start">
             <div>
                 <span className="text-[12px] font-mono  text-ink-3 uppercase tracking-wider block mb-1">
-                    {mockData.trackingCode} · {mockData.orderId}
+                    {offer.shippingId}
                 </span>
                 <span className="font-sans text-sm font-semibold text-ink">
-                    <p className="text-[26px] font-bold text-ink">${mockData.price}</p>
+                    <p className="text-[26px] font-bold text-ink">
+                        ${offer.price.toLocaleString()}
+                    </p>
                 </span>
             </div>
         </div>
     );
 }
-function Cuerpo() {
+function Cuerpo({ offer }: { offer: ShipmentOffer }) {
+    const { pickupAddress: p, deliveryAddress: d } = offer;
     return (
         <div>
 
@@ -51,7 +50,10 @@ function Cuerpo() {
                     </div>
                     <div className="min-w-0">
                         <p className="text-[10px] font-bold text-ink-3 uppercase leading-none mb-1">Origen</p>
-                        <p className="text-[13px] text-ink font-medium truncate">{mockData.pickup}</p>
+                        <p className="text-[13px] text-ink font-medium truncate">
+                            {p.street} {p.number}
+                            {p.floor ? `, ${p.floor}°${p.apartment || ''}` : ''}
+                        </p>
                     </div>
                 </div>
 
@@ -61,31 +63,28 @@ function Cuerpo() {
                     </div>
                     <div className="min-w-0">
                         <p className="text-[10px] font-bold text-ink-3 uppercase leading-none mb-1">Destino</p>
-                        <p className="text-[13px] text-ink font-medium truncate">{mockData.delivery}</p>
+                        <p className="text-[13px] text-ink font-medium truncate">
+                            {d.street} {d.number}
+                            {d.floor ? `, ${d.floor}°${d.apartment || ''}` : ''}
+                        </p>
                     </div>
                 </div>
             </div>
             <div className="pt-2 flex items-center gap-4 w-full">
-                <DistanceTag value={mockData.distance} />
-                <WeightTag value={mockData.weight} />
-                <TimeTag value={`~${mockData.time}`} />
+                <DistanceTag value={offer.distance} />
+                <WeightTag value={offer.weight} />
+                <TimeTag value={`~${offer.estimatedTime}`} />
             </div>
         </div>
 
     );
 }
 
-function Pie() {
+function Pie({ offer }: { offer: ShipmentOffer }) {
     return (
         <div className="pt-4 border-t border-line flex items-center gap-4 w-full">
-            <button className="flex-1 bg-paper text-ink h-11 rounded-full text-xs font-bold hover:bg-cream transition-all flex items-center justify-center gap-2 active:scale-[0.98]">
-                Ver detalles
-                <ArrowRight size={14} className="group-hover:translate-x-1 transition-transform" />
-            </button>
-            <button className="flex-1 bg-clay text-paper h-11 rounded-full text-xs font-bold hover:bg-cocoa transition-all flex items-center justify-center gap-2 active:scale-[0.98]">
-                <Check size={14} />
-                Tomar envío
-            </button>
+            <ViewDetailsButton shippingId={offer.shippingId} />
+            <TakeShipmentButton shippingId={offer.shippingId} />
         </div>
     );
 }

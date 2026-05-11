@@ -11,7 +11,7 @@ export async function getDashboardMetrics(operatorId: string): Promise<Dashboard
     // Simulación de latencia de base de datos local para la Etapa 2.
     // TODO (Etapa 3): Reemplazar este mock por una consulta a la BD usando el ORM (Drizzle o Prisma).
     // Ej: return await db.select().from(shipments).where(eq(shipments.operatorId, operatorId));
-    await new Promise((resolve) => setTimeout(resolve, 80));
+    await new Promise((resolve) => setTimeout(resolve, 1));
 
     return {
         shipmentToday: 5,
@@ -25,12 +25,12 @@ export async function getDashboardMetrics(operatorId: string): Promise<Dashboard
 export async function getActiveShipments(operatorId: string): Promise<ShipmentSummary[]> {
     // Simulación de latencia de base de datos local para la Etapa 2.
     // TODO (Etapa 3): Reemplazar por consulta ORM real a la base de datos PostgreSQL de la Shipping App.
-    await new Promise((resolve) => setTimeout(resolve, 100));
+    await new Promise((resolve) => setTimeout(resolve, 1));
 
     return [
         {
-            id: "SHP-001",
-            orderId: "ORD-991",
+            shippingId: "shp_04MNB23BP9D2BJ6L1T3PB15678",
+            orderId: "ord_04MNB23BP9D2BJ6L1T7PB15678",
             status: "in_transit",
             trackingCode: "TRK-88291",
             pickupAddress: { street: "San Martín 123", number: "123", zip: "8000" },
@@ -39,8 +39,8 @@ export async function getActiveShipments(operatorId: string): Promise<ShipmentSu
             createdAt: new Date(),
         },
         {
-            id: "SHP-002",
-            orderId: "ORD-992",
+            shippingId: "shp_04MNB23BP9D2BJ6L1T5PB15678",
+            orderId: "ord_04MNB43BP9D2BJ6L1T3PB15678",
             status: "pending_pickup",
             trackingCode: "TRK-88292",
             pickupAddress: { street: "Alsina 45", number: "45", zip: "8000" },

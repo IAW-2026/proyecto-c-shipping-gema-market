@@ -4,8 +4,8 @@ import { PageWrapper, Content } from "../_components/page-layout";
 import { DashboardHeader } from "./_components/dashboard-header";
 import { ActiveShipmentsList } from "./_components/active-shipments-list";
 import { Metadata } from "next";
-import { ROLES } from "@/lib/shared/auth-constants";
-import { MetricsGrid } from "./_components/metricsGrid";
+import { ROLES } from "@/lib/definitions/auth";
+import { MetricsGrid } from "./_components/metrics-grid";
 
 
 export const metadata: Metadata = {
@@ -16,7 +16,7 @@ export const metadata: Metadata = {
 export default async function DashboardPage() {
     // 1. Validación de seguridad perimetral y extracción de identidad
     // Reemplazamos los magic strings por nuestras constantes inmutables
-    const { userId } = await requireRole([ROLES.LOGISTICS, ROLES.ADMIN]);
+    const { userId } = await requireRole([ROLES.LOGISTICS, ROLES.SHIPPING_ADMIN]);
 
     // 2. Fetching de datos en paralelo
     // Al no depender una promesa de la otra, las ejecutamos al mismo tiempo para optimizar el rendimiento

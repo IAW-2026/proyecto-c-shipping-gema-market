@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { Package, ArrowRight } from "lucide-react";
-import { ShipmentSummary } from "../../../../lib/definitions/shipment";
+import { ShipmentSummary } from "@/lib/definitions/shipment";
 import { ShipmentStatusBadge } from "../../_components/shipment-status-badge";
 interface ActiveShipmentsListProps {
   shipments: ShipmentSummary[];
@@ -27,8 +27,8 @@ export function ActiveShipmentsList({ shipments }: ActiveShipmentsListProps) {
         ) : (
           shipments.map((s) => (
             <Link
-              key={s.id}
-              href={`/shipment/${s.id}`}
+              key={s.shippingId}
+              href={`/shipments/${s.shippingId}`}
               className="p-4 hover:bg-cream/50 transition-colors flex items-center gap-4 group"
             >
               <div className="w-12 h-12 rounded-xl bg-bone flex items-center justify-center group-hover:scale-105 transition-transform">
@@ -36,7 +36,7 @@ export function ActiveShipmentsList({ shipments }: ActiveShipmentsListProps) {
               </div>
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-2 mb-1">
-                  <span className="font-mono text-xs font-bold text-ink">{s.trackingCode}</span>
+                  <span className="font-mono text-xs font-bold text-ink">{s.shippingId}</span>
                   <ShipmentStatusBadge status={s.status} />
                 </div>
                 <div className="text-sm text-ink-2 truncate">

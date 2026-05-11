@@ -1,5 +1,5 @@
 import { Header } from "../../_components/page-layout";
-import { AvailableActions } from "./button-actions";
+import { ReceiptActions } from "./receipt-actions";
 
 
 export function SettlementsHeader() {
@@ -7,7 +7,7 @@ export function SettlementsHeader() {
         <Header
             title={"Mis ganancias"}
             subtitle="Liquidaciones"
-            action={<AvailableActions />}
+            action={<ReceiptActions />}
 
         />
     );
