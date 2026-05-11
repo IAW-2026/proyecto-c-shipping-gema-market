@@ -241,7 +241,7 @@ export type UsuarioScalarWhereWithAggregatesInput = {
 }
 
 export type UsuarioCreateInput = {
-  id?: string
+  id: string
   clerk_user_id: string
   email: string
   full_name: string
@@ -251,7 +251,7 @@ export type UsuarioCreateInput = {
 }
 
 export type UsuarioUncheckedCreateInput = {
-  id?: string
+  id: string
   clerk_user_id: string
   email: string
   full_name: string
@@ -281,7 +281,7 @@ export type UsuarioUncheckedUpdateInput = {
 }
 
 export type UsuarioCreateManyInput = {
-  id?: string
+  id: string
   clerk_user_id: string
   email: string
   full_name: string
@@ -364,7 +364,7 @@ export type UsuarioUpdateOneWithoutEnviosNestedInput = {
 }
 
 export type UsuarioCreateWithoutEnviosInput = {
-  id?: string
+  id: string
   clerk_user_id: string
   email: string
   full_name: string
@@ -373,7 +373,7 @@ export type UsuarioCreateWithoutEnviosInput = {
 }
 
 export type UsuarioUncheckedCreateWithoutEnviosInput = {
-  id?: string
+  id: string
   clerk_user_id: string
   email: string
   full_name: string

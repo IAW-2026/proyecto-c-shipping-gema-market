@@ -28,7 +28,7 @@ export default async function OperatorLayout({ children }: { children: ReactNode
         <div className="flex min-h-screen bg-cream">
             <OperatorSidebar />
 
-            <main className="flex-1 min-w-0 flex flex-col lgx:ml-[240px] lgx:w-[calc(100%-240px)] pb-16 lgx:pb-0">
+            <main className="flex-1 min-w-0 flex flex-col lgx:ml-[240px] lgx:w-[calc(100%-240px)] pb-[128px] lgx:pb-0">
                 {/* El contenido dinámico de cada página (page.tsx) se inyecta aquí */}
                 {children}
             </main>

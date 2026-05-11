@@ -775,6 +775,7 @@ export type CotizacionScalarFieldEnum = (typeof CotizacionScalarFieldEnum)[keyof
 export const EnvioScalarFieldEnum = {
   id: 'id',
   order_id: 'order_id',
+  quote_id: 'quote_id',
   buyer_id: 'buyer_id',
   receiver_name: 'receiver_name',
   receiver_phone: 'receiver_phone',

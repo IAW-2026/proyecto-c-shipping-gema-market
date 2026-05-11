@@ -11,35 +11,37 @@ import { generatePrefixedId } from "@/lib/shared/utils";
  * Server Action para que un repartidor tome posesión de un envío disponible.
  */
 export async function takeShipmentAction(shipmentId: string) {
-    // 1. Verificación de identidad y rol (Defense in Depth)
-    const { userId } = await requireRole([ROLES.LOGISTICS, ROLES.SHIPPING_ADMIN]);
+    try {
+        console.log(`[ACTION] Iniciando takeShipmentAction para: ${shipmentId}`);
+        
+        // 1. Verificación de identidad y rol
+        const { userId } = await requireRole([ROLES.LOGISTICS, ROLES.SHIPPING_ADMIN]);
 
-    // 2. Validación de datos
-    const parsed = TakeShipmentSchema.safeParse({ shipmentId });
+        // 2. Validación de datos
+        const parsed = TakeShipmentSchema.safeParse({ shipmentId });
+        if (!parsed.success) {
+            return { success: false, error: "ID de envío inválido" };
+        }
 
-    if (!parsed.success) {
+        // 3. Mock delay
+        console.log(`[ACTION] Usuario ${userId} tomando envío ${shipmentId}`);
+        await new Promise(resolve => setTimeout(resolve, 800));
+
+        // 4. Revalidación
+        revalidatePath("/available");
+        revalidatePath("/dashboard");
+
+        return { 
+            success: true,
+            message: "Envío asignado correctamente"
+        };
+    } catch (error) {
+        console.error("[ACTION] Error en takeShipmentAction:", error);
         return { 
             success: false, 
-            error: "ID de envío inválido" 
+            error: error instanceof Error ? error.message : "Error desconocido" 
         };
     }
-
-    // 3. TODO (Etapa 3): Persistencia en Base de Datos
-    // Actualizar el shipment con logisticsId = userId y status = 'pending_pickup'
-    console.log(`[ACTION] Usuario ${userId} tomando envío ${shipmentId}`);
-
-    // Simulamos una demora de red
-    await new Promise(resolve => setTimeout(resolve, 800));
-
-    // 4. Revalidación de caché de Next.js
-    // Esto asegura que al volver al dashboard o lista de disponibles, la UI esté actualizada.
-    revalidatePath("/available");
-    revalidatePath("/dashboard");
-
-    return { 
-        success: true,
-        message: "Envío asignado correctamente"
-    };
 }
 
 /**
