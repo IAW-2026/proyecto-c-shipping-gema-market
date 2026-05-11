@@ -1,6 +1,6 @@
 import { currentUser } from '@clerk/nextjs/server';
 import prisma from '@/lib/db/prisma';
-import { generatePrefixedId } from '@/lib/shared/utils';
+import { generatePrefixedId, isNextDynamicServerError } from '@/lib/shared/utils';
 
 export async function syncCurrentUser(): Promise<void> {
   try {
@@ -33,6 +33,11 @@ export async function syncCurrentUser(): Promise<void> {
     });
     console.log(` [Sync] Usuario ${user.id} sincronizado con éxito.`);
   } catch (error) {
+    // No atrapar la señal interna de Next.js — debe propagarse para que
+    // el framework convierta la ruta a renderizado dinámico automáticamente
+    if (isNextDynamicServerError(error)) {
+      throw error;
+    }
     console.error(' [Sync] Error al sincronizar usuario:', error);
     // Silent fail — database errors shouldn't break page loads
   }
