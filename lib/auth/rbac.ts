@@ -2,6 +2,7 @@
 import { auth } from "@clerk/nextjs/server";
 import { UserRole, UserSessionClaims } from "../definitions/auth";
 import { redirect } from "next/navigation";
+import { isNextDynamicServerError } from "@/lib/shared/utils";
 
 /**
  * Verifica si el usuario actual posee uno de los roles permitidos.
@@ -32,6 +33,9 @@ export async function requireRole(allowedRoles: UserRole[]) {
 
         return { userId, role: userRole };
     } catch (error) {
+        if (isNextDynamicServerError(error)) {
+            throw error;
+        }
         if (error instanceof Error && error.message.includes("NEXT_REDIRECT")) {
             throw error; // Re-lanzar redirecciones de Next.js
         }

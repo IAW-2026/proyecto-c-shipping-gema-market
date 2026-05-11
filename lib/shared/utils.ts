@@ -18,3 +18,19 @@ export function cn(...inputs: ClassValue[]) {
 export function generatePrefixedId(prefix: string) {
     return `${prefix}_${ulid()}`;
 }
+
+/**
+ * Determina si un error es la señal interna de Next.js (DynamicServerError)
+ * que indica que una ruta no puede ser estática porque usa APIs dinámicas
+ * como headers(), cookies(), o auth() de Clerk.
+ *
+ * Esta señal NO debe ser atrapada — debe re-lanzarse para que Next.js
+ * convierta automáticamente la ruta a renderizado dinámico.
+ */
+export function isNextDynamicServerError(error: unknown): boolean {
+    return (
+        typeof error === 'object' &&
+        error !== null &&
+        (error as { digest?: string }).digest === 'DYNAMIC_SERVER_USAGE'
+    );
+}

@@ -5,7 +5,7 @@ import { ROLES } from "@/lib/definitions/auth";
 import { TakeShipmentSchema } from "@/lib/validations/shipment";
 import { revalidatePath } from "next/cache";
 import prisma from "@/lib/db/prisma";
-import { generatePrefixedId } from "@/lib/shared/utils";
+import { generatePrefixedId, isNextDynamicServerError } from "@/lib/shared/utils";
 
 /**
  * Server Action para que un repartidor tome posesión de un envío disponible.
@@ -36,6 +36,9 @@ export async function takeShipmentAction(shipmentId: string) {
             message: "Envío asignado correctamente"
         };
     } catch (error) {
+        if (isNextDynamicServerError(error)) {
+            throw error;
+        }
         console.error("[ACTION] Error en takeShipmentAction:", error);
         return { 
             success: false, 
