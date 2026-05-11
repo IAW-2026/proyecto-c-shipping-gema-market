@@ -4,6 +4,8 @@ import { requireRole } from "@/lib/auth/rbac";
 import { ROLES } from "@/lib/definitions/auth";
 import { TakeShipmentSchema } from "@/lib/validations/shipment";
 import { revalidatePath } from "next/cache";
+import prisma from "@/lib/db/prisma";
+import { generatePrefixedId } from "@/lib/shared/utils";
 
 /**
  * Server Action para que un repartidor tome posesión de un envío disponible.
@@ -47,4 +49,22 @@ export async function exportShipmentsAction() {
     const { userId } = await requireRole([ROLES.LOGISTICS, ROLES.SHIPPING_ADMIN]);
     console.log(`[ACTION] Usuario ${userId} solicitando exportación`);
     return { success: true };
+}
+
+/**
+ * Crea un nuevo envío con ID prefijado y código de seguimiento.
+ */
+export async function createShipping(data: any) {
+  const newShipment = await prisma.envio.create({
+    data: {
+      id: generatePrefixedId("shp"),
+      ...data,
+      tracking_code: `BB-${Math.floor(Math.random() * 10000)}-2026`,
+    }
+  });
+  
+  revalidatePath("/dashboard");
+  revalidatePath("/available");
+  
+  return newShipment;
 }
