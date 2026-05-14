@@ -8,7 +8,7 @@ import { CourierMap } from "./courier-map";
 import { ShipmentSelector } from "./shipment-selector";
 import { CancelDialog } from "./cancel-dialog";
 import { CourierEmpty } from "./courier-empty";
-import { Tag, Home, Loader2 } from "lucide-react";
+import { Tag, Home, Loader2, Navigation } from "lucide-react";
 
 export function CourierView({ shipments }: { shipments: ShipmentSummary[] }) {
     const router = useRouter();
@@ -96,6 +96,21 @@ export function CourierView({ shipments }: { shipments: ShipmentSummary[] }) {
                         </div>
                     </div>
                 </div>
+
+                <button
+                    onClick={() => {
+                        const toGmaps = (addr: ShipmentSummary["pickupAddress"]) =>
+                            `${addr.street}${addr.number ? ` ${addr.number}` : ""}, Bahía Blanca, Argentina`;
+                        const origin = encodeURIComponent(toGmaps(current.pickupAddress));
+                        const dest = encodeURIComponent(toGmaps(current.deliveryAddress));
+                        const url = `https://www.google.com/maps/dir/?api=1&origin=${origin}&destination=${dest}&travelmode=driving`;
+                        window.open(url, "_blank", "noopener,noreferrer");
+                    }}
+                    className="w-full flex items-center justify-center gap-2 text-sm font-medium text-clay hover:text-cocoa transition-colors py-2"
+                >
+                    <Navigation size={16} />
+                    Abrir en Google Maps
+                </button>
 
                 <div className="flex items-center justify-between">
                     <span className="text-sm text-ink-2">Pago</span>

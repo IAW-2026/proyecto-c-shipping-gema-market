@@ -37,7 +37,7 @@ const ENDPOINTS: EndpointDef[] = [
             "El comprador solicita una cotización de envío para un producto. Se calcula el precio según peso, dimensiones y tarifas vigentes.",
         defaultBody: JSON.stringify(
             {
-                destination_address: { street: "Av. San Martín", zip: "8000" },
+                destination_address: { street: "Av. San Martín", number: "123", zip: "8000" },
                 product_id: "prd_01HXYZ1234567890ABCDEF",
                 weight_kg: 15,
                 height_cm: 80,
@@ -103,6 +103,17 @@ const ENDPOINTS: EndpointDef[] = [
             2
         ),
     },
+    {
+        id: "ver-ruta",
+        app: "seller",
+        step: 3,
+        label: "Ver ruta en mapa",
+        method: "GET",
+        url: "/api/shipping/envios/{shipping_id}/route",
+        description:
+            "Obtiene la geometría de la ruta entre la dirección de retiro y la de entrega del envío, usando OpenRouteService.",
+        defaultBody: "{}",
+    },
 ];
 
 const APP_INFO: Record<string, { label: string; icon: string; color: string }> = {
@@ -152,12 +163,21 @@ export default function ApiPlaygroundPage() {
         setResults((prev) => ({ ...prev, [ep.id]: null }));
 
         try {
-            const parsed = JSON.parse(bodies[ep.id]);
-            const res = await fetch(ep.url, {
-                method: ep.method,
-                headers: { "Content-Type": "application/json", "X-Debug": "true" },
-                body: JSON.stringify(parsed),
-            });
+            const url = ep.url.replace("{shipping_id}", flow.shipping_id ?? "");
+            let res: Response;
+            let requestBody: Record<string, unknown> | undefined;
+
+            if (ep.method === "GET") {
+                res = await fetch(url, { headers: { "X-Debug": "true" } });
+            } else {
+                requestBody = JSON.parse(bodies[ep.id]);
+                res = await fetch(url, {
+                    method: ep.method,
+                    headers: { "Content-Type": "application/json", "X-Debug": "true" },
+                    body: JSON.stringify(requestBody),
+                });
+            }
+
             const text = await res.text();
             let body: string;
             let trace: TraceEntry[] | undefined;
@@ -180,10 +200,10 @@ export default function ApiPlaygroundPage() {
                         updateDefaultBody("reservar", "quote_id", data.quote_id);
                         updateDefaultBody("liberar", "quote_id", data.quote_id);
                     }
-                    if (ep.id === "reservar" && parsed.order_id) {
-                        setFlow((prev) => ({ ...prev, order_id: parsed.order_id }));
-                        updateDefaultBody("crear-envio", "order_id", parsed.order_id);
-                        updateDefaultBody("liberar", "order_id", parsed.order_id);
+                    if (ep.id === "reservar" && requestBody?.order_id) {
+                        setFlow((prev) => ({ ...prev, order_id: requestBody.order_id as string }));
+                        updateDefaultBody("crear-envio", "order_id", requestBody.order_id as string);
+                        updateDefaultBody("liberar", "order_id", requestBody.order_id as string);
                     }
                     if (ep.id === "crear-envio" && data.shipping_id) {
                         setFlow((prev) => ({
@@ -251,6 +271,7 @@ export default function ApiPlaygroundPage() {
                                         onSend={() => handleSend(ep)}
                                         state={states[ep.id]}
                                         result={results[ep.id]}
+                                        shippingId={flow.shipping_id}
                                     />
                                 ))}
                             </div>
@@ -277,6 +298,7 @@ export default function ApiPlaygroundPage() {
                                         onSend={() => handleSend(ep)}
                                         state={states[ep.id]}
                                         result={results[ep.id]}
+                                        shippingId={flow.shipping_id}
                                     />
                                 ))}
                             </div>
@@ -303,6 +325,7 @@ export default function ApiPlaygroundPage() {
                                         onSend={() => handleSend(ep)}
                                         state={states[ep.id]}
                                         result={results[ep.id]}
+                                        shippingId={flow.shipping_id}
                                     />
                                 ))}
                             </div>
@@ -373,6 +396,7 @@ function EndpointCard({
     onSend,
     state,
     result,
+    shippingId,
 }: {
     ep: EndpointDef;
     body: string;
@@ -380,7 +404,12 @@ function EndpointCard({
     onSend: () => void;
     state?: RequestState;
     result: { status: number; body: string; trace?: TraceEntry[] } | null;
+    shippingId?: string | null;
 }) {
+    const resolvedUrl = ep.url.replace("{shipping_id}", shippingId ?? "");
+    const hasPlaceholder = resolvedUrl.includes("{");
+    const isGet = ep.method === "GET";
+
     return (
         <div>
             <div className="flex items-center gap-2 mb-1">
@@ -388,27 +417,30 @@ function EndpointCard({
                 <span className="bg-gray-800 text-gray-400 px-1.5 py-0.5 rounded text-xs font-mono">
                     {ep.method}
                 </span>
-                <span className="text-xs font-mono text-gray-500">{ep.url}</span>
+                <span className="text-xs font-mono text-gray-500">{resolvedUrl}</span>
             </div>
             <p className="text-xs text-gray-500 mb-2">{ep.description}</p>
 
-            <textarea
-                value={body}
-                onChange={(e) => onBodyChange(e.target.value)}
-                rows={6}
-                className="w-full bg-gray-950 border border-gray-700 rounded p-2.5 font-mono text-xs text-gray-200 resize-y mb-2"
-            />
+            {!isGet && (
+                <textarea
+                    value={body}
+                    onChange={(e) => onBodyChange(e.target.value)}
+                    rows={6}
+                    className="w-full bg-gray-950 border border-gray-700 rounded p-2.5 font-mono text-xs text-gray-200 resize-y mb-2"
+                />
+            )}
 
             <div className="flex items-center gap-2">
                 <button
                     onClick={onSend}
-                    disabled={state === "loading"}
+                    disabled={state === "loading" || hasPlaceholder}
                     className="px-4 py-1.5 bg-gray-700 hover:bg-gray-600 disabled:bg-gray-800 disabled:cursor-not-allowed rounded text-sm font-medium transition"
                 >
                     {state === "loading" ? "Enviando..." : "Enviar"}
                 </button>
                 {state === "success" && <span className="text-green-400 text-xs">✓ OK</span>}
                 {state === "error" && <span className="text-red-400 text-xs">✗ Error</span>}
+                {hasPlaceholder && <span className="text-amber-400 text-xs">⚠ Crear envío primero</span>}
             </div>
 
             {result && (

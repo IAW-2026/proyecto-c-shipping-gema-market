@@ -5,6 +5,7 @@ import { ShippingStatusSchema } from "../definitions/shipment";
 
 export const DestinationAddressSchema = z.object({
     street: z.string().min(1, "La calle es obligatoria"),
+    number: z.string().min(1, "El número es obligatorio"),
     zip: z.string().min(1, "El código postal es obligatorio"),
     floor: z.string().optional(),
     apartment: z.string().optional(),

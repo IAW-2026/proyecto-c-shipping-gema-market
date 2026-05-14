@@ -72,6 +72,7 @@ export async function calculateQuote(request: QuoteRequest, trace?: ApiTrace): P
             },
             destination_address: {
                 street: destination_address.street,
+                number: destination_address.number,
                 zip: destination_address.zip,
                 floor: destination_address.floor ?? null,
                 apartment: destination_address.apartment ?? null,

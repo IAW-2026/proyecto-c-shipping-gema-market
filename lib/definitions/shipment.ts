@@ -7,7 +7,7 @@ export const ShippingStatusSchema = z.enum(SHIPMENT_STATUSES);
 
 export const AddressSchema = z.object({
     street: z.string().min(1, "La calle es obligatoria"),
-    number: z.string().optional(),
+    number: z.string().min(1, "El número es obligatorio"),
     zip: z.string().min(1, "El código postal es obligatorio"),
     floor: z.string().nullish(),
     apartment: z.string().nullish(),
