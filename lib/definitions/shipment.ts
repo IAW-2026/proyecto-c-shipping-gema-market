@@ -7,10 +7,10 @@ export const ShippingStatusSchema = z.enum(SHIPMENT_STATUSES);
 
 export const AddressSchema = z.object({
     street: z.string().min(1, "La calle es obligatoria"),
-    number: z.string().min(1, "El número es obligatorio"),
+    number: z.string().optional(),
     zip: z.string().min(1, "El código postal es obligatorio"),
-    floor: z.string().optional(),
-    apartment: z.string().optional(),
+    floor: z.string().nullish(),
+    apartment: z.string().nullish(),
 });
 
 // --- 2. ESQUEMA PRINCIPAL DEL DOMINIO ---
@@ -49,10 +49,12 @@ export const ShipmentSchema = z.object({
     distance: z.number().optional().describe("Distancia calculada en km"),
 });
 
+const toIntCm = z.number().transform(v => Math.round(v)).pipe(z.number().int().positive());
+
 export const DimensionsSchema = z.object({
-    height: z.number().int().positive().describe("Altura en cm"),
-    width: z.number().int().positive().describe("Ancho en cm"),
-    depth: z.number().int().positive().describe("Profundidad en cm"),
+    height: toIntCm.describe("Altura en cm"),
+    width: toIntCm.describe("Ancho en cm"),
+    depth: toIntCm.describe("Profundidad en cm"),
 });
 
 // --- 3. INFERENCIA DE TIPOS ---

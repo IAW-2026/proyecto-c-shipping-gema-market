@@ -26,10 +26,12 @@ export const AvailableSearchParamsSchema = z.object({
 
 export type AvailableSearchParams = z.infer<typeof AvailableSearchParamsSchema>;
 
+const toIntCm = z.number().transform(v => Math.round(v)).pipe(z.number().int().positive());
+
 export const DimensionsSchema = z.object({
-    height: z.number().int().positive(),
-    width: z.number().int().positive(),
-    depth: z.number().int().positive(),
+    height: toIntCm,
+    width: toIntCm,
+    depth: toIntCm,
 });
 
 export type DimensionsInput = z.infer<typeof DimensionsSchema>;

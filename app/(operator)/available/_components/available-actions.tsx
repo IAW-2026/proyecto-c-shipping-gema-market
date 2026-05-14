@@ -45,6 +45,7 @@ export function ViewDetailsButton({ shippingId }: { shippingId: string }) {
 }
 
 export function TakeShipmentButton({ shippingId }: { shippingId: string }) {
+    const router = useRouter();
     const [isPending, setIsPending] = useState(false);
 
     const handleTakeShipment = async () => {
@@ -52,12 +53,12 @@ export function TakeShipmentButton({ shippingId }: { shippingId: string }) {
         try {
             const result = await takeShipmentAction(shippingId);
             if (result.success) {
-                alert(result.message);
+                router.refresh();
             } else {
-                alert(`Error: ${result.error}`);
+                console.error("Error al tomar envío:", result.error);
             }
         } catch (error) {
-            alert("Error crítico al intentar tomar el envío");
+            console.error("Error crítico al tomar envío:", error);
         } finally {
             setIsPending(false);
         }

@@ -8,3 +8,13 @@ export interface SellerOrderDetails {
 export interface SellerNotificationResponse {
     success: boolean;
 }
+
+export interface OriginAddress {
+    street: string;
+    number: string;
+    zip: string;
+}
+
+export interface OriginAddressResponse {
+    origin_address: OriginAddress;
+}

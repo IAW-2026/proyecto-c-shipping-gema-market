@@ -1,9 +1,12 @@
 import { NextRequest, NextResponse } from "next/server";
 import { quoteRequestSchema } from "@/lib/validations/api-schemas";
+import { calculateQuote } from "@/lib/services/cotizacion.service";
+import { createTraceIfDebug, withTrace } from "@/lib/shared/api-handler";
 
 /**
- * Endpoint para cotización de envíos.
- * Invocado por Buyer/Seller App para calcular costos antes de la compra.
+ * POST /api/shipping/cotizaciones
+ * Consumido por: Buyer App
+ * Calcula el costo y tiempo estimado de envío logístico entre dos domicilios.
  */
 export async function POST(request: NextRequest) {
     try {
@@ -17,23 +20,14 @@ export async function POST(request: NextRequest) {
             );
         }
 
-        // TODO: Lógica de cálculo real (Etapa 3)
-        // Por ahora devolvemos un cálculo mock basado en el peso
-        const basePrice = 1500;
-        const weightPrice = parsed.data.weight_kg * 500;
-        const totalPrice = basePrice + weightPrice;
+        const trace = createTraceIfDebug(request);
+        const result = await calculateQuote(parsed.data, trace);
 
-        return NextResponse.json({
-            success: true,
-            data: {
-                price: totalPrice,
-                currency: "ARS",
-                estimated_days: 3,
-                provider: "UniHousing Shipping"
-            }
-        });
+        return NextResponse.json(withTrace(result, trace), { status: 200 });
 
     } catch (error) {
-        return NextResponse.json({ error: "Internal Error" }, { status: 500 });
+        console.error("[COTIZACIONES] Error:", error);
+        const message = error instanceof Error ? error.message : "Error interno del servidor";
+        return NextResponse.json({ error: message }, { status: 500 });
     }
 }

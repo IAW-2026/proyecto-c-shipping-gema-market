@@ -1,47 +1,40 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createShipmentSchema } from "@/lib/validations/api-schemas";
+import { createShipment } from "@/lib/services/envio.service";
+
 
 /**
- * Endpoint para la creación de envíos.
- * Invocado por Seller App cuando se concreta una venta.
+ * POST /api/shipping/envios
+ * Consumido por: Seller App (tras pago confirmado)
+ * Solicita la creación y gestión logística de un envío para una orden específica.
  */
 export async function POST(request: NextRequest) {
     try {
         const body = await request.json();
-        
-        // 1. Validación de contrato mediante Zod
-        const parsed = createShipmentSchema.safeParse(body);
 
+        const parsed = createShipmentSchema.safeParse(body);
         if (!parsed.success) {
             return NextResponse.json(
-                { 
-                    error: "Contrato inválido", 
-                    details: parsed.error.flatten().fieldErrors 
+                {
+                    error: "Datos inválidos",
+                    details: parsed.error.flatten().fieldErrors,
                 },
                 { status: 400 }
             );
         }
 
-        // 2. TODO: Lógica de negocio (Etapa 3)
-        // - Generar shippingId (ULID)
-        // - Generar trackingCode
-        // - Persistir en DB con estado 'pending_pickup'
-        
-        console.log("[API] Recibida solicitud de creación de envío para orden:", parsed.data.order_id);
+        const result = await createShipment(parsed.data);
 
-        return NextResponse.json({
-            success: true,
-            data: {
-                shippingId: `shp_${Math.random().toString(36).substr(2, 26)}`,
-                trackingCode: `TRK-${Math.random().toString(36).substr(2, 8).toUpperCase()}`,
-                status: "pending_pickup"
-            }
-        }, { status: 201 });
+        return NextResponse.json(result, { status: 201 });
 
     } catch (error) {
-        return NextResponse.json(
-            { error: "Internal Server Error" },
-            { status: 500 }
-        );
+        const err = error as Error & { statusCode?: number; code?: string };
+        console.error("[ENVIOS] Error:", err.message);
+
+        if (err.statusCode) {
+            return NextResponse.json({ error: err.message }, { status: err.statusCode });
+        }
+
+        return NextResponse.json({ error: "Error interno del servidor" }, { status: 500 });
     }
 }
