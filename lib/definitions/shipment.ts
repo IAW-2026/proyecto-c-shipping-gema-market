@@ -49,10 +49,17 @@ export const ShipmentSchema = z.object({
     distance: z.number().optional().describe("Distancia calculada en km"),
 });
 
+export const DimensionsSchema = z.object({
+    height: z.number().int().positive().describe("Altura en cm"),
+    width: z.number().int().positive().describe("Ancho en cm"),
+    depth: z.number().int().positive().describe("Profundidad en cm"),
+});
+
 // --- 3. INFERENCIA DE TIPOS ---
 
 export type ShippingStatus = z.infer<typeof ShippingStatusSchema>;
 export type Address = z.infer<typeof AddressSchema>;
+export type Dimensions = z.infer<typeof DimensionsSchema>;
 export type Shipment = z.infer<typeof ShipmentSchema>;
 
 // --- 4. DTOs (DATA TRANSFER OBJECTS) ---
@@ -108,3 +115,33 @@ export const ShipmentOfferSchema = ShipmentSchema.pick({
 });
 
 export type ShipmentOffer = z.infer<typeof ShipmentOfferSchema>;
+
+// --- 5. DTOs DE CONSULTA (FILTROS Y PAGINACIÓN) ---
+
+export interface ShipmentFilterParams {
+    logisticsId?: string;
+    status?: ShipmentStatus | ShipmentStatus[];
+    query?: string;
+    dateFrom?: Date;
+    dateTo?: Date;
+    page?: number;
+    pageSize?: number;
+    sortBy?: 'created_at' | 'price' | 'tracking_code' | 'status';
+    sortOrder?: 'asc' | 'desc';
+}
+
+export interface PaginatedResult<T> {
+    data: T[];
+    total: number;
+    page: number;
+    pageSize: number;
+    totalPages: number;
+}
+
+export interface SettlementPeriod {
+    period: string;
+    weekStart: Date;
+    weekEnd: Date;
+    trips: number;
+    amount: number;
+}

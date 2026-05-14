@@ -12,18 +12,24 @@ interface HistoryTabsProps {
     };
 }
 
+const TAB_STATUS_MAP: Record<string, string | undefined> = {
+    todos: undefined,
+    active: undefined,
+    delivered: "delivered",
+    issues: undefined,
+};
+
 export function HistoryTabs({ counts }: HistoryTabsProps) {
     const router = useRouter();
     const searchParams = useSearchParams();
 
-    // Obtenemos el estado actual de la URL o por defecto "todos"
     const activeTab = searchParams.get("status") || "todos";
 
     const tabs = [
         { id: "todos", label: "Todos", count: counts.all },
-        { id: "activos", label: "Activos", count: counts.active },
-        { id: "entregados", label: "Entregados", count: counts.delivered },
-        { id: "problemas", label: "Con problemas", count: counts.issues },
+        { id: "active", label: "Activos", count: counts.active },
+        { id: "delivered", label: "Entregados", count: counts.delivered },
+        { id: "issues", label: "Con problemas", count: counts.issues },
     ];
 
     const handleTabChange = (id: string) => {
@@ -33,7 +39,7 @@ export function HistoryTabs({ counts }: HistoryTabsProps) {
         } else {
             params.set("status", id);
         }
-        // Sincronizamos la URL sin recargar la página completa
+        params.delete("page");
         router.push(`?${params.toString()}`, { scroll: false });
     };
 

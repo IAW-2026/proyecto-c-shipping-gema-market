@@ -23,13 +23,17 @@ export async function takeShipmentAction(shipmentId: string) {
             return { success: false, error: "ID de envío inválido" };
         }
 
-        // 3. Mock delay
+        // 3. Asignar el envío al repartidor en BD
         console.log(`[ACTION] Usuario ${userId} tomando envío ${shipmentId}`);
-        await new Promise(resolve => setTimeout(resolve, 800));
+        await prisma.envio.update({
+            where: { id: shipmentId },
+            data: { logistics_id: userId },
+        });
 
         // 4. Revalidación
         revalidatePath("/available");
         revalidatePath("/dashboard");
+        revalidatePath("/history");
 
         return { 
             success: true,

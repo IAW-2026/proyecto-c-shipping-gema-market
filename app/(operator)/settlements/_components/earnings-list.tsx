@@ -1,13 +1,8 @@
 import { Card } from "@/components/ui/card";
 import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from "@/components/ui/table";
+import type { SettlementPeriod } from "@/lib/definitions/shipment";
 
-export interface Settlement {
-    period: string;
-    trips: number;
-    amount: number;
-}
-
-export function EarningsList({ settlements }: { settlements: Settlement[] }) {
+export function EarningsList({ settlements }: { settlements: SettlementPeriod[] }) {
     return (
         <>
             {/* Vista Desktop: Tabla Genérica Especializada */}

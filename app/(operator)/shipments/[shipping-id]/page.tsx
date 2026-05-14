@@ -1,8 +1,7 @@
 import { Suspense } from "react";
 import { Metadata } from "next";
-import { redirect } from "next/navigation";
-import { auth } from "@clerk/nextjs/server";
-import { ROLES, UserRole } from "@/lib/definitions/auth";
+import { requireRole } from "@/lib/auth/rbac";
+import { ROLES } from "@/lib/definitions/auth";
 import { PageWrapper, Content } from "../../_components/page-layout";
 import { ShipmentDetailData } from "./_components/shipment-detail-data";
 import { ShipmentDetailSkeleton } from "./_components/skeletons/shipment-detail-skeleton";
@@ -17,18 +16,7 @@ interface ShipmentDetailPageProps {
 }
 
 export default async function ShipmentDetailPage({ params }: ShipmentDetailPageProps) {
-    const { userId, sessionClaims } = await auth();
-
-    if (!userId) {
-        redirect("/sign-in");
-    }
-
-    const metadata = sessionClaims?.metadata as { role?: UserRole } | undefined;
-    const userRole = metadata?.role;
-
-    if (userRole !== ROLES.LOGISTICS && userRole !== ROLES.SHIPPING_ADMIN) {
-        redirect("/unauthorized");
-    }
+    await requireRole([ROLES.LOGISTICS, ROLES.SHIPPING_ADMIN]);
 
     const resolvedParams = await params;
     const shippingId = resolvedParams["shipping-id"];

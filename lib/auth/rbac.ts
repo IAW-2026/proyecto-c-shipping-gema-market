@@ -1,25 +1,25 @@
-// lib/auth/rbac.ts
 import { auth } from "@clerk/nextjs/server";
 import { UserRole, UserSessionClaims } from "../definitions/auth";
 import { redirect } from "next/navigation";
 import { isNextDynamicServerError } from "@/lib/shared/utils";
+import prisma from "@/lib/db/prisma";
 
 /**
  * Verifica si el usuario actual posee uno de los roles permitidos.
- * Lanza una excepción o redirige si no tiene acceso.
+ * Retorna el userId interno (prefijo usr_ ) para usar en consultas a la BD.
  */
 export async function requireRole(allowedRoles: UserRole[]) {
-    // 1. Soporte para Bypass en desarrollo (para evitar errores de sesión)
-    if (process.env.BYPASS_RBAC === "true") {
-        console.log("[RBAC] Bypassing role check");
-        return { userId: "mock_user", role: allowedRoles[0] };
+    const bypass = process.env.BYPASS_RBAC;
+    if (bypass) {
+        // BYPASS_RBAC=true usa usr_mock; BYPASS_RBAC=usr_xxx usa ese ID
+        const bypassUserId = bypass === "true" ? "usr_mock" : bypass;
+        return { userId: bypassUserId, role: allowedRoles[0] };
     }
 
     try {
-        const { userId, sessionClaims } = await auth();
+        const { userId: clerkUserId, sessionClaims } = await auth();
 
-        if (!userId) {
-            console.log("[RBAC] No userId found, redirecting to login");
+        if (!clerkUserId) {
             redirect("/login");
         }
 
@@ -27,17 +27,25 @@ export async function requireRole(allowedRoles: UserRole[]) {
         const userRole = claims?.metadata?.role;
 
         if (!userRole || !allowedRoles.includes(userRole)) {
-            console.log(`[RBAC] User ${userId} has role ${userRole}, but needs ${allowedRoles.join(", ")}`);
             redirect("/unauthorized");
         }
 
-        return { userId, role: userRole };
+        const usuario = await prisma.usuario.findUnique({
+            where: { clerk_user_id: clerkUserId },
+            select: { id: true },
+        });
+
+        if (!usuario) {
+            redirect("/login");
+        }
+
+        return { userId: usuario.id, role: userRole };
     } catch (error) {
         if (isNextDynamicServerError(error)) {
             throw error;
         }
         if (error instanceof Error && error.message.includes("NEXT_REDIRECT")) {
-            throw error; // Re-lanzar redirecciones de Next.js
+            throw error;
         }
         console.error("[RBAC] Error in requireRole:", error);
         throw error;
