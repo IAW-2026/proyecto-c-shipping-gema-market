@@ -1,7 +1,8 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { MapContainer, TileLayer, Polyline, useMap } from "react-leaflet";
+import { useEffect, useState, useMemo } from "react";
+import { MapContainer, TileLayer, Polyline, Marker, useMap } from "react-leaflet";
+import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 
 interface RouteData {
@@ -20,6 +21,18 @@ interface MapViewerProps {
     className?: string;
 }
 
+const ORIGIN_SVG = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#4285F4" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2H2v10l9.29 9.29c.94.94 2.48.94 3.42 0l6.58-6.58c.94-.94.94-2.48 0-3.42L12 2Z"/><path d="M7 7h.01"/></svg>`;
+const DEST_SVG = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#4285F4" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>`;
+
+function markerIcon(svg: string): L.DivIcon {
+    return L.divIcon({
+        className: "",
+        html: `<div style="width:34px;height:34px;border-radius:50%;background:white;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 6px rgba(0,0,0,0.25);border:2px solid #4285F4;">${svg}</div>`,
+        iconSize: [34, 34],
+        iconAnchor: [17, 17],
+    });
+}
+
 function FitBounds({ coords }: { coords: [number, number][] }) {
     const map = useMap();
     useEffect(() => {
@@ -34,8 +47,12 @@ export default function MapViewer({ shippingId, className }: MapViewerProps) {
     const [route, setRoute] = useState<RouteData | null>(null);
     const [error, setError] = useState<string | null>(null);
 
+    const originIcon = useMemo(() => markerIcon(ORIGIN_SVG), []);
+    const destIcon = useMemo(() => markerIcon(DEST_SVG), []);
+
     useEffect(() => {
         const controller = new AbortController();
+        setRoute(null);
         setError(null);
 
         fetch(`/api/shipping/envios/${shippingId}/route`, {
@@ -90,11 +107,17 @@ export default function MapViewer({ shippingId, className }: MapViewerProps) {
             <Polyline
                 positions={positions}
                 pathOptions={{
-                    color: "#936639",
+                    color: "#4285F4",
                     weight: 4,
                     opacity: 0.8,
                 }}
             />
+            {route.waypoints && (
+                <>
+                    <Marker position={[route.waypoints.origin.lat, route.waypoints.origin.lng]} icon={originIcon} />
+                    <Marker position={[route.waypoints.destination.lat, route.waypoints.destination.lng]} icon={destIcon} />
+                </>
+            )}
             <FitBounds coords={positions} />
         </MapContainer>
     );
