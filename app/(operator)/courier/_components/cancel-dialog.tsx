@@ -4,16 +4,16 @@ import { X, AlertTriangle } from "lucide-react";
 
 interface CancelDialogProps {
     open: boolean;
-    isPending: boolean;
+    hasPendingAction: boolean;
     onConfirm: () => void;
     onCancel: () => void;
 }
 
-export function CancelDialog({ open, isPending, onConfirm, onCancel }: CancelDialogProps) {
+export function CancelDialog({ open, hasPendingAction, onConfirm, onCancel }: CancelDialogProps) {
     if (!open) return null;
 
     return (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+        <div className="fixed inset-0 z-[1100] flex items-center justify-center p-4">
             <div className="absolute inset-0 bg-black/50" onClick={onCancel} />
             <div className="relative bg-paper rounded-2xl p-6 max-w-sm w-full shadow-xl">
                 <button
@@ -36,17 +36,17 @@ export function CancelDialog({ open, isPending, onConfirm, onCancel }: CancelDia
                 <div className="flex gap-3">
                     <button
                         onClick={onCancel}
-                        disabled={isPending}
+                        disabled={hasPendingAction}
                         className="flex-1 bg-paper text-ink border border-line h-11 rounded-full text-sm font-bold hover:bg-cream transition-all disabled:opacity-50"
                     >
                         No, volver
                     </button>
                     <button
                         onClick={onConfirm}
-                        disabled={isPending}
+                        disabled={hasPendingAction}
                         className="flex-1 bg-red-600 text-white h-11 rounded-full text-sm font-bold hover:bg-red-700 transition-all disabled:opacity-50 flex items-center justify-center gap-2"
                     >
-                        {isPending ? "Cancelando..." : "Sí, cancelar"}
+                        {hasPendingAction ? "Cancelando..." : "Sí, cancelar"}
                     </button>
                 </div>
             </div>

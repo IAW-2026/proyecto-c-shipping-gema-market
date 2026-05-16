@@ -1,26 +1,17 @@
 // app/(operator)/layout.tsx
 import { ReactNode } from "react";
-import { auth } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
-import { ROLES, UserRole } from "@/lib/definitions/auth";
+import { ROLES } from "@/lib/definitions/auth";
+import { requireRole } from "@/lib/auth/rbac";
 import { OperatorSidebar } from "./_components/Sidebar";
 import { MobileNav } from "./_components/MobileNav";
 
 
 export default async function OperatorLayout({ children }: { children: ReactNode }) {
-    // 1. Verificación de Identidad y Roles en la capa más alta del módulo
-    const { userId, sessionClaims } = await auth();
+    const result = await requireRole([ROLES.LOGISTICS, ROLES.SHIPPING_ADMIN]);
 
-    if (!userId) {
+    if (!result) {
         redirect("/login");
-    }
-
-    const claims = sessionClaims as unknown as { metadata?: { role?: typeof ROLES[keyof typeof ROLES] } };
-    const userRole = claims?.metadata?.role;
-
-    if (!userRole || (userRole !== ROLES.LOGISTICS && userRole !== ROLES.SHIPPING_ADMIN)) {
-        // Si un comprador intenta entrar a la ruta de operadores, lo expulsamos
-        redirect("/unauthorized");
     }
 
     // 2. Estructura Persistente

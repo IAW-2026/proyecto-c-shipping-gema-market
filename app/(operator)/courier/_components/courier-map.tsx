@@ -8,13 +8,14 @@ const MapViewer = dynamic(() => import("@/components/ui/map-viewer"), {
 
 interface CourierMapProps {
     shipment: ShipmentSummary;
+    hasPendingAction?: boolean;
 }
 
-export function CourierMap({ shipment }: CourierMapProps) {
+export function CourierMap({ shipment, hasPendingAction }: CourierMapProps) {
     return (
         <div className="h-full relative">
             <MapViewer shippingId={shipment.shippingId} />
-            <div className="absolute top-4 left-4 z-[1000]">
+            <div className={`absolute top-4 left-4 z-[1000] transition-opacity duration-300 ${hasPendingAction ? "opacity-50" : ""}`}>
                 <ShipmentStatusBadge status={shipment.status} />
             </div>
         </div>
