@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/db/prisma";
-import { getCoordinatesFromAddress, getRoute } from "@/lib/services/open-route";
+import { getCoordinatesFromAddress, getRoute } from "@/lib/services/map-services";
 
 interface RouteParams {
     params: Promise<{ shipmentId: string }>;

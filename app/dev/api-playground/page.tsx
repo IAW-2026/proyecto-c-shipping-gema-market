@@ -710,7 +710,7 @@ function FlowItem({
                 <span>{icon}</span>
                 <span className="text-gray-400">{label}</span>
             </div>
-            <p className={`font-mono mt-0.5 ${done ? "text-green-300" : "text-gray-600"}`}>
+            <p className={`font-mono mt-0.5 truncate ${done ? "text-green-300" : "text-gray-600"}`}>
                 {value}
             </p>
         </div>

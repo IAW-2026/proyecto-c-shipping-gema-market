@@ -1,6 +1,6 @@
 /** Orquestador del flujo de cotización: coordina API externa, geocoding, pricing y persistencia. */
 import { sellerApiClient } from "@/lib/clients/seller-api/seller-api.client";
-import { getCoordinatesFromAddress, getRoute, type ORSRouteResult } from "@/lib/services/open-route";
+import { getCoordinatesFromAddress, getMatrixDistance } from "@/lib/services/map-services";
 import type { ApiTrace } from "@/lib/shared/api-trace";
 import type { z } from "zod";
 import type { quoteRequestSchema } from "@/lib/validations/api-schemas";
@@ -46,21 +46,23 @@ export async function calculateQuote(
 
     const volume_m3 = calculateVolume(height_cm, width_cm, depth_cm);
 
-    let route: ORSRouteResult | null = null;
+    let distanceKm = DEFAULT_DISTANCE_KM;
+    let durationSeconds: number | undefined;
     if (originCoords && destCoords) {
         try {
-            route = await getRoute(originCoords, destCoords);
+            const matrix = await getMatrixDistance(originCoords, destCoords);
+            distanceKm = matrix.distance_km || DEFAULT_DISTANCE_KM;
+            durationSeconds = matrix.duration_seconds ?? undefined;
         } catch {
-            console.warn("[Cotización] Error al obtener ruta, continuando sin ella");
+            console.warn("[Cotización] Error al obtener distancia, continuando con valor por defecto");
         }
     }
 
     const [tarifa] = await Promise.all([findMatchingTarifa(weight_kg, volume_m3)]);
 
-    const distanceKm = route?.summary.distance ? route.summary.distance / 1000 : DEFAULT_DISTANCE_KM;
     const pricePerKm = tarifa ? tarifa.price_per_km : getDefaultPricePerKm();
     const price = calculatePrice(pricePerKm, distanceKm);
-    const estimatedDays = calculateEstimatedDays(route?.summary.duration);
+    const estimatedDays = calculateEstimatedDays(durationSeconds);
     const valid_until = new Date(Date.now() + 1 * 60 * 60 * 1000);
 
     const recordData: CreateQuoteData = {
@@ -82,8 +84,8 @@ export async function calculateQuote(
         pickup_lng: originCoords?.[0] ?? null,
         delivery_lat: destCoords?.[1] ?? null,
         delivery_lng: destCoords?.[0] ?? null,
-        route_distance: route?.summary.distance ?? null,
-        route_duration: route?.summary.duration ?? null,
+        route_distance: distanceKm * 1000,
+        route_duration: durationSeconds ?? null,
     };
 
     const cotizacion = await createQuoteRecord(recordData);

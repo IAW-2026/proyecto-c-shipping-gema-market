@@ -11,8 +11,18 @@ import prisma from "@/lib/db/prisma";
 export async function requireRole(allowedRoles: UserRole[]) {
     const bypass = process.env.BYPASS_RBAC;
     if (bypass) {
-        // BYPASS_RBAC=true usa usr_mock; BYPASS_RBAC=usr_xxx usa ese ID
         const bypassUserId = bypass === "true" ? "usr_mock" : bypass;
+        await prisma.usuario.upsert({
+            where: { id: bypassUserId },
+            update: {},
+            create: {
+                id: bypassUserId,
+                clerk_user_id: `clerk_${bypassUserId}`,
+                email: `${bypassUserId}@localhost`,
+                full_name: "Bypass User",
+                role: allowedRoles[0],
+            },
+        });
         return { userId: bypassUserId, role: allowedRoles[0] };
     }
 
