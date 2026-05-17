@@ -39,6 +39,13 @@ model Cotizacion {
   estimated_days        Int
   valid_until           DateTime
   created_at            DateTime @default(now())
+
+  pickup_lat            Float?
+  pickup_lng            Float?
+  delivery_lat          Float?
+  delivery_lng          Float?
+  route_distance        Float?
+  route_duration        Float?
 }
 
 // 3. Envio: Entidad maestra de logística
@@ -61,6 +68,14 @@ model Envio {
   picked_up_at     DateTime?
   delivered_at     DateTime?
   created_at       DateTime  @default(now())
+
+  pickup_lat       Float?
+  pickup_lng       Float?
+  delivery_lat     Float?
+  delivery_lng     Float?
+  route_geometry   Json?
+  route_distance   Float?
+  route_duration   Float?
 
   // Relación con el fletero asignado
   operador Usuario? @relation(fields: [logistics_id], references: [id])

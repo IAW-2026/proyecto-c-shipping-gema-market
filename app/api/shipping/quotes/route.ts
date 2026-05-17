@@ -1,10 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
 import { quoteRequestSchema } from "@/lib/validations/api-schemas";
-import { calculateQuote } from "@/lib/services/cotizacion.service";
+import { calculateQuote } from "@/lib/services/quote";
 import { createTraceIfDebug, withTrace } from "@/lib/shared/api-handler";
 
 /**
- * POST /api/shipping/cotizaciones
+ * POST /api/shipping/quotes
  * Consumido por: Buyer App
  * Calcula el costo y tiempo estimado de envío logístico entre dos domicilios.
  */
@@ -21,7 +21,7 @@ export async function POST(request: NextRequest) {
         }
 
         const trace = createTraceIfDebug(request);
-        const result = await calculateQuote(parsed.data, trace);
+        const result = await calculateQuote(parsed.data, trace, request);
 
         return NextResponse.json(withTrace(result, trace), { status: 200 });
 

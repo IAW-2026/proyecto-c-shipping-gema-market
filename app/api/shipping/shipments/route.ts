@@ -1,10 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createShipmentSchema } from "@/lib/validations/api-schemas";
-import { createShipment } from "@/lib/services/envio.service";
-
+import { createShipment } from "@/lib/services/shipment";
 
 /**
- * POST /api/shipping/envios
+ * POST /api/shipping/shipments
  * Consumido por: Seller App (tras pago confirmado)
  * Solicita la creación y gestión logística de un envío para una orden específica.
  */
@@ -23,7 +22,7 @@ export async function POST(request: NextRequest) {
             );
         }
 
-        const result = await createShipment(parsed.data);
+        const result = await createShipment(parsed.data, request);
 
         return NextResponse.json(result, { status: 201 });
 

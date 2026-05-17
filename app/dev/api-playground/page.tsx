@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useCallback } from "react";
 
 type RequestState = "idle" | "loading" | "success" | "error";
 
@@ -25,6 +25,85 @@ type EndpointDef = {
     defaultBody: string;
 };
 
+type PlaygroundConfig = {
+    dest_street: string;
+    dest_number: string;
+    dest_zip: string;
+    seller_id: string;
+    buyer_id: string;
+    mock_origin_street: string;
+    mock_origin_number: string;
+    mock_origin_zip: string;
+    mock_buyer_name: string;
+    mock_buyer_phone: string;
+};
+
+const DEFAULT_CONFIG: PlaygroundConfig = {
+    dest_street: "Av. San Martín",
+    dest_number: "123",
+    dest_zip: "8000",
+    seller_id: "usr_01HXYZSELLER1234567890",
+    buyer_id: "usr_01HXYZBUYER1234567890",
+    mock_origin_street: "San Martín",
+    mock_origin_number: "123",
+    mock_origin_zip: "8000",
+    mock_buyer_name: "Carlos Pérez",
+    mock_buyer_phone: "2915550101",
+};
+
+function buildCotizarBody(config: PlaygroundConfig): string {
+    return JSON.stringify(
+        {
+            destination_address: { street: config.dest_street, number: config.dest_number, zip: config.dest_zip },
+            product_id: "prd_01HXYZ1234567890ABCDEF",
+            weight_kg: 15,
+            height_cm: 80,
+            width_cm: 100,
+            depth_cm: 50,
+        },
+        null,
+        2
+    );
+}
+
+function buildEnvioBody(config: PlaygroundConfig): string {
+    return JSON.stringify(
+        {
+            order_id: "ord_01HXYZ1234567890ABCDEF",
+            seller_id: config.seller_id,
+            buyer_id: config.buyer_id,
+        },
+        null,
+        2
+    );
+}
+
+function buildReservarBody(): string {
+    return JSON.stringify(
+        { quote_id: "qte_01HXYZ1234567890ABCDEF", order_id: "ord_01HXYZ1234567890ABCDEF" },
+        null,
+        2
+    );
+}
+
+function buildLiberarBody(): string {
+    return JSON.stringify(
+        { quote_id: "qte_01HXYZ1234567890ABCDEF", order_id: "ord_01HXYZ1234567890ABCDEF" },
+        null,
+        2
+    );
+}
+
+function getDefaultBodies(config: PlaygroundConfig): Record<string, string> {
+    return {
+        cotizar: buildCotizarBody(config),
+        reservar: buildReservarBody(),
+        liberar: buildLiberarBody(),
+        "crear-envio": buildEnvioBody(config),
+        "ver-ruta": "{}",
+    };
+}
+
 const ENDPOINTS: EndpointDef[] = [
     {
         id: "cotizar",
@@ -32,21 +111,10 @@ const ENDPOINTS: EndpointDef[] = [
         step: 1,
         label: "Cotizar envío",
         method: "POST",
-        url: "/api/shipping/cotizaciones",
+        url: "/api/shipping/quotes",
         description:
             "El comprador solicita una cotización de envío para un producto. Se calcula el precio según peso, dimensiones y tarifas vigentes.",
-        defaultBody: JSON.stringify(
-            {
-                destination_address: { street: "Av. San Martín", number: "123", zip: "8000" },
-                product_id: "prd_01HXYZ1234567890ABCDEF",
-                weight_kg: 15,
-                height_cm: 80,
-                width_cm: 100,
-                depth_cm: 50,
-            },
-            null,
-            2
-        ),
+        defaultBody: buildCotizarBody(DEFAULT_CONFIG),
     },
     {
         id: "reservar",
@@ -54,17 +122,10 @@ const ENDPOINTS: EndpointDef[] = [
         step: 2,
         label: "Reservar cotización",
         method: "POST",
-        url: "/api/shipping/cotizaciones/reservar",
+        url: "/api/shipping/quotes/reserve",
         description:
             "Payments App vincula la cotización con una orden de compra. La cotización queda reservada y no puede ser usada por otra orden.",
-        defaultBody: JSON.stringify(
-            {
-                quote_id: "qte_01HXYZ1234567890ABCDEF",
-                order_id: "ord_01HXYZ1234567890ABCDEF",
-            },
-            null,
-            2
-        ),
+        defaultBody: buildReservarBody(),
     },
     {
         id: "liberar",
@@ -72,17 +133,10 @@ const ENDPOINTS: EndpointDef[] = [
         step: 2,
         label: "Liberar reserva",
         method: "POST",
-        url: "/api/shipping/cotizaciones/liberar-reserva",
+        url: "/api/shipping/quotes/release",
         description:
             "Si el pago se rechaza, Payments App libera la cotización para que pueda ser reutilizada por otra orden.",
-        defaultBody: JSON.stringify(
-            {
-                quote_id: "qte_01HXYZ1234567890ABCDEF",
-                order_id: "ord_01HXYZ1234567890ABCDEF",
-            },
-            null,
-            2
-        ),
+        defaultBody: buildLiberarBody(),
     },
     {
         id: "crear-envio",
@@ -90,18 +144,10 @@ const ENDPOINTS: EndpointDef[] = [
         step: 3,
         label: "Crear envío",
         method: "POST",
-        url: "/api/shipping/envios",
+        url: "/api/shipping/shipments",
         description:
             "Cuando el pago se confirma, el vendedor solicita la creación del envío. Se genera un código de seguimiento y el envío queda listo para ser tomado por un operador logístico.",
-        defaultBody: JSON.stringify(
-            {
-                order_id: "ord_01HXYZ1234567890ABCDEF",
-                seller_id: "usr_01HXYZSELLER1234567890",
-                buyer_id: "usr_01HXYZBUYER1234567890",
-            },
-            null,
-            2
-        ),
+        defaultBody: buildEnvioBody(DEFAULT_CONFIG),
     },
     {
         id: "ver-ruta",
@@ -109,7 +155,7 @@ const ENDPOINTS: EndpointDef[] = [
         step: 3,
         label: "Ver ruta en mapa",
         method: "GET",
-        url: "/api/shipping/envios/{shipping_id}/route",
+        url: "/api/shipping/shipments/{shipment_id}/route",
         description:
             "Obtiene la geometría de la ruta entre la dirección de retiro y la de entrega del envío, usando OpenRouteService.",
         defaultBody: "{}",
@@ -131,11 +177,9 @@ type FlowStatus = {
 };
 
 export default function ApiPlaygroundPage() {
-    const [bodies, setBodies] = useState<Record<string, string>>(() => {
-        const initial: Record<string, string> = {};
-        for (const ep of ENDPOINTS) initial[ep.id] = ep.defaultBody;
-        return initial;
-    });
+    const [configOpen, setConfigOpen] = useState(true);
+    const [config, setConfig] = useState<PlaygroundConfig>(DEFAULT_CONFIG);
+    const [bodies, setBodies] = useState<Record<string, string>>(() => getDefaultBodies(DEFAULT_CONFIG));
     const [results, setResults] = useState<Record<string, { status: number; body: string; trace?: TraceEntry[] } | null>>({});
     const [states, setStates] = useState<Record<string, RequestState>>({});
     const [flow, setFlow] = useState<FlowStatus>({
@@ -145,6 +189,20 @@ export default function ApiPlaygroundPage() {
         tracking_code: null,
         status: null,
     });
+
+    const syncConfigToBodies = useCallback((cfg: PlaygroundConfig) => {
+        setBodies((prev) => ({
+            ...prev,
+            cotizar: buildCotizarBody(cfg),
+            "crear-envio": buildEnvioBody(cfg),
+        }));
+    }, []);
+
+    const updateConfig = (patch: Partial<PlaygroundConfig>) => {
+        const next = { ...config, ...patch };
+        setConfig(next);
+        syncConfigToBodies(next);
+    };
 
     const handleBodyChange = (id: string, value: string) => {
         setBodies((prev) => ({ ...prev, [id]: value }));
@@ -158,22 +216,39 @@ export default function ApiPlaygroundPage() {
         } catch {}
     };
 
+    const buildMockHeaders = (ep: EndpointDef): Record<string, string> => {
+        const headers: Record<string, string> = {};
+        if (ep.id === "cotizar") {
+            headers["X-Mock-Origin-Street"] = config.mock_origin_street;
+            headers["X-Mock-Origin-Number"] = config.mock_origin_number;
+            headers["X-Mock-Origin-Zip"] = config.mock_origin_zip;
+        }
+        if (ep.id === "crear-envio") {
+            headers["X-Mock-Buyer-Name"] = config.mock_buyer_name;
+            headers["X-Mock-Buyer-Phone"] = config.mock_buyer_phone;
+        }
+        return headers;
+    };
+
     const handleSend = async (ep: EndpointDef) => {
         setStates((prev) => ({ ...prev, [ep.id]: "loading" }));
         setResults((prev) => ({ ...prev, [ep.id]: null }));
 
         try {
             const url = ep.url.replace("{shipping_id}", flow.shipping_id ?? "");
+            const mockHeaders = buildMockHeaders(ep);
             let res: Response;
             let requestBody: Record<string, unknown> | undefined;
 
+            const baseHeaders: Record<string, string> = { "X-Debug": "true", ...mockHeaders };
+
             if (ep.method === "GET") {
-                res = await fetch(url, { headers: { "X-Debug": "true" } });
+                res = await fetch(url, { headers: baseHeaders });
             } else {
                 requestBody = JSON.parse(bodies[ep.id]);
                 res = await fetch(url, {
                     method: ep.method,
-                    headers: { "Content-Type": "application/json", "X-Debug": "true" },
+                    headers: { "Content-Type": "application/json", ...baseHeaders },
                     body: JSON.stringify(requestBody),
                 });
             }
@@ -246,9 +321,133 @@ export default function ApiPlaygroundPage() {
                     <h1 className="text-2xl font-bold">API Playground</h1>
                     <span className="text-xs bg-gray-800 text-gray-400 px-2 py-0.5 rounded">dev</span>
                 </div>
-                <p className="text-gray-400 mb-6">
+                <p className="text-gray-400 mb-4">
                     Simulá el flujo completo de integración entre aplicaciones del ecosistema UniHousing.
                 </p>
+
+                {/* Config Panel */}
+                <div className="bg-gray-900 rounded-lg border border-gray-700 mb-6 overflow-hidden">
+                    <button
+                        onClick={() => setConfigOpen(!configOpen)}
+                        className="w-full flex items-center gap-2 px-4 py-2.5 text-sm font-medium text-gray-300 hover:bg-gray-800 transition"
+                    >
+                        <span>⚙️ Configuración</span>
+                        <span className="ml-auto text-gray-500">{configOpen ? "▲" : "▼"}</span>
+                    </button>
+                    {configOpen && (
+                        <div className="p-4 border-t border-gray-700 space-y-3">
+                            {/* Primera fila: destino + IDs */}
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                                <fieldset className="border border-gray-700 rounded p-3">
+                                    <legend className="text-xs text-gray-500 px-1">Dirección destino</legend>
+                                    <label className="block text-xs text-gray-400 mb-1">street</label>
+                                    <input
+                                        value={config.dest_street}
+                                        onChange={(e) => updateConfig({ dest_street: e.target.value })}
+                                        className="w-full bg-gray-950 border border-gray-700 rounded px-2 py-1.5 text-xs font-mono text-gray-200 mb-2"
+                                    />
+                                    <div className="flex gap-2">
+                                        <div className="flex-1">
+                                            <label className="block text-xs text-gray-400 mb-1">number</label>
+                                            <input
+                                                value={config.dest_number}
+                                                onChange={(e) => updateConfig({ dest_number: e.target.value })}
+                                                className="w-full bg-gray-950 border border-gray-700 rounded px-2 py-1.5 text-xs font-mono text-gray-200"
+                                            />
+                                        </div>
+                                        <div className="w-24">
+                                            <label className="block text-xs text-gray-400 mb-1">zip</label>
+                                            <input
+                                                value={config.dest_zip}
+                                                onChange={(e) => updateConfig({ dest_zip: e.target.value })}
+                                                className="w-full bg-gray-950 border border-gray-700 rounded px-2 py-1.5 text-xs font-mono text-gray-200"
+                                            />
+                                        </div>
+                                    </div>
+                                </fieldset>
+
+                                <fieldset className="border border-gray-700 rounded p-3">
+                                    <legend className="text-xs text-gray-500 px-1">Vendedor / Comprador</legend>
+                                    <div className="flex gap-2">
+                                        <div className="flex-1">
+                                            <label className="block text-xs text-gray-400 mb-1">seller_id</label>
+                                            <input
+                                                value={config.seller_id}
+                                                onChange={(e) => updateConfig({ seller_id: e.target.value })}
+                                                className="w-full bg-gray-950 border border-gray-700 rounded px-2 py-1.5 text-xs font-mono text-gray-200"
+                                            />
+                                        </div>
+                                        <div className="flex-1">
+                                            <label className="block text-xs text-gray-400 mb-1">buyer_id</label>
+                                            <input
+                                                value={config.buyer_id}
+                                                onChange={(e) => updateConfig({ buyer_id: e.target.value })}
+                                                className="w-full bg-gray-950 border border-gray-700 rounded px-2 py-1.5 text-xs font-mono text-gray-200"
+                                            />
+                                        </div>
+                                    </div>
+                                </fieldset>
+                            </div>
+
+                            {/* Segunda fila: datos simulados */}
+                            <fieldset className="border border-gray-700 rounded p-3">
+                                <legend className="text-xs text-amber-500 px-1">Datos simulados de otros sistemas</legend>
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                                    <div>
+                                        <p className="text-[11px] text-gray-500 mb-1.5">Seller App — dirección de origen</p>
+                                        <div className="flex gap-2 items-end">
+                                            <div className="flex-1">
+                                                <label className="block text-[10px] text-gray-400 mb-0.5">street</label>
+                                                <input
+                                                    value={config.mock_origin_street}
+                                                    onChange={(e) => updateConfig({ mock_origin_street: e.target.value })}
+                                                    className="w-full bg-gray-950 border border-gray-700 rounded px-2 py-1.5 text-xs font-mono text-gray-200"
+                                                />
+                                            </div>
+                                            <div className="w-20">
+                                                <label className="block text-[10px] text-gray-400 mb-0.5">number</label>
+                                                <input
+                                                    value={config.mock_origin_number}
+                                                    onChange={(e) => updateConfig({ mock_origin_number: e.target.value })}
+                                                    className="w-full bg-gray-950 border border-gray-700 rounded px-2 py-1.5 text-xs font-mono text-gray-200"
+                                                />
+                                            </div>
+                                            <div className="w-20">
+                                                <label className="block text-[10px] text-gray-400 mb-0.5">zip</label>
+                                                <input
+                                                    value={config.mock_origin_zip}
+                                                    onChange={(e) => updateConfig({ mock_origin_zip: e.target.value })}
+                                                    className="w-full bg-gray-950 border border-gray-700 rounded px-2 py-1.5 text-xs font-mono text-gray-200"
+                                                />
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <p className="text-[11px] text-gray-500 mb-1.5">Buyer App — datos del comprador</p>
+                                        <div className="flex gap-2 items-end">
+                                            <div className="flex-1">
+                                                <label className="block text-[10px] text-gray-400 mb-0.5">full_name</label>
+                                                <input
+                                                    value={config.mock_buyer_name}
+                                                    onChange={(e) => updateConfig({ mock_buyer_name: e.target.value })}
+                                                    className="w-full bg-gray-950 border border-gray-700 rounded px-2 py-1.5 text-xs font-mono text-gray-200"
+                                                />
+                                            </div>
+                                            <div className="w-32">
+                                                <label className="block text-[10px] text-gray-400 mb-0.5">phone</label>
+                                                <input
+                                                    value={config.mock_buyer_phone}
+                                                    onChange={(e) => updateConfig({ mock_buyer_phone: e.target.value })}
+                                                    className="w-full bg-gray-950 border border-gray-700 rounded px-2 py-1.5 text-xs font-mono text-gray-200"
+                                                />
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </fieldset>
+                        </div>
+                    )}
+                </div>
 
                 <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
                     <div className="lg:col-span-3 space-y-6">
@@ -373,9 +572,8 @@ export default function ApiPlaygroundPage() {
                                     setFlow({ quote_id: null, order_id: null, shipping_id: null, tracking_code: null, status: null });
                                     setResults({});
                                     setStates({});
-                                    const initial: Record<string, string> = {};
-                                    for (const ep of ENDPOINTS) initial[ep.id] = ep.defaultBody;
-                                    setBodies(initial);
+                                    setConfig(DEFAULT_CONFIG);
+                                    setBodies(getDefaultBodies(DEFAULT_CONFIG));
                                 }}
                                 className="mt-4 w-full text-xs text-gray-500 hover:text-gray-300 transition py-1"
                             >

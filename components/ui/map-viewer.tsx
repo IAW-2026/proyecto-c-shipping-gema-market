@@ -55,7 +55,7 @@ export default function MapViewer({ shippingId, className }: MapViewerProps) {
         setRoute(null);
         setError(null);
 
-        fetch(`/api/shipping/envios/${shippingId}/route`, {
+        fetch(`/api/shipping/shipments/${shippingId}/route`, {
             signal: controller.signal,
         })
             .then(async (res) => {

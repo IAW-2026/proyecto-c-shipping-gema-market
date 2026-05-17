@@ -1,8 +1,10 @@
+/** Servicio de creación de envíos: valida datos del comprador, busca cotización reservada y persiste el envío. */
 import prisma from "@/lib/db/prisma";
 import { generatePrefixedId } from "@/lib/shared/utils";
+import { buyerApiClient } from "@/lib/clients/buyer-api/buyer-api.client";
 import type { z } from "zod";
 import type { createShipmentSchema } from "@/lib/validations/api-schemas";
-import type { Prisma } from "@/lib/generated/prisma/client";
+import { Prisma } from "@/lib/generated/prisma/client";
 type CreateShipmentRequest = z.infer<typeof createShipmentSchema>;
 
 function generateTrackingCode(): string {
@@ -17,8 +19,29 @@ export interface CreateShipmentResult {
     tracking_code: string;
 }
 
-export async function createShipment(request: CreateShipmentRequest): Promise<CreateShipmentResult> {
-    const { order_id, seller_id, buyer_id, receiver_name, receiver_phone } = request;
+export async function createShipment(
+    data: CreateShipmentRequest,
+    req?: Request
+): Promise<CreateShipmentResult> {
+    let { order_id, seller_id, buyer_id, receiver_name, receiver_phone } = data;
+
+    if (!receiver_name || !receiver_phone) {
+        try {
+            const buyerResult = await buyerApiClient.getBuyerData(buyer_id, req);
+            if (buyerResult.data) {
+                receiver_name ??= buyerResult.data.full_name;
+                receiver_phone ??= buyerResult.data.phone_number;
+            }
+        } catch (e) {
+            console.warn("[Envio] Error al obtener datos del buyer:", e instanceof Error ? e.message : e);
+        }
+        if (!receiver_name || !receiver_phone) {
+            throw Object.assign(
+                new Error("Datos del comprador incompletos: se require receiver_name y receiver_phone, o X-Mock-Buyer-* en los headers"),
+                { statusCode: 400, code: "BAD_REQUEST" }
+            );
+        }
+    }
 
     const cotizacion = await prisma.cotizacion.findFirst({
         where: { reserved_for_order_id: order_id, status: "reserved" },
@@ -59,6 +82,13 @@ export async function createShipment(request: CreateShipmentRequest): Promise<Cr
             tracking_code,
             status: "pending_pickup",
             price: cotizacion.price,
+            pickup_lat: (cotizacion.pickup_lat as number | undefined) ?? null,
+            pickup_lng: (cotizacion.pickup_lng as number | undefined) ?? null,
+            delivery_lat: (cotizacion.delivery_lat as number | undefined) ?? null,
+            delivery_lng: (cotizacion.delivery_lng as number | undefined) ?? null,
+            route_geometry: Prisma.DbNull,
+            route_distance: (cotizacion.route_distance as number | undefined) ?? null,
+            route_duration: (cotizacion.route_duration as number | undefined) ?? null,
         },
     });
 

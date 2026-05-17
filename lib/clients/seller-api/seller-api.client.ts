@@ -2,108 +2,52 @@ import { ApiResult } from "../types";
 import { SellerOrderDetails, SellerNotificationResponse, OriginAddressResponse } from "./seller-api.types";
 import type { ApiTrace } from "@/lib/shared/api-trace";
 
-const SELLER_API_URL = process.env.SELLER_API_URL || "http://localhost:3001";
-
 /**
  * Cliente para la comunicación con el microservicio de Seller.
+ * 
+ * NOTA: Los endpoints externos (Seller App) aún no están disponibles.
+ * Todos los métodos retornan datos simulados directamente.
+ * TODO: Integrar con Seller App cuando esté disponible.
  */
 export const sellerApiClient = {
     /**
      * Obtiene la dirección de origen del vendedor para un producto.
      * GET /api/seller/productos/:product_id/direccion-origen
+     * TODO: Reemplazar mock con fetch real a Seller App.
      */
-    getOriginAddress: async (productId: string, trace?: ApiTrace): ApiResult<OriginAddressResponse> => {
-        console.log(`[M2M] Consultando dirección de origen para producto ${productId}`);
-
-        const traceEntry = {
-            target: "Seller App",
-            method: "GET" as const,
-            url: `/api/seller/productos/${productId}/direccion-origen`,
+    getOriginAddress: async (_productId: string, _trace?: ApiTrace, req?: Request): ApiResult<OriginAddressResponse> => {
+        await new Promise(resolve => setTimeout(resolve, 200));
+        return {
+            data: {
+                origin_address: {
+                    street: req?.headers.get("X-Mock-Origin-Street") ?? "San Martín",
+                    number: req?.headers.get("X-Mock-Origin-Number") ?? "123",
+                    zip: req?.headers.get("X-Mock-Origin-Zip") ?? "8000",
+                }
+            },
+            status: 200
         };
-
-        try {
-            const res = await fetch(
-                `${SELLER_API_URL}/api/seller/productos/${productId}/direccion-origen`,
-                { method: "GET", headers: { "Content-Type": "application/json" } }
-            );
-
-            if (!res.ok) {
-                console.warn(`[M2M] Seller API respondió con ${res.status}, usando fallback`);
-                throw new Error(`HTTP ${res.status}`);
-            }
-
-            const data: OriginAddressResponse = await res.json();
-            trace?.add({ ...traceEntry, response_status: res.status, response_body: data });
-            return { data, status: res.status };
-        } catch {
-            const fallback = { origin_address: { street: "San Martín", number: "123", zip: "8000" } };
-            console.log("[M2M] Usando dirección de origen mock");
-            await new Promise(resolve => setTimeout(resolve, 200));
-            trace?.add({ ...traceEntry, response_status: 200, response_body: fallback });
-            return { data: fallback, status: 200 };
-        }
     },
 
     /**
      * Obtiene detalles adicionales de una orden desde el vendedor para logística.
+     * GET /api/seller/ordenes/:order_id
+     * TODO: Reemplazar mock con fetch real a Seller App.
      */
-    getOrderDetails: async (orderId: string, trace?: ApiTrace): ApiResult<SellerOrderDetails> => {
-        console.log(`[M2M] Consultando Seller API para orden ${orderId}`);
+    getOrderDetails: async (orderId: string, _trace?: ApiTrace): ApiResult<SellerOrderDetails> => {
+        const fallback = { order_id: orderId, product_name: "Producto Mock", quantity: 1, pickup_address: "Calle Falsa 123" };
 
-        const traceEntry = {
-            target: "Seller App",
-            method: "GET" as const,
-            url: `/api/seller/ordenes/${orderId}`,
-        };
-
-        try {
-            const res = await fetch(
-                `${SELLER_API_URL}/api/seller/ordenes/${orderId}`,
-                { method: "GET", headers: { "Content-Type": "application/json" } }
-            );
-
-            if (!res.ok) throw new Error(`HTTP ${res.status}`);
-
-            const data: SellerOrderDetails = await res.json();
-            trace?.add({ ...traceEntry, response_status: res.status, response_body: data });
-            return { data, status: res.status };
-        } catch {
-            const fallback = { order_id: orderId, product_name: "Producto Mock", quantity: 1, pickup_address: "Calle Falsa 123" };
-            console.log("[M2M] Usando mock para detalles de orden");
-            await new Promise(resolve => setTimeout(resolve, 400));
-            trace?.add({ ...traceEntry, response_status: 200, response_body: fallback });
-            return { data: fallback, status: 200 };
-        }
+        await new Promise(resolve => setTimeout(resolve, 400));
+        return { data: fallback, status: 200 };
     },
 
     /**
      * Notifica al Seller que un envío ha sido tomado por un repartidor.
+     * POST /api/seller/envios/:order_id/tomado
+     * TODO: Reemplazar mock con fetch real a Seller App.
      */
-    notifyShipmentTaken: async (orderId: string, trace?: ApiTrace): ApiResult<SellerNotificationResponse> => {
-        console.log(`[M2M] Notificando toma de envío a Seller API: ${orderId}`);
-
-        const traceEntry = {
-            target: "Seller App",
-            method: "POST" as const,
-            url: `/api/seller/envios/${orderId}/tomado`,
-            request_body: { order_id: orderId },
-        };
-
-        try {
-            const res = await fetch(
-                `${SELLER_API_URL}/api/seller/envios/${orderId}/tomado`,
-                { method: "POST", headers: { "Content-Type": "application/json" } }
-            );
-
-            if (!res.ok) throw new Error(`HTTP ${res.status}`);
-
-            const data: SellerNotificationResponse = await res.json();
-            trace?.add({ ...traceEntry, response_status: res.status, response_body: data });
-            return { data, status: res.status };
-        } catch {
-            const fallback = { success: true };
-            trace?.add({ ...traceEntry, response_status: 200, response_body: fallback });
-            return { data: fallback, status: 200 };
-        }
+    notifyShipmentTaken: async (_orderId: string, _trace?: ApiTrace): ApiResult<SellerNotificationResponse> => {
+        await new Promise(resolve => setTimeout(resolve, 300));
+        return { data: { success: true }, status: 200 };
     }
 };

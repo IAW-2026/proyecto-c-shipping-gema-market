@@ -11,3 +11,18 @@ export interface BuyerNotificationResponse {
     received: boolean;
     order_id: string;
 }
+
+export interface BuyerAddress {
+    zip: string;
+    number: string;
+    street: string;
+}
+
+export interface BuyerDataResponse {
+    id: string;
+    email: string;
+    full_name: string;
+    phone_number: string;
+    address: BuyerAddress;
+    created_at: string;
+}

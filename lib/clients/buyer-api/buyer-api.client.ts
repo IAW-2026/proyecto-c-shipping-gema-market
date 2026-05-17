@@ -1,27 +1,44 @@
 import { ApiResult } from "../types";
-import { BuyerStatusUpdate, BuyerNotificationResponse } from "./buyer-api.types";
+import { BuyerStatusUpdate, BuyerNotificationResponse, BuyerDataResponse } from "./buyer-api.types";
 
 /**
  * Cliente para la comunicación con el microservicio de Buyer.
- * Implementa el patrón Adapter para aislar a la aplicación de cambios en la API externa.
+ * 
+ * NOTA: Los endpoints externos (Buyer App) aún no están disponibles.
+ * Todos los métodos retornan datos simulados directamente.
+ * TODO: Integrar con Buyer App cuando esté disponible.
  */
 export const buyerApiClient = {
     /**
-     * Notifica al Buyer sobre un cambio en el estado del envío de una orden.
+     * Obtiene los datos de un comprador por su ID.
+     * POST /api/buyer/:buyer_id
+     * TODO: Reemplazar mock con fetch real a Buyer App.
      */
-    notifyStatusChange: async (orderId: string, payload: BuyerStatusUpdate): ApiResult<BuyerNotificationResponse> => {
-        // TODO: Implementar fetch real usando variables de entorno para la URL
-        console.log(`[M2M] Notificando a Buyer API para orden ${orderId}`, payload);
-
-        // Simulamos latencia de red
-        await new Promise(resolve => setTimeout(resolve, 500));
-
-        // Mock de respuesta exitosa
+    getBuyerData: async (buyerId: string, req?: Request): ApiResult<BuyerDataResponse> => {
+        await new Promise(resolve => setTimeout(resolve, 200));
         return {
             data: {
-                received: true,
-                order_id: orderId
+                id: buyerId,
+                email: "",
+                full_name: req?.headers.get("X-Mock-Buyer-Name") ?? "Carlos Pérez",
+                phone_number: req?.headers.get("X-Mock-Buyer-Phone") ?? "2915550101",
+                address: { zip: "", number: "", street: "" },
+                created_at: new Date().toISOString()
             },
+            status: 200
+        };
+    },
+
+    /**
+     * Notifica al Buyer sobre un cambio en el estado del envío de una orden.
+     * TODO: Reemplazar mock con fetch real a Buyer App.
+     */
+    notifyStatusChange: async (_orderId: string, _payload: BuyerStatusUpdate): ApiResult<BuyerNotificationResponse> => {
+        console.log(`[M2M] Notificación a Buyer API simulada`);
+
+        await new Promise(resolve => setTimeout(resolve, 500));
+        return {
+            data: { received: true, order_id: _orderId },
             status: 200
         };
     }

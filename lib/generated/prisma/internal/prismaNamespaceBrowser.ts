@@ -97,7 +97,13 @@ export const CotizacionScalarFieldEnum = {
   currency: 'currency',
   estimated_days: 'estimated_days',
   valid_until: 'valid_until',
-  created_at: 'created_at'
+  created_at: 'created_at',
+  pickup_lat: 'pickup_lat',
+  pickup_lng: 'pickup_lng',
+  delivery_lat: 'delivery_lat',
+  delivery_lng: 'delivery_lng',
+  route_distance: 'route_distance',
+  route_duration: 'route_duration'
 } as const
 
 export type CotizacionScalarFieldEnum = (typeof CotizacionScalarFieldEnum)[keyof typeof CotizacionScalarFieldEnum]
@@ -121,7 +127,14 @@ export const EnvioScalarFieldEnum = {
   price: 'price',
   picked_up_at: 'picked_up_at',
   delivered_at: 'delivered_at',
-  created_at: 'created_at'
+  created_at: 'created_at',
+  pickup_lat: 'pickup_lat',
+  pickup_lng: 'pickup_lng',
+  delivery_lat: 'delivery_lat',
+  delivery_lng: 'delivery_lng',
+  route_geometry: 'route_geometry',
+  route_distance: 'route_distance',
+  route_duration: 'route_duration'
 } as const
 
 export type EnvioScalarFieldEnum = (typeof EnvioScalarFieldEnum)[keyof typeof EnvioScalarFieldEnum]
@@ -150,6 +163,14 @@ export const JsonNullValueInput = {
 } as const
 
 export type JsonNullValueInput = (typeof JsonNullValueInput)[keyof typeof JsonNullValueInput]
+
+
+export const NullableJsonNullValueInput = {
+  DbNull: DbNull,
+  JsonNull: JsonNull
+} as const
+
+export type NullableJsonNullValueInput = (typeof NullableJsonNullValueInput)[keyof typeof NullableJsonNullValueInput]
 
 
 export const QueryMode = {

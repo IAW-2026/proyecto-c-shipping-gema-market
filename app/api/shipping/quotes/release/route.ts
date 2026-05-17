@@ -1,9 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
 import { releaseQuoteSchema } from "@/lib/validations/api-schemas";
-import { releaseQuote } from "@/lib/services/cotizacion.service";
+import { releaseQuote } from "@/lib/services/quote";
 
 /**
- * POST /api/shipping/cotizaciones/liberar-reserva
+ * POST /api/shipping/quotes/release
  * Consumido por: Payments App
  * Libera la reserva de una cotización, dejándola disponible nuevamente.
  */

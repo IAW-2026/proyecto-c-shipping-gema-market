@@ -11,7 +11,7 @@ export const DestinationAddressSchema = z.object({
     apartment: z.string().optional(),
 });
 
-// --- Validación: POST /api/shipping/envios ---
+// --- Validación: POST /api/shipping/shipments ---
 
 export const createShipmentSchema = z.object({
     order_id: z.string().min(1),
@@ -28,7 +28,7 @@ export const updateStatusSchema = z.object({
     notes: z.string().optional(),
 });
 
-// --- Validación: POST /api/shipping/cotizaciones ---
+// --- Validación: POST /api/shipping/quotes ---
 
 export const quoteRequestSchema = z.object({
     destination_address: DestinationAddressSchema,
@@ -39,14 +39,14 @@ export const quoteRequestSchema = z.object({
     depth_cm: z.number().positive("La profundidad debe ser positiva"),
 });
 
-// --- Validación: POST /api/shipping/cotizaciones/reservar ---
+// --- Validación: POST /api/shipping/quotes/reserve ---
 
 export const reserveQuoteSchema = z.object({
     quote_id: z.string().min(1, "El ID de cotización es obligatorio"),
     order_id: z.string().min(1, "El ID de orden es obligatorio"),
 });
 
-// --- Validación: POST /api/shipping/cotizaciones/liberar-reserva ---
+// --- Validación: POST /api/shipping/quotes/release ---
 
 export const releaseQuoteSchema = z.object({
     quote_id: z.string().min(1, "El ID de cotización es obligatorio"),

@@ -1,9 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
 import { reserveQuoteSchema } from "@/lib/validations/api-schemas";
-import { reserveQuote } from "@/lib/services/cotizacion.service";
+import { reserveQuote } from "@/lib/services/quote";
 
 /**
- * POST /api/shipping/cotizaciones/reservar
+ * POST /api/shipping/quotes/reserve
  * Consumido por: Payments App
  * Reserva una cotización para una orden, evitando que sea utilizada por otra.
  */
