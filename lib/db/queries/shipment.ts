@@ -256,6 +256,18 @@ export async function getAvailableShipments(params?: ShipmentFilterParams): Prom
     return envios.map(toShipmentOffer);
 }
 
+export async function getEnvioCoords(envioId: string) {
+  return prisma.envio.findUnique({
+    where: { id: envioId },
+    select: {
+      pickup_lat: true,
+      pickup_lng: true,
+      delivery_lat: true,
+      delivery_lng: true,
+    },
+  });
+}
+
 export async function persistRouteGeometry(
   envioId: string,
   routeGeometry: Prisma.InputJsonValue
