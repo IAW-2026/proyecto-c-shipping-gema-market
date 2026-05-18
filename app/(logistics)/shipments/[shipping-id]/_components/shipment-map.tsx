@@ -2,7 +2,7 @@
 
 import dynamic from "next/dynamic";
 import type { ShipmentStatus } from "@/lib/shared/shipment-constants";
-import { ShipmentStatusBadge } from "@/app/(operator)/_components/shipment-status-badge";
+import { ShipmentStatusBadge } from "@/app/(logistics)/_components/shipment-status-badge";
 import { Card } from "@/components/ui/card";
 
 const MapViewer = dynamic(() => import("@/components/ui/map-viewer"), {

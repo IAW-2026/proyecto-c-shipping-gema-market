@@ -18,7 +18,7 @@ export default async function HistoryPage(props: {
     searchParams: Promise<{ [key: string]: string | undefined }>
 }) {
     const raw = await props.searchParams;
-    const { userId } = await requireRole([ROLES.LOGISTICS, ROLES.SHIPPING_ADMIN]);
+    const { userId } = await requireRole([ROLES.LOGISTICS]);
 
     const params = HistorySearchParamsSchema.parse(raw);
     const currentStatus = params.status;

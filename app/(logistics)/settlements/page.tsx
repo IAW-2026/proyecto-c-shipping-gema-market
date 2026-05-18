@@ -20,7 +20,7 @@ function currentMonthRange(): { start: Date; end: Date } {
 }
 
 export default async function SettlementsPage() {
-    const { userId } = await requireRole([ROLES.LOGISTICS, ROLES.SHIPPING_ADMIN]);
+    const { userId } = await requireRole([ROLES.LOGISTICS]);
     const { start, end } = currentMonthRange();
 
     const settlements = await getSettlements(userId, start, end);

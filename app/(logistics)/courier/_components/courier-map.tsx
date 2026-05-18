@@ -1,6 +1,6 @@
 import dynamic from "next/dynamic";
 import type { ShipmentSummary } from "@/lib/definitions/shipment";
-import { ShipmentStatusBadge } from "@/app/(operator)/_components/shipment-status-badge";
+import { ShipmentStatusBadge } from "@/app/(logistics)/_components/shipment-status-badge";
 
 const MapViewer = dynamic(() => import("@/components/ui/map-viewer"), {
     ssr: false,

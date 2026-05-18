@@ -16,7 +16,7 @@ interface ShipmentDetailPageProps {
 }
 
 export default async function ShipmentDetailPage({ params }: ShipmentDetailPageProps) {
-    await requireRole([ROLES.LOGISTICS, ROLES.SHIPPING_ADMIN]);
+    await requireRole([ROLES.LOGISTICS]);
 
     const resolvedParams = await params;
     const shippingId = resolvedParams["shipping-id"];

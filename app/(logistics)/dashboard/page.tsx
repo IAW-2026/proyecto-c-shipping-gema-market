@@ -16,7 +16,7 @@ export const metadata: Metadata = {
 };
 
 export default async function DashboardPage() {
-    const { userId } = await requireRole([ROLES.LOGISTICS, ROLES.SHIPPING_ADMIN]);
+    const { userId } = await requireRole([ROLES.LOGISTICS]);
 
     return (
         <PageWrapper>

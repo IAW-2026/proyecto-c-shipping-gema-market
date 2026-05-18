@@ -8,7 +8,7 @@ import { MobileNav } from "./_components/MobileNav";
 
 
 export default async function OperatorLayout({ children }: { children: ReactNode }) {
-    const result = await requireRole([ROLES.LOGISTICS, ROLES.SHIPPING_ADMIN]);
+    const result = await requireRole([ROLES.LOGISTICS]);
 
     if (!result) {
         redirect("/login");

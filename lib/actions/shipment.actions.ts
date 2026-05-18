@@ -15,7 +15,7 @@ export async function takeShipmentAction(shipmentId: string) {
         console.log(`[ACTION] Iniciando takeShipmentAction para: ${shipmentId}`);
         
         // 1. Verificación de identidad y rol
-        const { userId } = await requireRole([ROLES.LOGISTICS, ROLES.SHIPPING_ADMIN]);
+        const { userId } = await requireRole([ROLES.LOGISTICS]);
 
         // 2. Validación de datos
         const parsed = TakeShipmentSchema.safeParse({ shipmentId });
@@ -59,7 +59,7 @@ export async function transitionShipmentAction(
     transition: 'pickup' | 'deliver' | 'cancel'
 ) {
     try {
-        const { userId } = await requireRole([ROLES.LOGISTICS, ROLES.SHIPPING_ADMIN]);
+        const { userId } = await requireRole([ROLES.LOGISTICS]);
 
         const envio = await prisma.envio.findUnique({
             where: { id: shipmentId },

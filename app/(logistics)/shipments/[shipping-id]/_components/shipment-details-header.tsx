@@ -1,5 +1,5 @@
 // app/(operator)/dashboard/_components/dashboard-header.tsx
-import { Header } from "@/app/(operator)/_components/page-layout";
+import { Header } from "@/app/(logistics)/_components/page-layout";
 
 interface ShipmentDetailsHeaderProps {
     shippingId: string;
