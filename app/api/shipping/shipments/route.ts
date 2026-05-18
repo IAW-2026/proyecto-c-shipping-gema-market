@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createShipmentSchema } from "@/lib/validations/api-schemas";
 import { createShipment } from "@/lib/services/shipment";
+import { fetchAndPersistRouteGeometry } from "@/lib/db/queries/shipments.queries";
 
 /**
  * POST /api/shipping/shipments
@@ -23,6 +24,8 @@ export async function POST(request: NextRequest) {
         }
 
         const result = await createShipment(parsed.data, request);
+
+        await fetchAndPersistRouteGeometry(result.shipping_id);
 
         return NextResponse.json(result, { status: 201 });
 

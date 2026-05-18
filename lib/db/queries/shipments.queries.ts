@@ -253,6 +253,38 @@ export async function getAvailableShipments(params?: ShipmentFilterParams): Prom
     return envios.map(toShipmentOffer);
 }
 
+export async function persistRouteGeometry(
+  envioId: string,
+  routeGeometry: Prisma.InputJsonValue
+): Promise<void> {
+  await prisma.envio.update({
+    where: { id: envioId },
+    data: { route_geometry: routeGeometry },
+  });
+}
+
+export async function fetchAndPersistRouteGeometry(envioId: string): Promise<void> {
+  const envio = await prisma.envio.findUnique({
+    where: { id: envioId },
+    select: {
+      pickup_lat: true,
+      pickup_lng: true,
+      delivery_lat: true,
+      delivery_lng: true,
+    },
+  });
+
+  if (!envio?.pickup_lat || !envio?.delivery_lat) return;
+
+  const { getRoute } = await import("@/lib/services/map-services");
+  const route = await getRoute(
+    [envio.pickup_lng!, envio.pickup_lat!],
+    [envio.delivery_lng!, envio.delivery_lat!]
+  );
+
+  await persistRouteGeometry(envioId, route.geometry as Prisma.InputJsonValue);
+}
+
 export async function getShipmentCountsByStatus(userId: string): Promise<Record<string, number>> {
     const counts = await prisma.envio.groupBy({
         by: ['status'],
