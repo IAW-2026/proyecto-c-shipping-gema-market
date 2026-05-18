@@ -27,7 +27,7 @@ export async function ShipmentDetailData({ shippingId }: ShipmentDetailDataProps
                 orderId={shipment.orderId}
             />
             <Content className="px-4 lgx:px-7 pb-8">
-                <div className="grid gap-4 grid-cols-1 min-[901px]:grid-cols-[minmax(0,2fr)_minmax(280px,1fr)]">
+                <div className="grid gap-4 grid-cols-1 min-[901px]:grid-cols-[minmax(0,2fr)_minmax(280px,1fr)] h-full">
                     <div className="flex flex-col gap-4">
                         <ShipmentMap
                             shippingId={shipment.shippingId}

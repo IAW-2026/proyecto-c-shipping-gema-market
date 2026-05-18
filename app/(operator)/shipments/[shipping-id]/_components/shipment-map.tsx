@@ -19,8 +19,8 @@ export function ShipmentMap({ shippingId, distance, status }: ShipmentMapProps) 
     const formattedDistance = `${distance} km`;
 
     return (
-        <Card padding="none" className="overflow-hidden">
-            <div className="h-[280px] relative">
+        <Card padding="none" className="overflow-hidden flex-1">
+            <div className="h-full min-h-[280px] relative">
                 <MapViewer shippingId={shippingId} />
                 <div className="absolute top-4 left-4 px-3 py-1.5 bg-paper/95 rounded-full text-xs font-mono shadow-sm text-ink-2 z-[1000]">
                     {formattedDistance}

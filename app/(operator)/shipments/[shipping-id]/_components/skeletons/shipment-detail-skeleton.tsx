@@ -11,10 +11,10 @@ function InfoCardSkeleton() {
 
 export function ShipmentDetailSkeleton() {
     return (
-        <div className="grid gap-4 grid-cols-1 min-[901px]:grid-cols-[minmax(0,2fr)_minmax(280px,1fr)]">
+        <div className="grid gap-4 grid-cols-1 min-[901px]:grid-cols-[minmax(0,2fr)_minmax(280px,1fr)] h-full">
             <div className="flex flex-col gap-4">
-                <div className="bg-paper border border-line rounded-[22px] overflow-hidden">
-                    <Skeleton className="h-[280px] w-full" />
+                <div className="bg-paper border border-line rounded-[22px] overflow-hidden flex-1">
+                    <Skeleton className="h-full min-h-[280px] w-full" />
                 </div>
                 <div className="bg-paper border border-line rounded-[22px] p-5">
                     <Skeleton className="h-4 w-12 mb-4" />
