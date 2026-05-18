@@ -2,10 +2,10 @@ import { Card } from "@/components/ui/card";
 
 interface BuyerInfoProps {
     buyerName: string;
+    buyerPhone: string;
 }
 
-export function BuyerInfo({ buyerName }: BuyerInfoProps) {
-    // Generar un color de avatar basado en el nombre
+export function BuyerInfo({ buyerName, buyerPhone }: BuyerInfoProps) {
     const avatarColor = "#" + buyerName.split("").reduce((acc, char) => (acc + char.charCodeAt(0)) % 16777215, 0).toString(16).padEnd(6, "0");
     const initial = buyerName.charAt(0).toUpperCase();
 
@@ -21,10 +21,9 @@ export function BuyerInfo({ buyerName }: BuyerInfoProps) {
                 </div>
                 <div className="flex-1">
                     <div className="font-semibold font-sans text-sm text-ink">{buyerName}</div>
-                    <div className="text-xs text-slate-500">+54 291 555 1234</div>
+                    <div className="text-xs text-slate-500">{buyerPhone}</div>
                 </div>
             </div>
-            {/* Los datos reales se obtendrán a futuro mediante fetch a la Buyer API. */}
         </Card>
     );
 }

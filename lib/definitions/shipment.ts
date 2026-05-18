@@ -28,6 +28,7 @@ export const ShipmentSchema = z.object({
         .startsWith("ord_", "El ID debe empezar con ord_"),
     buyerId: UserIdSchema,
     buyerName: z.string().min(1, "El nombre del comprador es obligatorio"),
+    receiverPhone: z.string(),
     sellerId: UserIdSchema,
     logisticsId: UserIdSchema,
     status: ShippingStatusSchema,

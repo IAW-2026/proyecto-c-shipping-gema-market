@@ -2,11 +2,12 @@ import { getShipmentDetails } from "@/lib/db/queries/shipment";
 import { notFound } from "next/navigation";
 import { Content } from "../../../_components/page-layout";
 import { ShipmentDetailsHeader } from "./shipment-details-header";
-import { ShipmentMapPlaceholder } from "./shipment-map-placeholder";
+import { ShipmentMap } from "./shipment-map";
 import { RouteInfo } from "./route-info";
 import { PaymentInfo } from "./payment-info";
 import { BuyerInfo } from "./buyer-info";
 import { PackageInfo } from "./package-info";
+
 
 interface ShipmentDetailDataProps {
     shippingId: string;
@@ -28,7 +29,8 @@ export async function ShipmentDetailData({ shippingId }: ShipmentDetailDataProps
             <Content className="px-4 lgx:px-7 pb-8">
                 <div className="grid gap-4 grid-cols-1 min-[901px]:grid-cols-[minmax(0,2fr)_minmax(280px,1fr)]">
                     <div className="flex flex-col gap-4">
-                        <ShipmentMapPlaceholder
+                        <ShipmentMap
+                            shippingId={shipment.shippingId}
                             distance={shipment.distance || 0}
                             status={shipment.status}
                         />
@@ -39,7 +41,7 @@ export async function ShipmentDetailData({ shippingId }: ShipmentDetailDataProps
                     </div>
                     <div className="flex flex-col gap-4">
                         <PaymentInfo price={shipment.price} />
-                        <BuyerInfo buyerName={shipment.buyerName} />
+                        <BuyerInfo buyerName={shipment.buyerName} buyerPhone={shipment.receiverPhone} />
                         <PackageInfo
                             weight={shipment.weight}
                             height={shipment.height}

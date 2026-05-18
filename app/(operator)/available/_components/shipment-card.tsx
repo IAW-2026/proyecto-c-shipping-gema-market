@@ -73,7 +73,7 @@ function Cuerpo({ offer }: { offer: ShipmentOffer }) {
             <div className="pt-2 flex items-center gap-4 w-full">
                 <DistanceTag value={offer.distance} />
                 <WeightTag value={offer.weight} />
-                <TimeTag value={`~${offer.estimatedTime}`} />
+                <TimeTag value={offer.estimatedTime} />
             </div>
         </div>
 

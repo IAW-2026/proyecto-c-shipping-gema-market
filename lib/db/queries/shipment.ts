@@ -22,6 +22,7 @@ const detailSelect = {
     order_id: true,
     buyer_id: true,
     receiver_name: true,
+    receiver_phone: true,
     seller_id: true,
     logistics_id: true,
     status: true,
@@ -34,6 +35,8 @@ const detailSelect = {
     created_at: true,
     weight: true,
     dimensions: true,
+    route_distance: true,
+    route_duration: true,
 } as const;
 
 const offerSelect = {
@@ -43,6 +46,8 @@ const offerSelect = {
     delivery_address: true,
     weight: true,
     dimensions: true,
+    route_distance: true,
+    route_duration: true,
 } as const;
 
 function buildOrderBy(sortBy?: string, sortOrder?: 'asc' | 'desc'): Prisma.EnvioOrderByWithRelationInput {
@@ -112,6 +117,7 @@ function toShipmentDetail(row: {
     order_id: string;
     buyer_id: string;
     receiver_name: string;
+    receiver_phone: string;
     seller_id: string;
     logistics_id: string | null;
     status: string;
@@ -124,6 +130,8 @@ function toShipmentDetail(row: {
     created_at: Date;
     weight: unknown;
     dimensions: unknown;
+    route_distance: unknown;
+    route_duration: unknown;
 }): Shipment {
     const dims = DimensionsSchema.parse(row.dimensions);
     return {
@@ -131,6 +139,7 @@ function toShipmentDetail(row: {
         orderId: row.order_id,
         buyerId: row.buyer_id,
         buyerName: row.receiver_name,
+        receiverPhone: row.receiver_phone,
         sellerId: row.seller_id,
         logisticsId: row.logistics_id ?? "",
         status: ShippingStatusSchema.parse(row.status),
@@ -145,7 +154,7 @@ function toShipmentDetail(row: {
         height: dims.height,
         width: dims.width,
         depth: dims.depth,
-        distance: undefined,
+        distance: row.route_distance ? Number(row.route_distance) / 1000 : undefined,
     };
 }
 
@@ -156,6 +165,8 @@ function toShipmentOffer(row: {
     delivery_address: unknown;
     weight: unknown;
     dimensions: unknown;
+    route_distance: unknown;
+    route_duration: unknown;
 }): ShipmentOffer {
     const dims = DimensionsSchema.parse(row.dimensions);
     return {
@@ -167,8 +178,8 @@ function toShipmentOffer(row: {
         height: dims.height,
         width: dims.width,
         depth: dims.depth,
-        distance: undefined,
-        estimatedTime: "",
+        distance: row.route_distance ? Number(row.route_distance) / 1000 : undefined,
+        estimatedTime: row.route_duration ? `${Math.round(Number(row.route_duration) / 60)} min` : "",
     };
 }
 
