@@ -81,10 +81,9 @@ model Envio {
   operador Usuario? @relation(fields: [logistics_id], references: [id])
 }
 
-// 4. Tarifa: Configuración de precios
+// 4. Tarifa: Configuración de precios por peso facturable (USD/km)
 model Tarifa {
   id           String  @id // Generado en código: 'trf_' + ulid()
-  weight_range Json // Ejemplo: { "min": 0, "max": 20 }
-  volume_range Json // Ejemplo: { "min": 0, "max": 1 }
-  price_per_km Decimal @db.Decimal(10, 2)
+  weight_range Json // Ejemplo: { "min": 0, "max": 30 }
+  price_per_km Decimal @db.Decimal(10, 2) // USD por km
 }

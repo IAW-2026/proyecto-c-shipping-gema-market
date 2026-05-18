@@ -4,7 +4,8 @@ import { getCoordinatesFromAddress, getMatrixDistance } from "@/lib/services/map
 import type { ApiTrace } from "@/lib/shared/api-trace";
 import type { z } from "zod";
 import type { quoteRequestSchema } from "@/lib/validations/api-schemas";
-import { calculateVolume, calculatePrice, calculateEstimatedDays, getDefaultPricePerKm, CURRENCY, DEFAULT_DISTANCE_KM } from "./price-and-time-calculator";
+import { calculateVolume, calculateVolumetricWeight, calculateBillableWeight, calculatePrice, calculateEstimatedDays, getDefaultPricePerKm, CURRENCY, DEFAULT_DISTANCE_KM } from "./price-and-time-calculator";
+import { getUsdToArsRate } from "@/lib/services/exchange-rate";
 import { validateQuoteForReservation, validateQuoteForRelease } from "./state-validations";
 import { findMatchingTarifa, findQuoteById, findQuoteForRelease, createQuoteRecord, reserveQuoteInDb, releaseQuoteInDb, type CreateQuoteData } from "@/lib/db/queries/quote";
 
@@ -45,6 +46,8 @@ export async function calculateQuote(
     ]);
 
     const volume_m3 = calculateVolume(height_cm, width_cm, depth_cm);
+    const volumetricKg = calculateVolumetricWeight(volume_m3);
+    const billableKg = calculateBillableWeight(weight_kg, volumetricKg);
 
     let distanceKm = DEFAULT_DISTANCE_KM;
     let durationSeconds: number | undefined;
@@ -58,10 +61,12 @@ export async function calculateQuote(
         }
     }
 
-    const [tarifa] = await Promise.all([findMatchingTarifa(weight_kg, volume_m3)]);
+    const tarifa = await findMatchingTarifa(billableKg);
 
-    const pricePerKm = tarifa ? tarifa.price_per_km : getDefaultPricePerKm();
-    const price = calculatePrice(pricePerKm, distanceKm);
+    const pricePerKmUsd = tarifa ? tarifa.price_per_km : getDefaultPricePerKm();
+    const priceUsd = calculatePrice(pricePerKmUsd, distanceKm);
+    const usdToArs = await getUsdToArsRate();
+    const price = Math.round(priceUsd * usdToArs * 100) / 100;
     const estimatedDays = calculateEstimatedDays(durationSeconds);
     const valid_until = new Date(Date.now() + 1 * 60 * 60 * 1000);
 

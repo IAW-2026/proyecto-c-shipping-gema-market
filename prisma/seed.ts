@@ -14,7 +14,42 @@ async function main() {
     await prisma.tarifa.deleteMany();
     await prisma.usuario.deleteMany();
 
-    console.log("✅ Base de datos vaciada.");
+    console.log("Poblando tarifas...");
+
+    const tarifas = [
+        {
+            id: "trf_01J",
+            weight_range: { min: 0, max: 30 },
+            price_per_km: 0.05,
+        },
+        {
+            id: "trf_02J",
+            weight_range: { min: 31, max: 100 },
+            price_per_km: 0.15,
+        },
+        {
+            id: "trf_03J",
+            weight_range: { min: 101, max: 250 },
+            price_per_km: 0.35,
+        },
+        {
+            id: "trf_04J",
+            weight_range: { min: 251, max: 600 },
+            price_per_km: 0.70,
+        },
+        {
+            id: "trf_05J",
+            weight_range: { min: 601, max: 99999 },
+            price_per_km: 1.50,
+        },
+    ];
+
+    for (const t of tarifas) {
+        await prisma.tarifa.create({ data: t });
+        console.log(`  ✔ ${t.id} — ${t.weight_range.min}-${t.weight_range.max} kg → $${t.price_per_km}/km`);
+    }
+
+    console.log("✅ Base de datos poblada.");
 }
 
 main()

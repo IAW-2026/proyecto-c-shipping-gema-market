@@ -812,7 +812,6 @@ export type EnvioScalarFieldEnum = (typeof EnvioScalarFieldEnum)[keyof typeof En
 export const TarifaScalarFieldEnum = {
   id: 'id',
   weight_range: 'weight_range',
-  volume_range: 'volume_range',
   price_per_km: 'price_per_km'
 } as const
 

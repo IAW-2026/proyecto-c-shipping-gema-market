@@ -9,6 +9,14 @@ export function calculateVolume(height_cm: number, width_cm: number, depth_cm: n
     return height_cm * width_cm * depth_cm / 1_000_000;
 }
 
+export function calculateVolumetricWeight(volumeM3: number): number {
+    return volumeM3 * 250;
+}
+
+export function calculateBillableWeight(realKg: number, volumetricKg: number): number {
+    return Math.max(realKg, volumetricKg);
+}
+
 export function calculatePrice(pricePerKm: number, distanceKm: number): number {
     return pricePerKm * distanceKm;
 }

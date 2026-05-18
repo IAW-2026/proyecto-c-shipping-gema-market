@@ -23,14 +23,12 @@ export interface CreateQuoteData {
     route_duration: number | null;
 }
 
-export async function findMatchingTarifa(weight_kg: number, volume_m3: number): Promise<TarifaRecord | null> {
+export async function findMatchingTarifa(billableWeightKg: number): Promise<TarifaRecord | null> {
     const tarifa = await prisma.tarifa.findFirst({
         where: {
             AND: [
-                { weight_range: { path: ["min"], lte: weight_kg } },
-                { weight_range: { path: ["max"], gte: weight_kg } },
-                { volume_range: { path: ["min"], lte: volume_m3 } },
-                { volume_range: { path: ["max"], gte: volume_m3 } },
+                { weight_range: { path: ["min"], lte: billableWeightKg } },
+                { weight_range: { path: ["max"], gte: billableWeightKg } },
             ],
         },
     });
