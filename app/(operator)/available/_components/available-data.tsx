@@ -1,4 +1,4 @@
-import { getAvailableShipments } from "@/lib/db/queries/shipments.queries";
+import { getAvailableShipments } from "@/lib/db/queries/shipment";
 import type { ShipmentFilterParams } from "@/lib/definitions/shipment";
 import { AvailableShipmentCard } from "./shipment-card";
 

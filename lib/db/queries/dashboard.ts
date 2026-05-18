@@ -3,8 +3,6 @@ import { AddressSchema, ShippingStatusSchema } from "@/lib/definitions/shipment"
 import type { ShipmentSummary } from "@/lib/definitions/shipment";
 import type { DashboardMetrics, OperatorDashboardData } from "@/lib/definitions/dashboard-metrics";
 
-// --- Selector y tipo auxiliar para filas de envío resumido ---
-
 const summarySelect = {
     id: true,
     order_id: true,

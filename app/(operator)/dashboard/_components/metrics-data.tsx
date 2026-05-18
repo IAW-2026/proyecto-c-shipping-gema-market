@@ -1,4 +1,4 @@
-import { getDashboardMetrics } from "@/lib/db/queries/dashboard.queries";
+import { getDashboardMetrics } from "@/lib/db/queries/dashboard";
 import { MetricsGrid } from "./metrics-grid";
 
 export async function MetricsData({ userId }: { userId: string }) {

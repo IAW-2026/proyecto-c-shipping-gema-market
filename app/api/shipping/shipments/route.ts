@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createShipmentSchema } from "@/lib/validations/api-schemas";
 import { createShipment } from "@/lib/services/shipment";
-import { fetchAndPersistRouteGeometry } from "@/lib/db/queries/shipments.queries";
+import { fetchAndPersistRouteGeometry } from "@/lib/db/services/route";
 
 /**
  * POST /api/shipping/shipments

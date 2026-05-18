@@ -1,4 +1,4 @@
-import { getActiveShipments } from "@/lib/db/queries/dashboard.queries";
+import { getActiveShipments } from "@/lib/db/queries/dashboard";
 import { ActiveShipmentsList } from "./active-shipments-list";
 
 export async function ActiveShipmentsData({ userId }: { userId: string }) {

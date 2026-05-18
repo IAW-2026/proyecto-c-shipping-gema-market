@@ -1,7 +1,7 @@
 import { Metadata } from "next";
 import { requireRole } from "@/lib/auth/rbac";
 import { ROLES } from "@/lib/definitions/auth";
-import { getActiveShipments } from "@/lib/db/queries/dashboard.queries";
+import { getActiveShipments } from "@/lib/db/queries/dashboard";
 import { PageWrapper } from "../_components/page-layout";
 import { CourierData } from "./_components/courier-data";
 import { CourierEmpty } from "./_components/courier-empty";

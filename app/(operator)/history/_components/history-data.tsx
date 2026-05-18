@@ -1,4 +1,4 @@
-import { getFilteredShipments, getShipmentCountsByStatus } from "@/lib/db/queries/shipments.queries";
+import { getFilteredShipments, getShipmentCountsByStatus } from "@/lib/db/queries/shipment";
 import type { ShipmentFilterParams } from "@/lib/definitions/shipment";
 import type { ShipmentStatus } from "@/lib/shared/shipment-constants";
 import { HistoryTabs } from "./history-tabs";

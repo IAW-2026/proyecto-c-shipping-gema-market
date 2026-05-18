@@ -1,4 +1,3 @@
-/** Operaciones de base de datos sobre cotizaciones (CRUD + búsqueda de tarifas). */
 import prisma from "@/lib/db/prisma";
 import { generatePrefixedId } from "@/lib/shared/utils";
 
@@ -86,5 +85,18 @@ export async function releaseQuoteInDb(quoteId: string, orderId: string) {
             reserved_for_order_id: null,
             valid_until: new Date(Date.now() + 1 * 60 * 60 * 1000),
         },
+    });
+}
+
+export async function findReservedCotizacion(orderId: string) {
+    return prisma.cotizacion.findFirst({
+        where: { reserved_for_order_id: orderId, status: "reserved" },
+    });
+}
+
+export async function confirmCotizacion(quoteId: string) {
+    return prisma.cotizacion.update({
+        where: { id: quoteId },
+        data: { status: "confirmed" },
     });
 }

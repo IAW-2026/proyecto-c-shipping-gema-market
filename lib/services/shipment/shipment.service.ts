@@ -1,10 +1,10 @@
 /** Servicio de creación de envíos: valida datos del comprador, busca cotización reservada y persiste el envío. */
-import prisma from "@/lib/db/prisma";
 import { generatePrefixedId } from "@/lib/shared/utils";
 import { buyerApiClient } from "@/lib/clients/buyer-api/buyer-api.client";
 import type { z } from "zod";
 import type { createShipmentSchema } from "@/lib/validations/api-schemas";
-import { Prisma } from "@/lib/generated/prisma/client";
+import { createEnvioRecord, type CreateEnvioData } from "@/lib/db/queries/shipment";
+import { findReservedCotizacion, confirmCotizacion } from "@/lib/db/queries/quote";
 type CreateShipmentRequest = z.infer<typeof createShipmentSchema>;
 
 function generateTrackingCode(): string {
@@ -43,9 +43,7 @@ export async function createShipment(
         }
     }
 
-    const cotizacion = await prisma.cotizacion.findFirst({
-        where: { reserved_for_order_id: order_id, status: "reserved" },
-    });
+    const cotizacion = await findReservedCotizacion(order_id);
 
     if (!cotizacion) {
         throw Object.assign(
@@ -55,47 +53,40 @@ export async function createShipment(
     }
 
     const tracking_code = generateTrackingCode();
-    const packageDetails = cotizacion.package_details as Prisma.InputJsonValue as {
+    const packageDetails = cotizacion.package_details as {
         weight: number;
         width: number;
         height: number;
         depth: number;
     };
 
-    const envio = await prisma.envio.create({
-        data: {
-            id: generatePrefixedId("shp"),
-            order_id,
-            quote_id: cotizacion.id,
-            buyer_id,
-            receiver_name: receiver_name ?? "Comprador",
-            receiver_phone: receiver_phone ?? "Sin teléfono",
-            seller_id,
-            weight: packageDetails.weight ?? 0,
-            dimensions: {
-                width: packageDetails.width ?? 0,
-                height: packageDetails.height ?? 0,
-                depth: packageDetails.depth ?? 0,
-            },
-            pickup_address: cotizacion.origin_address as Prisma.InputJsonValue,
-            delivery_address: cotizacion.destination_address as Prisma.InputJsonValue,
-            tracking_code,
-            status: "pending_pickup",
-            price: cotizacion.price,
-            pickup_lat: (cotizacion.pickup_lat as number | undefined) ?? null,
-            pickup_lng: (cotizacion.pickup_lng as number | undefined) ?? null,
-            delivery_lat: (cotizacion.delivery_lat as number | undefined) ?? null,
-            delivery_lng: (cotizacion.delivery_lng as number | undefined) ?? null,
-            route_geometry: Prisma.DbNull,
-            route_distance: (cotizacion.route_distance as number | undefined) ?? null,
-            route_duration: (cotizacion.route_duration as number | undefined) ?? null,
+    const envio = await createEnvioRecord({
+        id: generatePrefixedId("shp"),
+        order_id,
+        quote_id: cotizacion.id,
+        buyer_id,
+        receiver_name: receiver_name ?? "Comprador",
+        receiver_phone: receiver_phone ?? "Sin teléfono",
+        seller_id,
+        weight: packageDetails.weight ?? 0,
+        dimensions: {
+            width: packageDetails.width ?? 0,
+            height: packageDetails.height ?? 0,
+            depth: packageDetails.depth ?? 0,
         },
+        pickup_address: cotizacion.origin_address as any,
+        delivery_address: cotizacion.destination_address as any,
+        tracking_code,
+        price: cotizacion.price,
+        pickup_lat: (cotizacion.pickup_lat as number | undefined) ?? null,
+        pickup_lng: (cotizacion.pickup_lng as number | undefined) ?? null,
+        delivery_lat: (cotizacion.delivery_lat as number | undefined) ?? null,
+        delivery_lng: (cotizacion.delivery_lng as number | undefined) ?? null,
+        route_distance: (cotizacion.route_distance as number | undefined) ?? null,
+        route_duration: (cotizacion.route_duration as number | undefined) ?? null,
     });
 
-    await prisma.cotizacion.update({
-        where: { id: cotizacion.id },
-        data: { status: "confirmed" },
-    });
+    await confirmCotizacion(cotizacion.id);
 
     return {
         shipping_id: envio.id,

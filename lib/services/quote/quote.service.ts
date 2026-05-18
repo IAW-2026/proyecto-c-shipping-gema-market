@@ -6,7 +6,7 @@ import type { z } from "zod";
 import type { quoteRequestSchema } from "@/lib/validations/api-schemas";
 import { calculateVolume, calculatePrice, calculateEstimatedDays, getDefaultPricePerKm, CURRENCY, DEFAULT_DISTANCE_KM } from "./price-and-time-calculator";
 import { validateQuoteForReservation, validateQuoteForRelease } from "./state-validations";
-import { findMatchingTarifa, findQuoteById, findQuoteForRelease, createQuoteRecord, reserveQuoteInDb, releaseQuoteInDb, type CreateQuoteData } from "./database-operations";
+import { findMatchingTarifa, findQuoteById, findQuoteForRelease, createQuoteRecord, reserveQuoteInDb, releaseQuoteInDb, type CreateQuoteData } from "@/lib/db/queries/quote";
 
 type QuoteRequest = z.infer<typeof quoteRequestSchema>;
 

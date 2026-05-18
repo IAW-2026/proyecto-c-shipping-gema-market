@@ -5,7 +5,7 @@ import { EarningsMetrics } from "./_components/earnings-metrics";
 import { EarningsList } from "./_components/earnings-list";
 import { requireRole } from "@/lib/auth/rbac";
 import { ROLES } from "@/lib/definitions/auth";
-import { getSettlements } from "@/lib/db/queries/settlements.queries";
+import { getSettlements } from "@/lib/db/queries/settlement";
 
 export const metadata: Metadata = {
     title: "Liquidaciones | UniHousing Shipping",

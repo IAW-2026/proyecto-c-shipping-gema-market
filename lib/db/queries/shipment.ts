@@ -1,12 +1,10 @@
 import prisma from "@/lib/db/prisma";
-import type { Prisma } from "@/lib/generated/prisma/client";
+import { Prisma } from "@/lib/generated/prisma/client";
 import {
     Shipment, ShipmentSummary, ShipmentOffer,
     ShipmentFilterParams, PaginatedResult,
     ShippingStatusSchema, AddressSchema, DimensionsSchema,
 } from "@/lib/definitions/shipment";
-
-// --- Selectores reutilizables ---
 
 const summarySelect = {
     id: true,
@@ -47,8 +45,6 @@ const offerSelect = {
     dimensions: true,
 } as const;
 
-// --- Utilidades de construcción de consultas ---
-
 function buildOrderBy(sortBy?: string, sortOrder?: 'asc' | 'desc'): Prisma.EnvioOrderByWithRelationInput {
     const dir = sortOrder ?? 'desc';
     switch (sortBy) {
@@ -88,8 +84,6 @@ function buildWhere(params: ShipmentFilterParams): Prisma.EnvioWhereInput {
 
     return where as Prisma.EnvioWhereInput;
 }
-
-// --- Mapeadores DB → Dominio ---
 
 function toShipmentSummary(row: {
     id: string;
@@ -178,8 +172,6 @@ function toShipmentOffer(row: {
     };
 }
 
-// --- Funciones públicas del DAO ---
-
 export async function getShipmentDetails(shippingId: string): Promise<Shipment | null> {
     const envio = await prisma.envio.findUnique({
         where: { id: shippingId },
@@ -263,26 +255,54 @@ export async function persistRouteGeometry(
   });
 }
 
-export async function fetchAndPersistRouteGeometry(envioId: string): Promise<void> {
-  const envio = await prisma.envio.findUnique({
-    where: { id: envioId },
-    select: {
-      pickup_lat: true,
-      pickup_lng: true,
-      delivery_lat: true,
-      delivery_lng: true,
+export interface CreateEnvioData {
+  id: string;
+  order_id: string;
+  quote_id: string;
+  buyer_id: string;
+  seller_id: string;
+  receiver_name: string;
+  receiver_phone: string;
+  weight: number;
+  dimensions: { width: number; height: number; depth: number };
+  pickup_address: Prisma.InputJsonValue;
+  delivery_address: Prisma.InputJsonValue;
+  tracking_code: string;
+  price: Prisma.Decimal | number;
+  pickup_lat: number | null;
+  pickup_lng: number | null;
+  delivery_lat: number | null;
+  delivery_lng: number | null;
+  route_distance: number | null;
+  route_duration: number | null;
+}
+
+export async function createEnvioRecord(data: CreateEnvioData) {
+  return prisma.envio.create({
+    data: {
+      id: data.id,
+      order_id: data.order_id,
+      quote_id: data.quote_id,
+      buyer_id: data.buyer_id,
+      receiver_name: data.receiver_name,
+      receiver_phone: data.receiver_phone,
+      seller_id: data.seller_id,
+      weight: data.weight,
+      dimensions: data.dimensions,
+      pickup_address: data.pickup_address,
+      delivery_address: data.delivery_address,
+      tracking_code: data.tracking_code,
+      status: "pending_pickup",
+      price: data.price,
+      pickup_lat: data.pickup_lat,
+      pickup_lng: data.pickup_lng,
+      delivery_lat: data.delivery_lat,
+      delivery_lng: data.delivery_lng,
+      route_geometry: Prisma.DbNull,
+      route_distance: data.route_distance,
+      route_duration: data.route_duration,
     },
   });
-
-  if (!envio?.pickup_lat || !envio?.delivery_lat) return;
-
-  const { getRoute } = await import("@/lib/services/map-services");
-  const route = await getRoute(
-    [envio.pickup_lng!, envio.pickup_lat!],
-    [envio.delivery_lng!, envio.delivery_lat!]
-  );
-
-  await persistRouteGeometry(envioId, route.geometry as Prisma.InputJsonValue);
 }
 
 export async function getShipmentCountsByStatus(userId: string): Promise<Record<string, number>> {
