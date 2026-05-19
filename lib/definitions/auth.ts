@@ -1,10 +1,10 @@
 export const ROLES = {
-    SHIPPING_ADMIN: "shipping_admin",
     LOGISTICS: "logistics",
+    ADMIN_LOGISTICS: "admin_logistics",
 } as const;
 export type UserRole = typeof ROLES[keyof typeof ROLES];
 export interface UserSessionClaims {
-    metadata?: {
+    public_metadata?: {
         role?: UserRole;
     };
 }

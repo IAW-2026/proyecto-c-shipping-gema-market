@@ -29,11 +29,23 @@ export type AggregateCotizacion = {
 export type CotizacionAvgAggregateOutputType = {
   price: runtime.Decimal | null
   estimated_days: number | null
+  pickup_lat: number | null
+  pickup_lng: number | null
+  delivery_lat: number | null
+  delivery_lng: number | null
+  route_distance: number | null
+  route_duration: number | null
 }
 
 export type CotizacionSumAggregateOutputType = {
   price: runtime.Decimal | null
   estimated_days: number | null
+  pickup_lat: number | null
+  pickup_lng: number | null
+  delivery_lat: number | null
+  delivery_lng: number | null
+  route_distance: number | null
+  route_duration: number | null
 }
 
 export type CotizacionMinAggregateOutputType = {
@@ -46,6 +58,12 @@ export type CotizacionMinAggregateOutputType = {
   estimated_days: number | null
   valid_until: Date | null
   created_at: Date | null
+  pickup_lat: number | null
+  pickup_lng: number | null
+  delivery_lat: number | null
+  delivery_lng: number | null
+  route_distance: number | null
+  route_duration: number | null
 }
 
 export type CotizacionMaxAggregateOutputType = {
@@ -58,6 +76,12 @@ export type CotizacionMaxAggregateOutputType = {
   estimated_days: number | null
   valid_until: Date | null
   created_at: Date | null
+  pickup_lat: number | null
+  pickup_lng: number | null
+  delivery_lat: number | null
+  delivery_lng: number | null
+  route_distance: number | null
+  route_duration: number | null
 }
 
 export type CotizacionCountAggregateOutputType = {
@@ -73,6 +97,12 @@ export type CotizacionCountAggregateOutputType = {
   estimated_days: number
   valid_until: number
   created_at: number
+  pickup_lat: number
+  pickup_lng: number
+  delivery_lat: number
+  delivery_lng: number
+  route_distance: number
+  route_duration: number
   _all: number
 }
 
@@ -80,11 +110,23 @@ export type CotizacionCountAggregateOutputType = {
 export type CotizacionAvgAggregateInputType = {
   price?: true
   estimated_days?: true
+  pickup_lat?: true
+  pickup_lng?: true
+  delivery_lat?: true
+  delivery_lng?: true
+  route_distance?: true
+  route_duration?: true
 }
 
 export type CotizacionSumAggregateInputType = {
   price?: true
   estimated_days?: true
+  pickup_lat?: true
+  pickup_lng?: true
+  delivery_lat?: true
+  delivery_lng?: true
+  route_distance?: true
+  route_duration?: true
 }
 
 export type CotizacionMinAggregateInputType = {
@@ -97,6 +139,12 @@ export type CotizacionMinAggregateInputType = {
   estimated_days?: true
   valid_until?: true
   created_at?: true
+  pickup_lat?: true
+  pickup_lng?: true
+  delivery_lat?: true
+  delivery_lng?: true
+  route_distance?: true
+  route_duration?: true
 }
 
 export type CotizacionMaxAggregateInputType = {
@@ -109,6 +157,12 @@ export type CotizacionMaxAggregateInputType = {
   estimated_days?: true
   valid_until?: true
   created_at?: true
+  pickup_lat?: true
+  pickup_lng?: true
+  delivery_lat?: true
+  delivery_lng?: true
+  route_distance?: true
+  route_duration?: true
 }
 
 export type CotizacionCountAggregateInputType = {
@@ -124,6 +178,12 @@ export type CotizacionCountAggregateInputType = {
   estimated_days?: true
   valid_until?: true
   created_at?: true
+  pickup_lat?: true
+  pickup_lng?: true
+  delivery_lat?: true
+  delivery_lng?: true
+  route_distance?: true
+  route_duration?: true
   _all?: true
 }
 
@@ -226,6 +286,12 @@ export type CotizacionGroupByOutputType = {
   estimated_days: number
   valid_until: Date
   created_at: Date
+  pickup_lat: number | null
+  pickup_lng: number | null
+  delivery_lat: number | null
+  delivery_lng: number | null
+  route_distance: number | null
+  route_duration: number | null
   _count: CotizacionCountAggregateOutputType | null
   _avg: CotizacionAvgAggregateOutputType | null
   _sum: CotizacionSumAggregateOutputType | null
@@ -264,6 +330,12 @@ export type CotizacionWhereInput = {
   estimated_days?: Prisma.IntFilter<"Cotizacion"> | number
   valid_until?: Prisma.DateTimeFilter<"Cotizacion"> | Date | string
   created_at?: Prisma.DateTimeFilter<"Cotizacion"> | Date | string
+  pickup_lat?: Prisma.FloatNullableFilter<"Cotizacion"> | number | null
+  pickup_lng?: Prisma.FloatNullableFilter<"Cotizacion"> | number | null
+  delivery_lat?: Prisma.FloatNullableFilter<"Cotizacion"> | number | null
+  delivery_lng?: Prisma.FloatNullableFilter<"Cotizacion"> | number | null
+  route_distance?: Prisma.FloatNullableFilter<"Cotizacion"> | number | null
+  route_duration?: Prisma.FloatNullableFilter<"Cotizacion"> | number | null
 }
 
 export type CotizacionOrderByWithRelationInput = {
@@ -279,6 +351,12 @@ export type CotizacionOrderByWithRelationInput = {
   estimated_days?: Prisma.SortOrder
   valid_until?: Prisma.SortOrder
   created_at?: Prisma.SortOrder
+  pickup_lat?: Prisma.SortOrderInput | Prisma.SortOrder
+  pickup_lng?: Prisma.SortOrderInput | Prisma.SortOrder
+  delivery_lat?: Prisma.SortOrderInput | Prisma.SortOrder
+  delivery_lng?: Prisma.SortOrderInput | Prisma.SortOrder
+  route_distance?: Prisma.SortOrderInput | Prisma.SortOrder
+  route_duration?: Prisma.SortOrderInput | Prisma.SortOrder
 }
 
 export type CotizacionWhereUniqueInput = Prisma.AtLeast<{
@@ -297,6 +375,12 @@ export type CotizacionWhereUniqueInput = Prisma.AtLeast<{
   estimated_days?: Prisma.IntFilter<"Cotizacion"> | number
   valid_until?: Prisma.DateTimeFilter<"Cotizacion"> | Date | string
   created_at?: Prisma.DateTimeFilter<"Cotizacion"> | Date | string
+  pickup_lat?: Prisma.FloatNullableFilter<"Cotizacion"> | number | null
+  pickup_lng?: Prisma.FloatNullableFilter<"Cotizacion"> | number | null
+  delivery_lat?: Prisma.FloatNullableFilter<"Cotizacion"> | number | null
+  delivery_lng?: Prisma.FloatNullableFilter<"Cotizacion"> | number | null
+  route_distance?: Prisma.FloatNullableFilter<"Cotizacion"> | number | null
+  route_duration?: Prisma.FloatNullableFilter<"Cotizacion"> | number | null
 }, "id">
 
 export type CotizacionOrderByWithAggregationInput = {
@@ -312,6 +396,12 @@ export type CotizacionOrderByWithAggregationInput = {
   estimated_days?: Prisma.SortOrder
   valid_until?: Prisma.SortOrder
   created_at?: Prisma.SortOrder
+  pickup_lat?: Prisma.SortOrderInput | Prisma.SortOrder
+  pickup_lng?: Prisma.SortOrderInput | Prisma.SortOrder
+  delivery_lat?: Prisma.SortOrderInput | Prisma.SortOrder
+  delivery_lng?: Prisma.SortOrderInput | Prisma.SortOrder
+  route_distance?: Prisma.SortOrderInput | Prisma.SortOrder
+  route_duration?: Prisma.SortOrderInput | Prisma.SortOrder
   _count?: Prisma.CotizacionCountOrderByAggregateInput
   _avg?: Prisma.CotizacionAvgOrderByAggregateInput
   _max?: Prisma.CotizacionMaxOrderByAggregateInput
@@ -335,6 +425,12 @@ export type CotizacionScalarWhereWithAggregatesInput = {
   estimated_days?: Prisma.IntWithAggregatesFilter<"Cotizacion"> | number
   valid_until?: Prisma.DateTimeWithAggregatesFilter<"Cotizacion"> | Date | string
   created_at?: Prisma.DateTimeWithAggregatesFilter<"Cotizacion"> | Date | string
+  pickup_lat?: Prisma.FloatNullableWithAggregatesFilter<"Cotizacion"> | number | null
+  pickup_lng?: Prisma.FloatNullableWithAggregatesFilter<"Cotizacion"> | number | null
+  delivery_lat?: Prisma.FloatNullableWithAggregatesFilter<"Cotizacion"> | number | null
+  delivery_lng?: Prisma.FloatNullableWithAggregatesFilter<"Cotizacion"> | number | null
+  route_distance?: Prisma.FloatNullableWithAggregatesFilter<"Cotizacion"> | number | null
+  route_duration?: Prisma.FloatNullableWithAggregatesFilter<"Cotizacion"> | number | null
 }
 
 export type CotizacionCreateInput = {
@@ -350,6 +446,12 @@ export type CotizacionCreateInput = {
   estimated_days: number
   valid_until: Date | string
   created_at?: Date | string
+  pickup_lat?: number | null
+  pickup_lng?: number | null
+  delivery_lat?: number | null
+  delivery_lng?: number | null
+  route_distance?: number | null
+  route_duration?: number | null
 }
 
 export type CotizacionUncheckedCreateInput = {
@@ -365,6 +467,12 @@ export type CotizacionUncheckedCreateInput = {
   estimated_days: number
   valid_until: Date | string
   created_at?: Date | string
+  pickup_lat?: number | null
+  pickup_lng?: number | null
+  delivery_lat?: number | null
+  delivery_lng?: number | null
+  route_distance?: number | null
+  route_duration?: number | null
 }
 
 export type CotizacionUpdateInput = {
@@ -380,6 +488,12 @@ export type CotizacionUpdateInput = {
   estimated_days?: Prisma.IntFieldUpdateOperationsInput | number
   valid_until?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  pickup_lat?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  pickup_lng?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  delivery_lat?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  delivery_lng?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  route_distance?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  route_duration?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
 }
 
 export type CotizacionUncheckedUpdateInput = {
@@ -395,6 +509,12 @@ export type CotizacionUncheckedUpdateInput = {
   estimated_days?: Prisma.IntFieldUpdateOperationsInput | number
   valid_until?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  pickup_lat?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  pickup_lng?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  delivery_lat?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  delivery_lng?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  route_distance?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  route_duration?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
 }
 
 export type CotizacionCreateManyInput = {
@@ -410,6 +530,12 @@ export type CotizacionCreateManyInput = {
   estimated_days: number
   valid_until: Date | string
   created_at?: Date | string
+  pickup_lat?: number | null
+  pickup_lng?: number | null
+  delivery_lat?: number | null
+  delivery_lng?: number | null
+  route_distance?: number | null
+  route_duration?: number | null
 }
 
 export type CotizacionUpdateManyMutationInput = {
@@ -425,6 +551,12 @@ export type CotizacionUpdateManyMutationInput = {
   estimated_days?: Prisma.IntFieldUpdateOperationsInput | number
   valid_until?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  pickup_lat?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  pickup_lng?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  delivery_lat?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  delivery_lng?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  route_distance?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  route_duration?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
 }
 
 export type CotizacionUncheckedUpdateManyInput = {
@@ -440,6 +572,12 @@ export type CotizacionUncheckedUpdateManyInput = {
   estimated_days?: Prisma.IntFieldUpdateOperationsInput | number
   valid_until?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  pickup_lat?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  pickup_lng?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  delivery_lat?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  delivery_lng?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  route_distance?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  route_duration?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
 }
 
 export type CotizacionCountOrderByAggregateInput = {
@@ -455,11 +593,23 @@ export type CotizacionCountOrderByAggregateInput = {
   estimated_days?: Prisma.SortOrder
   valid_until?: Prisma.SortOrder
   created_at?: Prisma.SortOrder
+  pickup_lat?: Prisma.SortOrder
+  pickup_lng?: Prisma.SortOrder
+  delivery_lat?: Prisma.SortOrder
+  delivery_lng?: Prisma.SortOrder
+  route_distance?: Prisma.SortOrder
+  route_duration?: Prisma.SortOrder
 }
 
 export type CotizacionAvgOrderByAggregateInput = {
   price?: Prisma.SortOrder
   estimated_days?: Prisma.SortOrder
+  pickup_lat?: Prisma.SortOrder
+  pickup_lng?: Prisma.SortOrder
+  delivery_lat?: Prisma.SortOrder
+  delivery_lng?: Prisma.SortOrder
+  route_distance?: Prisma.SortOrder
+  route_duration?: Prisma.SortOrder
 }
 
 export type CotizacionMaxOrderByAggregateInput = {
@@ -472,6 +622,12 @@ export type CotizacionMaxOrderByAggregateInput = {
   estimated_days?: Prisma.SortOrder
   valid_until?: Prisma.SortOrder
   created_at?: Prisma.SortOrder
+  pickup_lat?: Prisma.SortOrder
+  pickup_lng?: Prisma.SortOrder
+  delivery_lat?: Prisma.SortOrder
+  delivery_lng?: Prisma.SortOrder
+  route_distance?: Prisma.SortOrder
+  route_duration?: Prisma.SortOrder
 }
 
 export type CotizacionMinOrderByAggregateInput = {
@@ -484,11 +640,23 @@ export type CotizacionMinOrderByAggregateInput = {
   estimated_days?: Prisma.SortOrder
   valid_until?: Prisma.SortOrder
   created_at?: Prisma.SortOrder
+  pickup_lat?: Prisma.SortOrder
+  pickup_lng?: Prisma.SortOrder
+  delivery_lat?: Prisma.SortOrder
+  delivery_lng?: Prisma.SortOrder
+  route_distance?: Prisma.SortOrder
+  route_duration?: Prisma.SortOrder
 }
 
 export type CotizacionSumOrderByAggregateInput = {
   price?: Prisma.SortOrder
   estimated_days?: Prisma.SortOrder
+  pickup_lat?: Prisma.SortOrder
+  pickup_lng?: Prisma.SortOrder
+  delivery_lat?: Prisma.SortOrder
+  delivery_lng?: Prisma.SortOrder
+  route_distance?: Prisma.SortOrder
+  route_duration?: Prisma.SortOrder
 }
 
 export type NullableStringFieldUpdateOperationsInput = {
@@ -511,6 +679,14 @@ export type IntFieldUpdateOperationsInput = {
   divide?: number
 }
 
+export type NullableFloatFieldUpdateOperationsInput = {
+  set?: number | null
+  increment?: number
+  decrement?: number
+  multiply?: number
+  divide?: number
+}
+
 
 
 export type CotizacionSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -526,6 +702,12 @@ export type CotizacionSelect<ExtArgs extends runtime.Types.Extensions.InternalAr
   estimated_days?: boolean
   valid_until?: boolean
   created_at?: boolean
+  pickup_lat?: boolean
+  pickup_lng?: boolean
+  delivery_lat?: boolean
+  delivery_lng?: boolean
+  route_distance?: boolean
+  route_duration?: boolean
 }, ExtArgs["result"]["cotizacion"]>
 
 export type CotizacionSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -541,6 +723,12 @@ export type CotizacionSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Ex
   estimated_days?: boolean
   valid_until?: boolean
   created_at?: boolean
+  pickup_lat?: boolean
+  pickup_lng?: boolean
+  delivery_lat?: boolean
+  delivery_lng?: boolean
+  route_distance?: boolean
+  route_duration?: boolean
 }, ExtArgs["result"]["cotizacion"]>
 
 export type CotizacionSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -556,6 +744,12 @@ export type CotizacionSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Ex
   estimated_days?: boolean
   valid_until?: boolean
   created_at?: boolean
+  pickup_lat?: boolean
+  pickup_lng?: boolean
+  delivery_lat?: boolean
+  delivery_lng?: boolean
+  route_distance?: boolean
+  route_duration?: boolean
 }, ExtArgs["result"]["cotizacion"]>
 
 export type CotizacionSelectScalar = {
@@ -571,9 +765,15 @@ export type CotizacionSelectScalar = {
   estimated_days?: boolean
   valid_until?: boolean
   created_at?: boolean
+  pickup_lat?: boolean
+  pickup_lng?: boolean
+  delivery_lat?: boolean
+  delivery_lng?: boolean
+  route_distance?: boolean
+  route_duration?: boolean
 }
 
-export type CotizacionOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "product_id" | "status" | "reserved_for_order_id" | "package_details" | "origin_address" | "destination_address" | "price" | "currency" | "estimated_days" | "valid_until" | "created_at", ExtArgs["result"]["cotizacion"]>
+export type CotizacionOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "product_id" | "status" | "reserved_for_order_id" | "package_details" | "origin_address" | "destination_address" | "price" | "currency" | "estimated_days" | "valid_until" | "created_at" | "pickup_lat" | "pickup_lng" | "delivery_lat" | "delivery_lng" | "route_distance" | "route_duration", ExtArgs["result"]["cotizacion"]>
 
 export type $CotizacionPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   name: "Cotizacion"
@@ -591,6 +791,12 @@ export type $CotizacionPayload<ExtArgs extends runtime.Types.Extensions.Internal
     estimated_days: number
     valid_until: Date
     created_at: Date
+    pickup_lat: number | null
+    pickup_lng: number | null
+    delivery_lat: number | null
+    delivery_lng: number | null
+    route_distance: number | null
+    route_duration: number | null
   }, ExtArgs["result"]["cotizacion"]>
   composites: {}
 }
@@ -1026,6 +1232,12 @@ export interface CotizacionFieldRefs {
   readonly estimated_days: Prisma.FieldRef<"Cotizacion", 'Int'>
   readonly valid_until: Prisma.FieldRef<"Cotizacion", 'DateTime'>
   readonly created_at: Prisma.FieldRef<"Cotizacion", 'DateTime'>
+  readonly pickup_lat: Prisma.FieldRef<"Cotizacion", 'Float'>
+  readonly pickup_lng: Prisma.FieldRef<"Cotizacion", 'Float'>
+  readonly delivery_lat: Prisma.FieldRef<"Cotizacion", 'Float'>
+  readonly delivery_lng: Prisma.FieldRef<"Cotizacion", 'Float'>
+  readonly route_distance: Prisma.FieldRef<"Cotizacion", 'Float'>
+  readonly route_duration: Prisma.FieldRef<"Cotizacion", 'Float'>
 }
     
 

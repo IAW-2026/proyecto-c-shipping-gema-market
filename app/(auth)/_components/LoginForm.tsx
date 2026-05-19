@@ -69,47 +69,29 @@ export function LoginForm({
         return;
       }
 
-      try {
-        const result = await signIn.create({
-          identifier: validation.data.identifier,
-          password: validation.data.password,
-        });
+      const { error: passwordError } = await signIn.password({
+        identifier: validation.data.identifier,
+        password: validation.data.password,
+      });
 
-        if (result.error) {
-          setError(result.error.longMessage ?? result.error.message ?? "Credenciales inválidas.");
+      if (passwordError) {
+        setError(passwordError.longMessage ?? passwordError.message ?? "Credenciales inválidas.");
+        return;
+      }
+
+      if (signIn.status === "complete") {
+        const { error: finalizeError } = await signIn.finalize();
+        if (finalizeError) {
+          setError(finalizeError.longMessage ?? "Error al finalizar inicio de sesión.");
           return;
         }
-
-        if (signIn.status === "complete") {
-          await signIn.finalize();
-          router.push("/dashboard");
-        } else if (signIn.status === "needs_first_factor") {
-          const emailFactor = signIn.supportedFirstFactors?.find(
-            (f) => f.strategy === "email_code" && "emailAddressId" in f
-          ) as EmailCodeFactor | undefined;
-
-          if (emailFactor) {
-            const sendResult = await signIn.emailCode.sendCode({
-              emailAddressId: emailFactor.emailAddressId,
-            });
-            if (sendResult.error) {
-              setError(sendResult.error.longMessage ?? "Error al enviar código de verificación.");
-              return;
-            }
-            setAuthStep("needs_email_code");
-          } else {
-            setError("No se encontró un método de verificación por email compatible.");
-          }
-        } else if (signIn.status === "needs_second_factor") {
-          resetTwoFactorState();
-          captureSecondFactors(signIn);
-          setAuthStep("needs_2fa");
-        } else {
-          setError("Estado de inicio de sesión inesperado.");
-        }
-      } catch (err: any) {
-        const clerkError = err?.errors?.[0];
-        setError(clerkError?.longMessage ?? clerkError?.message ?? "Error de servidor al iniciar sesión.");
+        router.push("/dashboard");
+      } else if (signIn.status === "needs_second_factor") {
+        resetTwoFactorState();
+        captureSecondFactors(signIn);
+        setAuthStep("needs_2fa");
+      } else {
+        setError("Estado de inicio de sesión inesperado.");
       }
     },
     [signIn, isLoading, formData, router, resetTwoFactorState]
