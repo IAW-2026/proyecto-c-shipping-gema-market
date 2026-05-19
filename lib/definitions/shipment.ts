@@ -9,8 +9,8 @@ export const AddressSchema = z.object({
     street: z.string().min(1, "La calle es obligatoria"),
     number: z.string().min(1, "El número es obligatorio"),
     zip: z.string().min(1, "El código postal es obligatorio"),
-    floor: z.string().optional(),
-    apartment: z.string().optional(),
+    floor: z.string().nullish(),
+    apartment: z.string().nullish(),
 });
 
 // --- 2. ESQUEMA PRINCIPAL DEL DOMINIO ---
@@ -28,6 +28,7 @@ export const ShipmentSchema = z.object({
         .startsWith("ord_", "El ID debe empezar con ord_"),
     buyerId: UserIdSchema,
     buyerName: z.string().min(1, "El nombre del comprador es obligatorio"),
+    receiverPhone: z.string(),
     sellerId: UserIdSchema,
     logisticsId: UserIdSchema,
     status: ShippingStatusSchema,
@@ -49,10 +50,19 @@ export const ShipmentSchema = z.object({
     distance: z.number().optional().describe("Distancia calculada en km"),
 });
 
+const toIntCm = z.number().transform(v => Math.round(v)).pipe(z.number().int().positive());
+
+export const DimensionsSchema = z.object({
+    height: toIntCm.describe("Altura en cm"),
+    width: toIntCm.describe("Ancho en cm"),
+    depth: toIntCm.describe("Profundidad en cm"),
+});
+
 // --- 3. INFERENCIA DE TIPOS ---
 
 export type ShippingStatus = z.infer<typeof ShippingStatusSchema>;
 export type Address = z.infer<typeof AddressSchema>;
+export type Dimensions = z.infer<typeof DimensionsSchema>;
 export type Shipment = z.infer<typeof ShipmentSchema>;
 
 // --- 4. DTOs (DATA TRANSFER OBJECTS) ---
@@ -108,3 +118,33 @@ export const ShipmentOfferSchema = ShipmentSchema.pick({
 });
 
 export type ShipmentOffer = z.infer<typeof ShipmentOfferSchema>;
+
+// --- 5. DTOs DE CONSULTA (FILTROS Y PAGINACIÓN) ---
+
+export interface ShipmentFilterParams {
+    logisticsId?: string;
+    status?: ShipmentStatus | ShipmentStatus[];
+    query?: string;
+    dateFrom?: Date;
+    dateTo?: Date;
+    page?: number;
+    pageSize?: number;
+    sortBy?: 'created_at' | 'price' | 'tracking_code' | 'status';
+    sortOrder?: 'asc' | 'desc';
+}
+
+export interface PaginatedResult<T> {
+    data: T[];
+    total: number;
+    page: number;
+    pageSize: number;
+    totalPages: number;
+}
+
+export interface SettlementPeriod {
+    period: string;
+    weekStart: Date;
+    weekEnd: Date;
+    trips: number;
+    amount: number;
+}

@@ -13,7 +13,7 @@ export interface BuyerNotificationRequest {
 }
 
 /**
- * Contrato: POST /api/shipping/envios
+ * Contrato: POST /api/shipping/shipments
  */
 export interface CreateShipmentRequest {
     order_id: string;

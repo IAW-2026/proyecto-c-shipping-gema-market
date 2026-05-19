@@ -29,11 +29,23 @@ export type AggregateEnvio = {
 export type EnvioAvgAggregateOutputType = {
   weight: runtime.Decimal | null
   price: runtime.Decimal | null
+  pickup_lat: number | null
+  pickup_lng: number | null
+  delivery_lat: number | null
+  delivery_lng: number | null
+  route_distance: number | null
+  route_duration: number | null
 }
 
 export type EnvioSumAggregateOutputType = {
   weight: runtime.Decimal | null
   price: runtime.Decimal | null
+  pickup_lat: number | null
+  pickup_lng: number | null
+  delivery_lat: number | null
+  delivery_lng: number | null
+  route_distance: number | null
+  route_duration: number | null
 }
 
 export type EnvioMinAggregateOutputType = {
@@ -52,6 +64,12 @@ export type EnvioMinAggregateOutputType = {
   picked_up_at: Date | null
   delivered_at: Date | null
   created_at: Date | null
+  pickup_lat: number | null
+  pickup_lng: number | null
+  delivery_lat: number | null
+  delivery_lng: number | null
+  route_distance: number | null
+  route_duration: number | null
 }
 
 export type EnvioMaxAggregateOutputType = {
@@ -70,6 +88,12 @@ export type EnvioMaxAggregateOutputType = {
   picked_up_at: Date | null
   delivered_at: Date | null
   created_at: Date | null
+  pickup_lat: number | null
+  pickup_lng: number | null
+  delivery_lat: number | null
+  delivery_lng: number | null
+  route_distance: number | null
+  route_duration: number | null
 }
 
 export type EnvioCountAggregateOutputType = {
@@ -91,6 +115,13 @@ export type EnvioCountAggregateOutputType = {
   picked_up_at: number
   delivered_at: number
   created_at: number
+  pickup_lat: number
+  pickup_lng: number
+  delivery_lat: number
+  delivery_lng: number
+  route_geometry: number
+  route_distance: number
+  route_duration: number
   _all: number
 }
 
@@ -98,11 +129,23 @@ export type EnvioCountAggregateOutputType = {
 export type EnvioAvgAggregateInputType = {
   weight?: true
   price?: true
+  pickup_lat?: true
+  pickup_lng?: true
+  delivery_lat?: true
+  delivery_lng?: true
+  route_distance?: true
+  route_duration?: true
 }
 
 export type EnvioSumAggregateInputType = {
   weight?: true
   price?: true
+  pickup_lat?: true
+  pickup_lng?: true
+  delivery_lat?: true
+  delivery_lng?: true
+  route_distance?: true
+  route_duration?: true
 }
 
 export type EnvioMinAggregateInputType = {
@@ -121,6 +164,12 @@ export type EnvioMinAggregateInputType = {
   picked_up_at?: true
   delivered_at?: true
   created_at?: true
+  pickup_lat?: true
+  pickup_lng?: true
+  delivery_lat?: true
+  delivery_lng?: true
+  route_distance?: true
+  route_duration?: true
 }
 
 export type EnvioMaxAggregateInputType = {
@@ -139,6 +188,12 @@ export type EnvioMaxAggregateInputType = {
   picked_up_at?: true
   delivered_at?: true
   created_at?: true
+  pickup_lat?: true
+  pickup_lng?: true
+  delivery_lat?: true
+  delivery_lng?: true
+  route_distance?: true
+  route_duration?: true
 }
 
 export type EnvioCountAggregateInputType = {
@@ -160,6 +215,13 @@ export type EnvioCountAggregateInputType = {
   picked_up_at?: true
   delivered_at?: true
   created_at?: true
+  pickup_lat?: true
+  pickup_lng?: true
+  delivery_lat?: true
+  delivery_lng?: true
+  route_geometry?: true
+  route_distance?: true
+  route_duration?: true
   _all?: true
 }
 
@@ -268,6 +330,13 @@ export type EnvioGroupByOutputType = {
   picked_up_at: Date | null
   delivered_at: Date | null
   created_at: Date
+  pickup_lat: number | null
+  pickup_lng: number | null
+  delivery_lat: number | null
+  delivery_lng: number | null
+  route_geometry: runtime.JsonValue | null
+  route_distance: number | null
+  route_duration: number | null
   _count: EnvioCountAggregateOutputType | null
   _avg: EnvioAvgAggregateOutputType | null
   _sum: EnvioSumAggregateOutputType | null
@@ -312,6 +381,13 @@ export type EnvioWhereInput = {
   picked_up_at?: Prisma.DateTimeNullableFilter<"Envio"> | Date | string | null
   delivered_at?: Prisma.DateTimeNullableFilter<"Envio"> | Date | string | null
   created_at?: Prisma.DateTimeFilter<"Envio"> | Date | string
+  pickup_lat?: Prisma.FloatNullableFilter<"Envio"> | number | null
+  pickup_lng?: Prisma.FloatNullableFilter<"Envio"> | number | null
+  delivery_lat?: Prisma.FloatNullableFilter<"Envio"> | number | null
+  delivery_lng?: Prisma.FloatNullableFilter<"Envio"> | number | null
+  route_geometry?: Prisma.JsonNullableFilter<"Envio">
+  route_distance?: Prisma.FloatNullableFilter<"Envio"> | number | null
+  route_duration?: Prisma.FloatNullableFilter<"Envio"> | number | null
   operador?: Prisma.XOR<Prisma.UsuarioNullableScalarRelationFilter, Prisma.UsuarioWhereInput> | null
 }
 
@@ -334,6 +410,13 @@ export type EnvioOrderByWithRelationInput = {
   picked_up_at?: Prisma.SortOrderInput | Prisma.SortOrder
   delivered_at?: Prisma.SortOrderInput | Prisma.SortOrder
   created_at?: Prisma.SortOrder
+  pickup_lat?: Prisma.SortOrderInput | Prisma.SortOrder
+  pickup_lng?: Prisma.SortOrderInput | Prisma.SortOrder
+  delivery_lat?: Prisma.SortOrderInput | Prisma.SortOrder
+  delivery_lng?: Prisma.SortOrderInput | Prisma.SortOrder
+  route_geometry?: Prisma.SortOrderInput | Prisma.SortOrder
+  route_distance?: Prisma.SortOrderInput | Prisma.SortOrder
+  route_duration?: Prisma.SortOrderInput | Prisma.SortOrder
   operador?: Prisma.UsuarioOrderByWithRelationInput
 }
 
@@ -359,6 +442,13 @@ export type EnvioWhereUniqueInput = Prisma.AtLeast<{
   picked_up_at?: Prisma.DateTimeNullableFilter<"Envio"> | Date | string | null
   delivered_at?: Prisma.DateTimeNullableFilter<"Envio"> | Date | string | null
   created_at?: Prisma.DateTimeFilter<"Envio"> | Date | string
+  pickup_lat?: Prisma.FloatNullableFilter<"Envio"> | number | null
+  pickup_lng?: Prisma.FloatNullableFilter<"Envio"> | number | null
+  delivery_lat?: Prisma.FloatNullableFilter<"Envio"> | number | null
+  delivery_lng?: Prisma.FloatNullableFilter<"Envio"> | number | null
+  route_geometry?: Prisma.JsonNullableFilter<"Envio">
+  route_distance?: Prisma.FloatNullableFilter<"Envio"> | number | null
+  route_duration?: Prisma.FloatNullableFilter<"Envio"> | number | null
   operador?: Prisma.XOR<Prisma.UsuarioNullableScalarRelationFilter, Prisma.UsuarioWhereInput> | null
 }, "id" | "order_id" | "tracking_code">
 
@@ -381,6 +471,13 @@ export type EnvioOrderByWithAggregationInput = {
   picked_up_at?: Prisma.SortOrderInput | Prisma.SortOrder
   delivered_at?: Prisma.SortOrderInput | Prisma.SortOrder
   created_at?: Prisma.SortOrder
+  pickup_lat?: Prisma.SortOrderInput | Prisma.SortOrder
+  pickup_lng?: Prisma.SortOrderInput | Prisma.SortOrder
+  delivery_lat?: Prisma.SortOrderInput | Prisma.SortOrder
+  delivery_lng?: Prisma.SortOrderInput | Prisma.SortOrder
+  route_geometry?: Prisma.SortOrderInput | Prisma.SortOrder
+  route_distance?: Prisma.SortOrderInput | Prisma.SortOrder
+  route_duration?: Prisma.SortOrderInput | Prisma.SortOrder
   _count?: Prisma.EnvioCountOrderByAggregateInput
   _avg?: Prisma.EnvioAvgOrderByAggregateInput
   _max?: Prisma.EnvioMaxOrderByAggregateInput
@@ -410,6 +507,13 @@ export type EnvioScalarWhereWithAggregatesInput = {
   picked_up_at?: Prisma.DateTimeNullableWithAggregatesFilter<"Envio"> | Date | string | null
   delivered_at?: Prisma.DateTimeNullableWithAggregatesFilter<"Envio"> | Date | string | null
   created_at?: Prisma.DateTimeWithAggregatesFilter<"Envio"> | Date | string
+  pickup_lat?: Prisma.FloatNullableWithAggregatesFilter<"Envio"> | number | null
+  pickup_lng?: Prisma.FloatNullableWithAggregatesFilter<"Envio"> | number | null
+  delivery_lat?: Prisma.FloatNullableWithAggregatesFilter<"Envio"> | number | null
+  delivery_lng?: Prisma.FloatNullableWithAggregatesFilter<"Envio"> | number | null
+  route_geometry?: Prisma.JsonNullableWithAggregatesFilter<"Envio">
+  route_distance?: Prisma.FloatNullableWithAggregatesFilter<"Envio"> | number | null
+  route_duration?: Prisma.FloatNullableWithAggregatesFilter<"Envio"> | number | null
 }
 
 export type EnvioCreateInput = {
@@ -430,6 +534,13 @@ export type EnvioCreateInput = {
   picked_up_at?: Date | string | null
   delivered_at?: Date | string | null
   created_at?: Date | string
+  pickup_lat?: number | null
+  pickup_lng?: number | null
+  delivery_lat?: number | null
+  delivery_lng?: number | null
+  route_geometry?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  route_distance?: number | null
+  route_duration?: number | null
   operador?: Prisma.UsuarioCreateNestedOneWithoutEnviosInput
 }
 
@@ -452,6 +563,13 @@ export type EnvioUncheckedCreateInput = {
   picked_up_at?: Date | string | null
   delivered_at?: Date | string | null
   created_at?: Date | string
+  pickup_lat?: number | null
+  pickup_lng?: number | null
+  delivery_lat?: number | null
+  delivery_lng?: number | null
+  route_geometry?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  route_distance?: number | null
+  route_duration?: number | null
 }
 
 export type EnvioUpdateInput = {
@@ -472,6 +590,13 @@ export type EnvioUpdateInput = {
   picked_up_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   delivered_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  pickup_lat?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  pickup_lng?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  delivery_lat?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  delivery_lng?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  route_geometry?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  route_distance?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  route_duration?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   operador?: Prisma.UsuarioUpdateOneWithoutEnviosNestedInput
 }
 
@@ -494,6 +619,13 @@ export type EnvioUncheckedUpdateInput = {
   picked_up_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   delivered_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  pickup_lat?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  pickup_lng?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  delivery_lat?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  delivery_lng?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  route_geometry?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  route_distance?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  route_duration?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
 }
 
 export type EnvioCreateManyInput = {
@@ -515,6 +647,13 @@ export type EnvioCreateManyInput = {
   picked_up_at?: Date | string | null
   delivered_at?: Date | string | null
   created_at?: Date | string
+  pickup_lat?: number | null
+  pickup_lng?: number | null
+  delivery_lat?: number | null
+  delivery_lng?: number | null
+  route_geometry?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  route_distance?: number | null
+  route_duration?: number | null
 }
 
 export type EnvioUpdateManyMutationInput = {
@@ -535,6 +674,13 @@ export type EnvioUpdateManyMutationInput = {
   picked_up_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   delivered_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  pickup_lat?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  pickup_lng?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  delivery_lat?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  delivery_lng?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  route_geometry?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  route_distance?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  route_duration?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
 }
 
 export type EnvioUncheckedUpdateManyInput = {
@@ -556,6 +702,13 @@ export type EnvioUncheckedUpdateManyInput = {
   picked_up_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   delivered_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  pickup_lat?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  pickup_lng?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  delivery_lat?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  delivery_lng?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  route_geometry?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  route_distance?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  route_duration?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
 }
 
 export type EnvioListRelationFilter = {
@@ -587,11 +740,24 @@ export type EnvioCountOrderByAggregateInput = {
   picked_up_at?: Prisma.SortOrder
   delivered_at?: Prisma.SortOrder
   created_at?: Prisma.SortOrder
+  pickup_lat?: Prisma.SortOrder
+  pickup_lng?: Prisma.SortOrder
+  delivery_lat?: Prisma.SortOrder
+  delivery_lng?: Prisma.SortOrder
+  route_geometry?: Prisma.SortOrder
+  route_distance?: Prisma.SortOrder
+  route_duration?: Prisma.SortOrder
 }
 
 export type EnvioAvgOrderByAggregateInput = {
   weight?: Prisma.SortOrder
   price?: Prisma.SortOrder
+  pickup_lat?: Prisma.SortOrder
+  pickup_lng?: Prisma.SortOrder
+  delivery_lat?: Prisma.SortOrder
+  delivery_lng?: Prisma.SortOrder
+  route_distance?: Prisma.SortOrder
+  route_duration?: Prisma.SortOrder
 }
 
 export type EnvioMaxOrderByAggregateInput = {
@@ -610,6 +776,12 @@ export type EnvioMaxOrderByAggregateInput = {
   picked_up_at?: Prisma.SortOrder
   delivered_at?: Prisma.SortOrder
   created_at?: Prisma.SortOrder
+  pickup_lat?: Prisma.SortOrder
+  pickup_lng?: Prisma.SortOrder
+  delivery_lat?: Prisma.SortOrder
+  delivery_lng?: Prisma.SortOrder
+  route_distance?: Prisma.SortOrder
+  route_duration?: Prisma.SortOrder
 }
 
 export type EnvioMinOrderByAggregateInput = {
@@ -628,11 +800,23 @@ export type EnvioMinOrderByAggregateInput = {
   picked_up_at?: Prisma.SortOrder
   delivered_at?: Prisma.SortOrder
   created_at?: Prisma.SortOrder
+  pickup_lat?: Prisma.SortOrder
+  pickup_lng?: Prisma.SortOrder
+  delivery_lat?: Prisma.SortOrder
+  delivery_lng?: Prisma.SortOrder
+  route_distance?: Prisma.SortOrder
+  route_duration?: Prisma.SortOrder
 }
 
 export type EnvioSumOrderByAggregateInput = {
   weight?: Prisma.SortOrder
   price?: Prisma.SortOrder
+  pickup_lat?: Prisma.SortOrder
+  pickup_lng?: Prisma.SortOrder
+  delivery_lat?: Prisma.SortOrder
+  delivery_lng?: Prisma.SortOrder
+  route_distance?: Prisma.SortOrder
+  route_duration?: Prisma.SortOrder
 }
 
 export type EnvioCreateNestedManyWithoutOperadorInput = {
@@ -699,6 +883,13 @@ export type EnvioCreateWithoutOperadorInput = {
   picked_up_at?: Date | string | null
   delivered_at?: Date | string | null
   created_at?: Date | string
+  pickup_lat?: number | null
+  pickup_lng?: number | null
+  delivery_lat?: number | null
+  delivery_lng?: number | null
+  route_geometry?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  route_distance?: number | null
+  route_duration?: number | null
 }
 
 export type EnvioUncheckedCreateWithoutOperadorInput = {
@@ -719,6 +910,13 @@ export type EnvioUncheckedCreateWithoutOperadorInput = {
   picked_up_at?: Date | string | null
   delivered_at?: Date | string | null
   created_at?: Date | string
+  pickup_lat?: number | null
+  pickup_lng?: number | null
+  delivery_lat?: number | null
+  delivery_lng?: number | null
+  route_geometry?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  route_distance?: number | null
+  route_duration?: number | null
 }
 
 export type EnvioCreateOrConnectWithoutOperadorInput = {
@@ -769,6 +967,13 @@ export type EnvioScalarWhereInput = {
   picked_up_at?: Prisma.DateTimeNullableFilter<"Envio"> | Date | string | null
   delivered_at?: Prisma.DateTimeNullableFilter<"Envio"> | Date | string | null
   created_at?: Prisma.DateTimeFilter<"Envio"> | Date | string
+  pickup_lat?: Prisma.FloatNullableFilter<"Envio"> | number | null
+  pickup_lng?: Prisma.FloatNullableFilter<"Envio"> | number | null
+  delivery_lat?: Prisma.FloatNullableFilter<"Envio"> | number | null
+  delivery_lng?: Prisma.FloatNullableFilter<"Envio"> | number | null
+  route_geometry?: Prisma.JsonNullableFilter<"Envio">
+  route_distance?: Prisma.FloatNullableFilter<"Envio"> | number | null
+  route_duration?: Prisma.FloatNullableFilter<"Envio"> | number | null
 }
 
 export type EnvioCreateManyOperadorInput = {
@@ -789,6 +994,13 @@ export type EnvioCreateManyOperadorInput = {
   picked_up_at?: Date | string | null
   delivered_at?: Date | string | null
   created_at?: Date | string
+  pickup_lat?: number | null
+  pickup_lng?: number | null
+  delivery_lat?: number | null
+  delivery_lng?: number | null
+  route_geometry?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  route_distance?: number | null
+  route_duration?: number | null
 }
 
 export type EnvioUpdateWithoutOperadorInput = {
@@ -809,6 +1021,13 @@ export type EnvioUpdateWithoutOperadorInput = {
   picked_up_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   delivered_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  pickup_lat?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  pickup_lng?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  delivery_lat?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  delivery_lng?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  route_geometry?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  route_distance?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  route_duration?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
 }
 
 export type EnvioUncheckedUpdateWithoutOperadorInput = {
@@ -829,6 +1048,13 @@ export type EnvioUncheckedUpdateWithoutOperadorInput = {
   picked_up_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   delivered_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  pickup_lat?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  pickup_lng?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  delivery_lat?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  delivery_lng?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  route_geometry?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  route_distance?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  route_duration?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
 }
 
 export type EnvioUncheckedUpdateManyWithoutOperadorInput = {
@@ -849,6 +1075,13 @@ export type EnvioUncheckedUpdateManyWithoutOperadorInput = {
   picked_up_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   delivered_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  pickup_lat?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  pickup_lng?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  delivery_lat?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  delivery_lng?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  route_geometry?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  route_distance?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  route_duration?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
 }
 
 
@@ -872,6 +1105,13 @@ export type EnvioSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = 
   picked_up_at?: boolean
   delivered_at?: boolean
   created_at?: boolean
+  pickup_lat?: boolean
+  pickup_lng?: boolean
+  delivery_lat?: boolean
+  delivery_lng?: boolean
+  route_geometry?: boolean
+  route_distance?: boolean
+  route_duration?: boolean
   operador?: boolean | Prisma.Envio$operadorArgs<ExtArgs>
 }, ExtArgs["result"]["envio"]>
 
@@ -894,6 +1134,13 @@ export type EnvioSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensi
   picked_up_at?: boolean
   delivered_at?: boolean
   created_at?: boolean
+  pickup_lat?: boolean
+  pickup_lng?: boolean
+  delivery_lat?: boolean
+  delivery_lng?: boolean
+  route_geometry?: boolean
+  route_distance?: boolean
+  route_duration?: boolean
   operador?: boolean | Prisma.Envio$operadorArgs<ExtArgs>
 }, ExtArgs["result"]["envio"]>
 
@@ -916,6 +1163,13 @@ export type EnvioSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensi
   picked_up_at?: boolean
   delivered_at?: boolean
   created_at?: boolean
+  pickup_lat?: boolean
+  pickup_lng?: boolean
+  delivery_lat?: boolean
+  delivery_lng?: boolean
+  route_geometry?: boolean
+  route_distance?: boolean
+  route_duration?: boolean
   operador?: boolean | Prisma.Envio$operadorArgs<ExtArgs>
 }, ExtArgs["result"]["envio"]>
 
@@ -938,9 +1192,16 @@ export type EnvioSelectScalar = {
   picked_up_at?: boolean
   delivered_at?: boolean
   created_at?: boolean
+  pickup_lat?: boolean
+  pickup_lng?: boolean
+  delivery_lat?: boolean
+  delivery_lng?: boolean
+  route_geometry?: boolean
+  route_distance?: boolean
+  route_duration?: boolean
 }
 
-export type EnvioOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "order_id" | "quote_id" | "buyer_id" | "receiver_name" | "receiver_phone" | "seller_id" | "logistics_id" | "weight" | "dimensions" | "pickup_address" | "delivery_address" | "tracking_code" | "status" | "price" | "picked_up_at" | "delivered_at" | "created_at", ExtArgs["result"]["envio"]>
+export type EnvioOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "order_id" | "quote_id" | "buyer_id" | "receiver_name" | "receiver_phone" | "seller_id" | "logistics_id" | "weight" | "dimensions" | "pickup_address" | "delivery_address" | "tracking_code" | "status" | "price" | "picked_up_at" | "delivered_at" | "created_at" | "pickup_lat" | "pickup_lng" | "delivery_lat" | "delivery_lng" | "route_geometry" | "route_distance" | "route_duration", ExtArgs["result"]["envio"]>
 export type EnvioInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   operador?: boolean | Prisma.Envio$operadorArgs<ExtArgs>
 }
@@ -975,6 +1236,13 @@ export type $EnvioPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs 
     picked_up_at: Date | null
     delivered_at: Date | null
     created_at: Date
+    pickup_lat: number | null
+    pickup_lng: number | null
+    delivery_lat: number | null
+    delivery_lng: number | null
+    route_geometry: runtime.JsonValue | null
+    route_distance: number | null
+    route_duration: number | null
   }, ExtArgs["result"]["envio"]>
   composites: {}
 }
@@ -1417,6 +1685,13 @@ export interface EnvioFieldRefs {
   readonly picked_up_at: Prisma.FieldRef<"Envio", 'DateTime'>
   readonly delivered_at: Prisma.FieldRef<"Envio", 'DateTime'>
   readonly created_at: Prisma.FieldRef<"Envio", 'DateTime'>
+  readonly pickup_lat: Prisma.FieldRef<"Envio", 'Float'>
+  readonly pickup_lng: Prisma.FieldRef<"Envio", 'Float'>
+  readonly delivery_lat: Prisma.FieldRef<"Envio", 'Float'>
+  readonly delivery_lng: Prisma.FieldRef<"Envio", 'Float'>
+  readonly route_geometry: Prisma.FieldRef<"Envio", 'Json'>
+  readonly route_distance: Prisma.FieldRef<"Envio", 'Float'>
+  readonly route_duration: Prisma.FieldRef<"Envio", 'Float'>
 }
     
 

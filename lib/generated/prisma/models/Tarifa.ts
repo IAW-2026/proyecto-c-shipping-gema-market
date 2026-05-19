@@ -47,7 +47,6 @@ export type TarifaMaxAggregateOutputType = {
 export type TarifaCountAggregateOutputType = {
   id: number
   weight_range: number
-  volume_range: number
   price_per_km: number
   _all: number
 }
@@ -74,7 +73,6 @@ export type TarifaMaxAggregateInputType = {
 export type TarifaCountAggregateInputType = {
   id?: true
   weight_range?: true
-  volume_range?: true
   price_per_km?: true
   _all?: true
 }
@@ -168,7 +166,6 @@ export type TarifaGroupByArgs<ExtArgs extends runtime.Types.Extensions.InternalA
 export type TarifaGroupByOutputType = {
   id: string
   weight_range: runtime.JsonValue
-  volume_range: runtime.JsonValue
   price_per_km: runtime.Decimal
   _count: TarifaCountAggregateOutputType | null
   _avg: TarifaAvgAggregateOutputType | null
@@ -198,14 +195,12 @@ export type TarifaWhereInput = {
   NOT?: Prisma.TarifaWhereInput | Prisma.TarifaWhereInput[]
   id?: Prisma.StringFilter<"Tarifa"> | string
   weight_range?: Prisma.JsonFilter<"Tarifa">
-  volume_range?: Prisma.JsonFilter<"Tarifa">
   price_per_km?: Prisma.DecimalFilter<"Tarifa"> | runtime.Decimal | runtime.DecimalJsLike | number | string
 }
 
 export type TarifaOrderByWithRelationInput = {
   id?: Prisma.SortOrder
   weight_range?: Prisma.SortOrder
-  volume_range?: Prisma.SortOrder
   price_per_km?: Prisma.SortOrder
 }
 
@@ -215,14 +210,12 @@ export type TarifaWhereUniqueInput = Prisma.AtLeast<{
   OR?: Prisma.TarifaWhereInput[]
   NOT?: Prisma.TarifaWhereInput | Prisma.TarifaWhereInput[]
   weight_range?: Prisma.JsonFilter<"Tarifa">
-  volume_range?: Prisma.JsonFilter<"Tarifa">
   price_per_km?: Prisma.DecimalFilter<"Tarifa"> | runtime.Decimal | runtime.DecimalJsLike | number | string
 }, "id">
 
 export type TarifaOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
   weight_range?: Prisma.SortOrder
-  volume_range?: Prisma.SortOrder
   price_per_km?: Prisma.SortOrder
   _count?: Prisma.TarifaCountOrderByAggregateInput
   _avg?: Prisma.TarifaAvgOrderByAggregateInput
@@ -237,63 +230,54 @@ export type TarifaScalarWhereWithAggregatesInput = {
   NOT?: Prisma.TarifaScalarWhereWithAggregatesInput | Prisma.TarifaScalarWhereWithAggregatesInput[]
   id?: Prisma.StringWithAggregatesFilter<"Tarifa"> | string
   weight_range?: Prisma.JsonWithAggregatesFilter<"Tarifa">
-  volume_range?: Prisma.JsonWithAggregatesFilter<"Tarifa">
   price_per_km?: Prisma.DecimalWithAggregatesFilter<"Tarifa"> | runtime.Decimal | runtime.DecimalJsLike | number | string
 }
 
 export type TarifaCreateInput = {
   id: string
   weight_range: Prisma.JsonNullValueInput | runtime.InputJsonValue
-  volume_range: Prisma.JsonNullValueInput | runtime.InputJsonValue
   price_per_km: runtime.Decimal | runtime.DecimalJsLike | number | string
 }
 
 export type TarifaUncheckedCreateInput = {
   id: string
   weight_range: Prisma.JsonNullValueInput | runtime.InputJsonValue
-  volume_range: Prisma.JsonNullValueInput | runtime.InputJsonValue
   price_per_km: runtime.Decimal | runtime.DecimalJsLike | number | string
 }
 
 export type TarifaUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   weight_range?: Prisma.JsonNullValueInput | runtime.InputJsonValue
-  volume_range?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   price_per_km?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
 }
 
 export type TarifaUncheckedUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   weight_range?: Prisma.JsonNullValueInput | runtime.InputJsonValue
-  volume_range?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   price_per_km?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
 }
 
 export type TarifaCreateManyInput = {
   id: string
   weight_range: Prisma.JsonNullValueInput | runtime.InputJsonValue
-  volume_range: Prisma.JsonNullValueInput | runtime.InputJsonValue
   price_per_km: runtime.Decimal | runtime.DecimalJsLike | number | string
 }
 
 export type TarifaUpdateManyMutationInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   weight_range?: Prisma.JsonNullValueInput | runtime.InputJsonValue
-  volume_range?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   price_per_km?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
 }
 
 export type TarifaUncheckedUpdateManyInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   weight_range?: Prisma.JsonNullValueInput | runtime.InputJsonValue
-  volume_range?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   price_per_km?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
 }
 
 export type TarifaCountOrderByAggregateInput = {
   id?: Prisma.SortOrder
   weight_range?: Prisma.SortOrder
-  volume_range?: Prisma.SortOrder
   price_per_km?: Prisma.SortOrder
 }
 
@@ -320,32 +304,28 @@ export type TarifaSumOrderByAggregateInput = {
 export type TarifaSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
   weight_range?: boolean
-  volume_range?: boolean
   price_per_km?: boolean
 }, ExtArgs["result"]["tarifa"]>
 
 export type TarifaSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
   weight_range?: boolean
-  volume_range?: boolean
   price_per_km?: boolean
 }, ExtArgs["result"]["tarifa"]>
 
 export type TarifaSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
   weight_range?: boolean
-  volume_range?: boolean
   price_per_km?: boolean
 }, ExtArgs["result"]["tarifa"]>
 
 export type TarifaSelectScalar = {
   id?: boolean
   weight_range?: boolean
-  volume_range?: boolean
   price_per_km?: boolean
 }
 
-export type TarifaOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "weight_range" | "volume_range" | "price_per_km", ExtArgs["result"]["tarifa"]>
+export type TarifaOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "weight_range" | "price_per_km", ExtArgs["result"]["tarifa"]>
 
 export type $TarifaPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   name: "Tarifa"
@@ -353,7 +333,6 @@ export type $TarifaPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
     weight_range: runtime.JsonValue
-    volume_range: runtime.JsonValue
     price_per_km: runtime.Decimal
   }, ExtArgs["result"]["tarifa"]>
   composites: {}
@@ -780,7 +759,6 @@ export interface Prisma__TarifaClient<T, Null = never, ExtArgs extends runtime.T
 export interface TarifaFieldRefs {
   readonly id: Prisma.FieldRef<"Tarifa", 'String'>
   readonly weight_range: Prisma.FieldRef<"Tarifa", 'Json'>
-  readonly volume_range: Prisma.FieldRef<"Tarifa", 'Json'>
   readonly price_per_km: Prisma.FieldRef<"Tarifa", 'Decimal'>
 }
     
