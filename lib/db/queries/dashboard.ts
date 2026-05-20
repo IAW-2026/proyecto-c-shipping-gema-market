@@ -1,7 +1,8 @@
 import prisma from "@/lib/db/prisma";
 import { AddressSchema, ShippingStatusSchema } from "@/lib/definitions/shipment";
 import type { ShipmentSummary } from "@/lib/definitions/shipment";
-import type { DashboardMetrics, OperatorDashboardData } from "@/lib/definitions/dashboard-metrics";
+import type { DashboardMetrics, OperatorDashboardData, PerformanceData, WeekData } from "@/lib/definitions/dashboard-metrics";
+import { getSettlements } from "./settlement";
 
 const summarySelect = {
     id: true,
@@ -115,4 +116,65 @@ export async function getActiveShipments(operatorId: string): Promise<ShipmentSu
     });
 
     return shipments.map(toSummary);
+}
+
+function getLast6WeeksRange(): { dateFrom: Date; dateTo: Date } {
+    const now = new Date();
+    const dayOfWeek = now.getDay();
+    const diffToMonday = dayOfWeek === 0 ? -6 : 1 - dayOfWeek;
+
+    const currentMonday = new Date(now);
+    currentMonday.setDate(now.getDate() + diffToMonday);
+    currentMonday.setHours(0, 0, 0, 0);
+
+    const weekEnd = new Date(currentMonday);
+    weekEnd.setDate(currentMonday.getDate() + 6);
+    weekEnd.setHours(23, 59, 59, 999);
+
+    const weekStart = new Date(currentMonday);
+    weekStart.setDate(currentMonday.getDate() - 5 * 7);
+
+    return { dateFrom: weekStart, dateTo: weekEnd };
+}
+
+function formatShortLabel(date: Date): string {
+    const opts: Intl.DateTimeFormatOptions = { day: "numeric", month: "short" };
+    return date.toLocaleDateString("es-AR", opts);
+}
+
+function calcChange(current: number, previous: number): number {
+    if (previous === 0) return current > 0 ? 100 : 0;
+    return Math.round(((current - previous) / previous) * 100);
+}
+
+export async function getPerformanceData(operatorId: string): Promise<PerformanceData> {
+    const { dateFrom, dateTo } = getLast6WeeksRange();
+
+    const settlements = await getSettlements(operatorId, dateFrom, dateTo);
+
+    const currentWeek = settlements[0];
+    const previousWeek = settlements[1];
+
+    const weeklyEarnings = currentWeek?.amount ?? 0;
+    const weeklyTrips = currentWeek?.trips ?? 0;
+    const prevEarnings = previousWeek?.amount ?? 0;
+    const prevTrips = previousWeek?.trips ?? 0;
+
+    const weeklyHistory: WeekData[] = settlements
+        .slice()
+        .reverse()
+        .map((s) => ({
+            label: formatShortLabel(s.weekStart),
+            earnings: s.amount,
+            trips: s.trips,
+        }));
+
+    return {
+        weeklyEarnings,
+        weeklyTrips,
+        avgPerTrip: weeklyTrips > 0 ? Math.round(weeklyEarnings / weeklyTrips) : 0,
+        earningsChange: calcChange(weeklyEarnings, prevEarnings),
+        tripsChange: calcChange(weeklyTrips, prevTrips),
+        weeklyHistory,
+    };
 }

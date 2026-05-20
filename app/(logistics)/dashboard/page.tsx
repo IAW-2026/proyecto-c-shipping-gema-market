@@ -8,6 +8,8 @@ import { MetricsData } from "./_components/metrics-data";
 import { MetricsGridSkeleton } from "./_components/skeletons/metrics-grid-skeleton";
 import { ActiveShipmentsData } from "./_components/active-shipments-data";
 import { ActiveShipmentsListSkeleton } from "./_components/skeletons/active-shipments-list-skeleton";
+import { PerformanceData } from "./_components/performance-data";
+import { PerformanceSkeleton } from "./_components/skeletons/performance-skeleton";
 
 
 export const metadata: Metadata = {
@@ -31,9 +33,9 @@ export default async function DashboardPage() {
                         <ActiveShipmentsData userId={userId} />
                     </Suspense>
 
-                    <div className="bg-paper border border-line rounded-r3 p-6 flex items-center justify-center text-ink-3">
-                        Módulo de Rendimiento (Próximamente)
-                    </div>
+                    <Suspense fallback={<PerformanceSkeleton />}>
+                        <PerformanceData userId={userId} />
+                    </Suspense>
                 </div>
             </Content>
         </PageWrapper>
