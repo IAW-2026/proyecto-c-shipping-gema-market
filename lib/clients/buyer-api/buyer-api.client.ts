@@ -15,6 +15,7 @@ export const buyerApiClient = {
      * TODO: Reemplazar mock con fetch real a Buyer App.
      */
     getBuyerData: async (buyerId: string, req?: Request): ApiResult<BuyerDataResponse> => {
+        console.log(`[M2M] Buyer → POST /api/buyer/${buyerId}`);
         await new Promise(resolve => setTimeout(resolve, 200));
         return {
             data: {
@@ -33,12 +34,12 @@ export const buyerApiClient = {
      * Notifica al Buyer sobre un cambio en el estado del envío de una orden.
      * TODO: Reemplazar mock con fetch real a Buyer App.
      */
-    notifyStatusChange: async (_orderId: string, _payload: BuyerStatusUpdate): ApiResult<BuyerNotificationResponse> => {
-        console.log(`[M2M] Notificación a Buyer API simulada`);
+    notifyStatusChange: async (orderId: string, payload: BuyerStatusUpdate): ApiResult<BuyerNotificationResponse> => {
+        console.log(`[M2M] Buyer → POST /api/buyer/ordenes/${orderId}/estado-envio → ${payload.status}`);
 
         await new Promise(resolve => setTimeout(resolve, 500));
         return {
-            data: { received: true, order_id: _orderId },
+            data: { received: true, order_id: orderId },
             status: 200
         };
     }
