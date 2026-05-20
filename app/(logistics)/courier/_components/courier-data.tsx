@@ -22,7 +22,7 @@ export function CourierData({ shipment, shipments, selectedTracking }: CourierDa
     const [showCancel, setShowCancel] = useState(false);
     const [hasPendingAction, setHasPendingAction] = useState(false);
 
-    const handleAction = useCallback(async (shippingId: string, transition: "pickup" | "deliver") => {
+    const handleAction = useCallback(async (shippingId: string, transition: "pickup" | "transit" | "deliver") => {
         setHasPendingAction(true);
         try {
             const result = await transitionShipmentAction(shippingId, transition);
@@ -59,9 +59,23 @@ export function CourierData({ shipment, shipments, selectedTracking }: CourierDa
         return base;
     };
 
-    const isPickup = shipment.status === "pending_pickup";
-    const mainActionLabel = isPickup ? "Recoger paquete" : "Marcar entregado";
-    const mainActionTransition: "pickup" | "deliver" = isPickup ? "pickup" : "deliver";
+    const isPendingPickup = shipment.status === "pending_pickup";
+    const isPickedUp = shipment.status === "picked_up";
+    const canCancel = isPendingPickup;
+
+    let mainActionLabel: string;
+    let mainActionTransition: "pickup" | "transit" | "deliver";
+
+    if (isPendingPickup) {
+        mainActionLabel = "Recoger paquete";
+        mainActionTransition = "pickup";
+    } else if (isPickedUp) {
+        mainActionLabel = "Iniciar viaje";
+        mainActionTransition = "transit";
+    } else {
+        mainActionLabel = "Marcar entregado";
+        mainActionTransition = "deliver";
+    }
 
     return (
         <>
@@ -70,6 +84,7 @@ export function CourierData({ shipment, shipments, selectedTracking }: CourierDa
                 selectedTracking={selectedTracking}
                 onCancelClick={() => setShowCancel(true)}
                 hasPendingAction={hasPendingAction}
+                canCancel={canCancel}
             />
 
             <section className="flex flex-col flex-1 px-4 lgx:px-0">

@@ -66,7 +66,7 @@ export async function getDashboardData(operatorId: string): Promise<OperatorDash
         prisma.envio.findMany({
             where: {
                 logistics_id: operatorId,
-                status: { in: ['pending_pickup', 'in_transit'] },
+                status: { in: ['pending_pickup', 'picked_up', 'in_transit'] },
             },
             orderBy: { created_at: 'desc' },
             select: summarySelect,
@@ -109,7 +109,7 @@ export async function getActiveShipments(operatorId: string): Promise<ShipmentSu
     const shipments = await prisma.envio.findMany({
         where: {
             logistics_id: operatorId,
-            status: { in: ['pending_pickup', 'in_transit'] },
+            status: { in: ['pending_pickup', 'picked_up', 'in_transit'] },
         },
         orderBy: { created_at: 'desc' },
         select: summarySelect,

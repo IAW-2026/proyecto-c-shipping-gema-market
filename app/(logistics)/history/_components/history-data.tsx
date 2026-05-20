@@ -8,9 +8,8 @@ import { Pagination } from "@/components/ui/pagination";
 function mapTabToFilter(tabId: string): ShipmentStatus[] | undefined {
     switch (tabId) {
         case "todos": return undefined;
-        case "active": return ["pending_pickup", "in_transit"];
+        case "active": return ["pending_pickup", "picked_up", "in_transit"];
         case "delivered": return ["delivered"];
-        case "issues": return ["failed", "cancelled"];
         default: return undefined;
     }
 }
@@ -43,9 +42,8 @@ export async function HistoryData({ userId, currentStatus, searchQuery, page, pa
 
     const counts = {
         all: countsByStatus.todos ?? 0,
-        active: (countsByStatus.pending_pickup ?? 0) + (countsByStatus.in_transit ?? 0),
+        active: (countsByStatus.pending_pickup ?? 0) + (countsByStatus.picked_up ?? 0) + (countsByStatus.in_transit ?? 0),
         delivered: countsByStatus.delivered ?? 0,
-        issues: (countsByStatus.failed ?? 0) + (countsByStatus.cancelled ?? 0),
     };
 
     return (

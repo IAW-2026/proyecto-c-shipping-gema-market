@@ -83,7 +83,7 @@ export function useCourierActions() {
     const router = useRouter();
     const [isPending, setIsPending] = useState(false);
 
-    const handleAction = async (shippingId: string, transition: "pickup" | "deliver") => {
+    const handleAction = async (shippingId: string, transition: "pickup" | "transit" | "deliver") => {
         setIsPending(true);
         try {
             const result = await transitionShipmentAction(shippingId, transition);

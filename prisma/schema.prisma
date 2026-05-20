@@ -63,7 +63,7 @@ model Envio {
   pickup_address   Json
   delivery_address Json
   tracking_code    String    @unique
-  status           String    @default("pending_pickup") // pending_pickup, in_transit, delivered, failed, cancelled
+  status           String    @default("waiting_for_courier") // waiting_for_courier, pending_pickup, picked_up, in_transit, delivered
   price            Decimal   @db.Decimal(10, 2)
   picked_up_at     DateTime?
   delivered_at     DateTime?

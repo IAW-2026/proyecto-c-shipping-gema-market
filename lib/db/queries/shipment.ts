@@ -232,7 +232,7 @@ export async function getShipmentHistory(userId: string): Promise<ShipmentSummar
 
 export async function getAvailableShipments(params?: ShipmentFilterParams): Promise<ShipmentOffer[]> {
     const where: Prisma.EnvioWhereInput = {
-        status: 'pending_pickup',
+        status: 'waiting_for_courier',
         logistics_id: null,
     };
 
@@ -315,7 +315,7 @@ export async function createEnvioRecord(data: CreateEnvioData) {
       pickup_address: data.pickup_address,
       delivery_address: data.delivery_address,
       tracking_code: data.tracking_code,
-      status: "pending_pickup",
+      status: "waiting_for_courier",
       price: data.price,
       pickup_lat: data.pickup_lat,
       pickup_lng: data.pickup_lng,

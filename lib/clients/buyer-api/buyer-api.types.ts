@@ -1,8 +1,8 @@
-import { ShippingStatus } from "@/lib/definitions/shipment";
+import type { ShipmentStatus } from "@/lib/shared/shipment-constants";
 
 export interface BuyerStatusUpdate {
     shipping_id: string;
-    status: ShippingStatus;
+    status: ShipmentStatus;
     tracking_code: string;
     updated_at: string;
 }

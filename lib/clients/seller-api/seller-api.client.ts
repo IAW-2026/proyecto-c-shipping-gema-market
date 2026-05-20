@@ -1,5 +1,5 @@
 import { ApiResult } from "../types";
-import { SellerOrderDetails, SellerNotificationResponse, OriginAddressResponse } from "./seller-api.types";
+import { SellerOrderDetails, SellerNotificationResponse, OriginAddressResponse, SellerStatusUpdate } from "./seller-api.types";
 import type { ApiTrace } from "@/lib/shared/api-trace";
 
 /**
@@ -47,6 +47,17 @@ export const sellerApiClient = {
      * TODO: Reemplazar mock con fetch real a Seller App.
      */
     notifyShipmentTaken: async (_orderId: string, _trace?: ApiTrace): ApiResult<SellerNotificationResponse> => {
+        await new Promise(resolve => setTimeout(resolve, 300));
+        return { data: { success: true }, status: 200 };
+    },
+
+    /**
+     * Notifica al Seller sobre un cambio de estado general del envío.
+     * POST /api/seller/envios/:order_id/status
+     * TODO: Reemplazar mock con fetch real a Seller App.
+     */
+    notifyStatusChange: async (_orderId: string, _payload: SellerStatusUpdate): ApiResult<SellerNotificationResponse> => {
+        console.log(`[M2M] Notificación a Seller API simulada: ${_payload.status}`);
         await new Promise(resolve => setTimeout(resolve, 300));
         return { data: { success: true }, status: 200 };
     }
