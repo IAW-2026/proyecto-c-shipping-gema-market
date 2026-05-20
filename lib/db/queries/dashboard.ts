@@ -60,7 +60,7 @@ export async function getDashboardData(operatorId: string): Promise<OperatorDash
                 created_at: { gte: todayStart, lte: todayEnd },
             },
             _count: { id: true },
-            _sum: { price: true },
+            _sum: { price: true, route_distance: true },
         }),
         prisma.envio.findMany({
             where: {
@@ -72,10 +72,11 @@ export async function getDashboardData(operatorId: string): Promise<OperatorDash
         }),
     ]);
 
+    const totalDistanceMeters = todayAggregation._sum.route_distance ?? 0;
     const metrics: DashboardMetrics = {
         shipmentToday: todayAggregation._count.id,
         totalEarnings: Number(todayAggregation._sum.price ?? 0),
-        totalDistance: 0,
+        totalDistance: Math.round(Number(totalDistanceMeters) / 1000),
     };
 
     return { metrics, activeShipments: activeShipments.map(toSummary) };
@@ -92,13 +93,14 @@ export async function getDashboardMetrics(operatorId: string): Promise<Dashboard
             created_at: { gte: todayStart, lte: todayEnd },
         },
         _count: { id: true },
-        _sum: { price: true },
+        _sum: { price: true, route_distance: true },
     });
 
+    const totalDistanceMeters = aggregation._sum.route_distance ?? 0;
     return {
         shipmentToday: aggregation._count.id,
         totalEarnings: Number(aggregation._sum.price ?? 0),
-        totalDistance: 0,
+        totalDistance: Math.round(Number(totalDistanceMeters) / 1000),
     };
 }
 
