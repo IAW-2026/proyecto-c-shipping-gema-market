@@ -87,12 +87,12 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
             );
         }
 
-        const route = await getRoute(originCoords, destCoords);
+        const route = await getRoute(originCoords.coordinates, destCoords.coordinates);
 
         return NextResponse.json({
             geometry: route.geometry,
             summary: route.summary,
-            waypoints: makeWaypoints(originCoords, destCoords),
+            waypoints: makeWaypoints(originCoords.coordinates, destCoords.coordinates),
         });
 
     } catch (error) {
