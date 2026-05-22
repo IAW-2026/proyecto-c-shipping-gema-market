@@ -193,6 +193,16 @@ export async function getShipmentDetails(shippingId: string): Promise<Shipment |
     return toShipmentDetail(envio);
 }
 
+export async function getShipmentByTrackingCode(code: string): Promise<Shipment | null> {
+    const envio = await prisma.envio.findUnique({
+        where: { tracking_code: code },
+        select: detailSelect,
+    });
+
+    if (!envio) return null;
+    return toShipmentDetail(envio);
+}
+
 export async function getFilteredShipments(params: ShipmentFilterParams): Promise<PaginatedResult<ShipmentSummary>> {
     const page = params.page ?? 1;
     const pageSize = params.pageSize ?? 20;

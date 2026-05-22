@@ -14,6 +14,10 @@ export const SHIPMENT_STATUSES = [
 
 export type ShipmentStatus = typeof SHIPMENT_STATUSES[number];
 
+export const ADMIN_DAYS = 1;
+export const SECONDS_PER_TRANSIT_DAY = 28800;
+export const MAX_TRANSIT_DAYS = 5;
+
 export const SHIPMENT_STATUS_LABELS: Record<ShipmentStatus, string> = {
     waiting_for_courier: "En espera",
     pending_pickup: "Todavía no fue retirado",
