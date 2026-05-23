@@ -3,7 +3,7 @@ import { clerkMiddleware, createRouteMatcher } from "@clerk/nextjs/server";
 import { NextResponse } from "next/server";
 
 // Rutas que no requieren autenticación (ej: tracking público)
-const isPublicRoute = createRouteMatcher(['/tracking(.*)']);
+const isPublicRoute = createRouteMatcher(['/tracking(.*)', '/api/shipping(.*)']);
 
 // Rutas exclusivas para usuarios NO autenticados (Login/Registro)
 const isAuthRoute = createRouteMatcher(['/sign-in(.*)', '/sign-up(.*)']);

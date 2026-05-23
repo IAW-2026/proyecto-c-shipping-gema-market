@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { validateApiKey } from "@/lib/auth/api-key";
 import { releaseQuoteSchema } from "@/lib/validations/api-schemas";
 import { releaseQuote } from "@/lib/services/quote";
 
@@ -8,6 +9,9 @@ import { releaseQuote } from "@/lib/services/quote";
  * Libera la reserva de una cotización, dejándola disponible nuevamente.
  */
 export async function POST(request: NextRequest) {
+    if (!validateApiKey(request)) {
+        return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
     try {
         const body = await request.json();
         const parsed = releaseQuoteSchema.safeParse(body);

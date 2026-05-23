@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { validateApiKey } from "@/lib/auth/api-key";
 import prisma from "@/lib/db/prisma";
 
 interface RouteParams {
@@ -6,6 +7,9 @@ interface RouteParams {
 }
 
 export async function GET(request: NextRequest, { params }: RouteParams) {
+    if (!validateApiKey(request)) {
+        return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
     try {
         const { order_id } = await params;
 

@@ -1,46 +1,43 @@
 import { ApiResult } from "../types";
 import { BuyerStatusUpdate, BuyerNotificationResponse, BuyerDataResponse } from "./buyer-api.types";
+import { hashApiKey } from "@/lib/auth/api-key";
 
-/**
- * Cliente para la comunicación con el microservicio de Buyer.
- * 
- * NOTA: Los endpoints externos (Buyer App) aún no están disponibles.
- * Todos los métodos retornan datos simulados directamente.
- * TODO: Integrar con Buyer App cuando esté disponible.
- */
+const BUYER_API_URL = process.env.BUYER_API_URL;
+const API_KEY_HASH = hashApiKey(process.env.INTERNAL_API_KEY ?? "");
+
 export const buyerApiClient = {
-    /**
-     * Obtiene los datos de un comprador por su ID.
-     * POST /api/buyer/:buyer_id
-     * TODO: Reemplazar mock con fetch real a Buyer App.
-     */
-    getBuyerData: async (buyerId: string, req?: Request): ApiResult<BuyerDataResponse> => {
-        console.log(`[M2M] Buyer → POST /api/buyer/${buyerId}`);
-        await new Promise(resolve => setTimeout(resolve, 200));
-        return {
-            data: {
-                id: buyerId,
-                email: "",
-                full_name: req?.headers.get("X-Mock-Buyer-Name") ?? "Carlos Pérez",
-                phone_number: req?.headers.get("X-Mock-Buyer-Phone") ?? "2915550101",
-                address: { zip: "", number: "", street: "" },
-                created_at: new Date().toISOString()
-            },
-            status: 200
-        };
+    getBuyerData: async (buyerId: string, _req?: Request): ApiResult<BuyerDataResponse> => {
+        try {
+            const res = await fetch(`${BUYER_API_URL}/api/buyer/${buyerId}`, {
+                method: "POST",
+                headers: { "x-api-key-hash": API_KEY_HASH },
+            });
+            if (!res.ok) {
+                return { error: { message: `Buyer API error: ${res.status}` }, status: res.status };
+            }
+            const data = await res.json();
+            return { data, status: res.status };
+        } catch (error) {
+            console.error("[BUYER CLIENT] getBuyerData error:", error);
+            return { error: { message: "Error contacting Buyer API" }, status: 503 };
+        }
     },
 
-    /**
-     * Notifica al Buyer sobre un cambio en el estado del envío de una orden.
-     * TODO: Reemplazar mock con fetch real a Buyer App.
-     */
     notifyStatusChange: async (orderId: string, payload: BuyerStatusUpdate): ApiResult<BuyerNotificationResponse> => {
-        console.log(`[M2M] Buyer → POST /api/buyer/ordenes/${orderId}/estado-envio → ${payload.status}`);
-
-        await new Promise(resolve => setTimeout(resolve, 500));
-        return {
-            data: { received: true, order_id: orderId },
-            status: 200
-        };
+        try {
+            const res = await fetch(`${BUYER_API_URL}/api/buyer/ordenes/${orderId}/estado-envio`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json", "x-api-key-hash": API_KEY_HASH },
+                body: JSON.stringify(payload),
+            });
+            if (!res.ok) {
+                return { error: { message: `Buyer API error: ${res.status}` }, status: res.status };
+            }
+            const data = await res.json();
+            return { data, status: res.status };
+        } catch (error) {
+            console.error("[BUYER CLIENT] notifyStatusChange error:", error);
+            return { error: { message: "Error contacting Buyer API" }, status: 503 };
+        }
     }
 };

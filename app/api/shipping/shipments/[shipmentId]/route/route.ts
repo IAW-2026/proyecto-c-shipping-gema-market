@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { validateApiKey } from "@/lib/auth/api-key";
 import prisma from "@/lib/db/prisma";
 import { getCoordinatesFromAddress, getRoute } from "@/lib/services/map-services";
 
@@ -16,6 +17,9 @@ function makeWaypoints(origin: [number, number], destination: [number, number]) 
 }
 
 export async function GET(request: NextRequest, { params }: RouteParams) {
+    if (!validateApiKey(request)) {
+        return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
     try {
         const { shipmentId } = await params;
 

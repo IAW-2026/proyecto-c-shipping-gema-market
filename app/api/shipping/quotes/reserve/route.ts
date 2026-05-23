@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { validateApiKey } from "@/lib/auth/api-key";
 import { reserveQuoteSchema } from "@/lib/validations/api-schemas";
 import { reserveQuote } from "@/lib/services/quote";
 
@@ -8,6 +9,9 @@ import { reserveQuote } from "@/lib/services/quote";
  * Reserva una cotización para una orden, evitando que sea utilizada por otra.
  */
 export async function POST(request: NextRequest) {
+    if (!validateApiKey(request)) {
+        return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
     try {
         const body = await request.json();
         const parsed = reserveQuoteSchema.safeParse(body);

@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { validateApiKey } from "@/lib/auth/api-key";
 import { z } from "zod";
 import { getCoordinatesFromAddress } from "@/lib/services/map-services";
 
@@ -10,6 +11,9 @@ const verifySchema = z.object({
 });
 
 export async function POST(request: NextRequest) {
+    if (!validateApiKey(request)) {
+        return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
     try {
         const body = await request.json();
         const parsed = verifySchema.safeParse(body);
