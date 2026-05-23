@@ -6,10 +6,26 @@ import { ROLES } from "@/lib/definitions/auth";
 import prisma from "@/lib/db/prisma";
 
 interface AvailableDataProps {
-    searchQuery?: string;
+    sortBy?: string;
+    sortOrder?: "asc" | "desc";
+    weightMin?: number;
+    weightMax?: number;
+    priceMin?: number;
+    priceMax?: number;
+    distanceMin?: number;
+    distanceMax?: number;
 }
 
-export async function AvailableData({ searchQuery }: AvailableDataProps) {
+export async function AvailableData({
+    sortBy,
+    sortOrder,
+    weightMin,
+    weightMax,
+    priceMin,
+    priceMax,
+    distanceMin,
+    distanceMax,
+}: AvailableDataProps) {
     const { userId } = await requireRole([ROLES.LOGISTICS]);
 
     const user = await prisma.usuario.findUnique({
@@ -31,7 +47,14 @@ export async function AvailableData({ searchQuery }: AvailableDataProps) {
     }
 
     const params: ShipmentFilterParams = {
-        query: searchQuery || undefined,
+        sortBy: sortBy as ShipmentFilterParams["sortBy"],
+        sortOrder,
+        weightMin,
+        weightMax,
+        priceMin,
+        priceMax,
+        distanceMin,
+        distanceMax,
     };
 
     const offers = await getAvailableShipments(params);

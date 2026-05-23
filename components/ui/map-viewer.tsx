@@ -57,6 +57,9 @@ export default function MapViewer({ shippingId, className }: MapViewerProps) {
 
         fetch(`/api/shipping/shipments/${shippingId}/route`, {
             signal: controller.signal,
+            headers: {
+                "x-api-key-hash": process.env.NEXT_PUBLIC_INTERNAL_API_KEY_HASH ?? "",
+            },
         })
             .then(async (res) => {
                 if (!res.ok) {

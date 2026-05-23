@@ -129,8 +129,14 @@ export interface ShipmentFilterParams {
     dateTo?: Date;
     page?: number;
     pageSize?: number;
-    sortBy?: 'created_at' | 'price' | 'tracking_code' | 'status';
+    sortBy?: 'created_at' | 'price' | 'tracking_code' | 'status' | 'weight' | 'distance';
     sortOrder?: 'asc' | 'desc';
+    weightMin?: number;
+    weightMax?: number;
+    priceMin?: number;
+    priceMax?: number;
+    distanceMin?: number;
+    distanceMax?: number;
 }
 
 export interface PaginatedResult<T> {

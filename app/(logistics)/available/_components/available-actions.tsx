@@ -5,17 +5,19 @@ import { Filter, RefreshCcw, ArrowRight, Check, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { takeShipmentAction } from "@/lib/actions/shipment.actions";
+import { useFilterDialog } from "./filter-dialog-context";
 import { useState } from "react";
 
 export function HeaderActions() {
     const router = useRouter();
+    const { open: openFilterDialog } = useFilterDialog();
 
     const handleRefresh = () => {
         router.refresh();
     };
 
     const handleFilter = () => {
-        console.log("Abrir modal de filtros");
+        openFilterDialog();
     };
 
     return (

@@ -54,6 +54,8 @@ function buildOrderBy(sortBy?: string, sortOrder?: 'asc' | 'desc'): Prisma.Envio
     const dir = sortOrder ?? 'desc';
     switch (sortBy) {
         case 'price': return { price: dir };
+        case 'distance': return { route_distance: dir };
+        case 'weight': return { weight: dir };
         case 'tracking_code': return { tracking_code: dir };
         case 'status': return { status: dir };
         default: return { created_at: dir };
@@ -251,6 +253,29 @@ export async function getAvailableShipments(params?: ShipmentFilterParams): Prom
             { tracking_code: { contains: params.query, mode: 'insensitive' } },
             { id: { contains: params.query, mode: 'insensitive' } },
         ];
+    }
+
+    const rangeFilters: Prisma.EnvioWhereInput[] = [];
+    if (params?.weightMin !== undefined || params?.weightMax !== undefined) {
+        const wf: { gte?: number; lte?: number } = {};
+        if (params.weightMin !== undefined) wf.gte = params.weightMin;
+        if (params.weightMax !== undefined) wf.lte = params.weightMax;
+        rangeFilters.push({ weight: wf });
+    }
+    if (params?.priceMin !== undefined || params?.priceMax !== undefined) {
+        const pf: { gte?: number; lte?: number } = {};
+        if (params.priceMin !== undefined) pf.gte = params.priceMin;
+        if (params.priceMax !== undefined) pf.lte = params.priceMax;
+        rangeFilters.push({ price: pf });
+    }
+    if (params?.distanceMin !== undefined || params?.distanceMax !== undefined) {
+        const df: { gte?: number; lte?: number } = {};
+        if (params.distanceMin !== undefined) df.gte = params.distanceMin * 1000;
+        if (params.distanceMax !== undefined) df.lte = params.distanceMax * 1000;
+        rangeFilters.push({ route_distance: df });
+    }
+    if (rangeFilters.length > 0) {
+        where.AND = rangeFilters;
     }
 
     const orderBy = params?.sortBy

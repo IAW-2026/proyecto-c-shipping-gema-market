@@ -8,6 +8,23 @@ const API_KEY_HASH = hashApiKey(process.env.INTERNAL_API_KEY ?? "");
 
 export const sellerApiClient = {
     getOriginAddress: async (productId: string, _trace?: ApiTrace, _req?: Request): ApiResult<OriginAddressResponse> => {
+        const mockStreet = _req?.headers.get("X-Mock-Origin-Street");
+        const mockNumber = _req?.headers.get("X-Mock-Origin-Number");
+        const mockZip = _req?.headers.get("X-Mock-Origin-Zip");
+
+        if (mockStreet && mockNumber && mockZip) {
+            return {
+                data: {
+                    origin_address: {
+                        street: mockStreet,
+                        number: mockNumber,
+                        zip: mockZip,
+                    },
+                },
+                status: 200,
+            };
+        }
+
         try {
             const res = await fetch(`${SELLER_API_URL}/api/seller/productos/${productId}/direccion-origen`, {
                 headers: { "x-api-key-hash": API_KEY_HASH },

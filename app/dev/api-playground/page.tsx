@@ -127,7 +127,10 @@ export default function ApiPlaygroundPage() {
     };
 
     const buildHeaders = (ep: EndpointDef): Record<string, string> => {
-        const headers: Record<string, string> = { "X-Debug": "true" };
+        const headers: Record<string, string> = {
+            "X-Debug": "true",
+            "x-api-key-hash": process.env.NEXT_PUBLIC_INTERNAL_API_KEY_HASH ?? "",
+        };
         if (ep.id === "cotizar") {
             headers["X-Mock-Origin-Street"] = config.origin_street;
             headers["X-Mock-Origin-Number"] = config.origin_number;
