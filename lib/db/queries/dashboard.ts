@@ -250,13 +250,30 @@ export async function getAllDrivers(
     }));
 }
 
-export async function getAllShipments(): Promise<AdminShipment[]> {
+export async function getAllShipments(
+    status?: string,
+    sortBy?: string,
+    sortOrder?: string
+): Promise<AdminShipment[]> {
+    const where: Prisma.EnvioWhereInput = {};
+    if (status && status !== "all") {
+        where.status = status;
+    }
+
+    const dir = sortOrder === "asc" ? "asc" : "desc";
+
+    const field = sortBy || "created_at";
+    const orderBy: Record<string, unknown> = sortBy === "logistics_id"
+        ? { operador: { full_name: dir } }
+        : { [field]: dir };
+
     const shipments = await prisma.envio.findMany({
-        orderBy: { created_at: "desc" },
+        where,
+        orderBy,
         include: { operador: { select: { full_name: true } } },
     });
 
-    return shipments.map((e) => ({
+    const mapped = shipments.map((e) => ({
         id: e.id,
         order_id: e.order_id,
         tracking_code: e.tracking_code,
@@ -266,6 +283,19 @@ export async function getAllShipments(): Promise<AdminShipment[]> {
         logistics_name: e.operador?.full_name ?? null,
         created_at: e.created_at,
     }));
+
+    if (sortBy === "logistics_id") {
+        mapped.sort((a, b) => {
+            if (!a.logistics_name && !b.logistics_name) return 0;
+            if (!a.logistics_name) return 1;
+            if (!b.logistics_name) return -1;
+            return dir === "asc"
+                ? a.logistics_name.localeCompare(b.logistics_name)
+                : b.logistics_name.localeCompare(a.logistics_name);
+        });
+    }
+
+    return mapped;
 }
 
 export async function getAllRates(): Promise<AdminRate[]> {

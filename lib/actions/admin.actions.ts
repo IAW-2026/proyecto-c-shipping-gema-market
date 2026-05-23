@@ -40,6 +40,15 @@ export async function updateShipmentPriceAction(shipmentId: string, price: numbe
     try {
         await requireRole([ROLES.ADMIN_LOGISTICS]);
 
+        const envio = await prisma.envio.findUnique({
+            where: { id: shipmentId },
+            select: { status: true },
+        });
+        if (!envio) return { success: false, error: "Envío no encontrado" };
+        if (envio.status !== "waiting_for_courier") {
+            return { success: false, error: "Solo se puede editar el precio de envíos sin repartidor asignado" };
+        }
+
         if (price < 0) return { success: false, error: "El precio no puede ser negativo" };
 
         await prisma.envio.update({

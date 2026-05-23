@@ -5,6 +5,8 @@ import { updateShipmentPriceAction } from "@/lib/actions/admin.actions";
 import { PageWrapper, Header, Content } from "../_components";
 import { DeleteShipmentButton } from "./_components/delete-shipment-button";
 import { UnassignShipmentButton } from "./_components/unassign-shipment-button";
+import { ShipmentsFilters } from "./_components/shipments-filters";
+import { SortableHeader } from "./_components/sortable-header";
 import { Edit3 } from "lucide-react";
 
 const STATUS_LABELS: Record<string, string> = {
@@ -23,24 +25,30 @@ const STATUS_COLORS: Record<string, string> = {
     delivered: "bg-green-100 text-green-700",
 };
 
-export default async function AdminShipmentsPage() {
+export default async function AdminShipmentsPage(props: {
+    searchParams: Promise<{ [key: string]: string | undefined }>
+}) {
     await requireRole([ROLES.ADMIN_LOGISTICS]);
-    const shipments = await getAllShipments();
+    const { status, sortBy, sortOrder } = await props.searchParams;
+    const shipments = await getAllShipments(status, sortBy, sortOrder);
 
     return (
         <PageWrapper>
             <Header title="Pedidos" subtitle="Gestión" />
-            <Content className="p-4 lgx:p-7">
+            <div className="px-4 lgx:px-7 pb-4">
+                <ShipmentsFilters />
+            </div>
+            <Content className="px-4 lgx:px-7 pb-4 lgx:pb-7">
                 <div className="bg-paper border border-line rounded-r2 overflow-hidden">
                     <div className="overflow-x-auto">
                         <table className="w-full text-sm">
                             <thead>
                                 <tr className="bg-bone text-ink-2 text-left">
-                                    <th className="px-4 py-3 font-medium whitespace-nowrap">Tracking</th>
-                                    <th className="px-4 py-3 font-medium whitespace-nowrap">Estado</th>
-                                    <th className="px-4 py-3 font-medium whitespace-nowrap">Precio</th>
-                                    <th className="px-4 py-3 font-medium whitespace-nowrap">Repartidor</th>
-                                    <th className="px-4 py-3 font-medium whitespace-nowrap">Fecha</th>
+                                    <th className="px-4 py-3 font-medium whitespace-nowrap"><SortableHeader label="Tracking" sortKey="tracking_code" /></th>
+                                    <th className="px-4 py-3 font-medium whitespace-nowrap"><SortableHeader label="Estado" sortKey="status" /></th>
+                                    <th className="px-4 py-3 font-medium whitespace-nowrap"><SortableHeader label="Precio" sortKey="price" /></th>
+                                    <th className="px-4 py-3 font-medium whitespace-nowrap"><SortableHeader label="Repartidor" sortKey="logistics_id" /></th>
+                                    <th className="px-4 py-3 font-medium whitespace-nowrap"><SortableHeader label="Fecha" sortKey="created_at" /></th>
                                     <th className="px-4 py-3 font-medium whitespace-nowrap text-right">Acciones</th>
                                 </tr>
                             </thead>
@@ -64,27 +72,31 @@ export default async function AdminShipmentsPage() {
                                                     </span>
                                                 </td>
                                                 <td className="px-4 py-3">
-                                                    <form action={async (formData: FormData) => {
-                                                        "use server";
-                                                        const price = Number(formData.get("price"));
-                                                        await updateShipmentPriceAction(s.id, price);
-                                                    }} className="flex items-center gap-1">
-                                                        <input
-                                                            type="number"
-                                                            name="price"
-                                                            defaultValue={s.price}
-                                                            step="0.01"
-                                                            min="0"
-                                                            className="w-24 text-xs px-2 py-1 border border-line rounded-lg bg-transparent text-ink-3 [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
-                                                        />
-                                                        <button
-                                                            type="submit"
-                                                            className="text-cocoa hover:text-cocoa/70 p-1"
-                                                            title="Guardar precio"
-                                                        >
-                                                            <Edit3 size={14} />
-                                                        </button>
-                                                    </form>
+                                                    {s.status === "waiting_for_courier" ? (
+                                                        <form action={async (formData: FormData) => {
+                                                            "use server";
+                                                            const price = Number(formData.get("price"));
+                                                            await updateShipmentPriceAction(s.id, price);
+                                                        }} className="flex items-center gap-1">
+                                                            <input
+                                                                type="number"
+                                                                name="price"
+                                                                defaultValue={s.price}
+                                                                step="0.01"
+                                                                min="0"
+                                                                className="w-24 text-xs px-2 py-1 border border-line rounded-lg bg-transparent text-ink-3 [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
+                                                            />
+                                                            <button
+                                                                type="submit"
+                                                                className="text-cocoa hover:text-cocoa/70 p-1"
+                                                                title="Guardar precio"
+                                                            >
+                                                                <Edit3 size={14} />
+                                                            </button>
+                                                        </form>
+                                                    ) : (
+                                                        <span className="text-ink-2 text-xs">$ {s.price.toLocaleString()}</span>
+                                                    )}
                                                 </td>
                                                 <td className="px-4 py-3 text-ink-2 text-xs">
                                                     {s.logistics_name ?? <span className="italic">Sin asignar</span>}
