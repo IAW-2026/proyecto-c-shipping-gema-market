@@ -8,7 +8,7 @@ export default async function AdminLayout({ children }: { children: ReactNode })
     const result = await requireRole([ROLES.ADMIN_LOGISTICS]);
 
     if (!result) {
-        redirect("/login");
+        redirect("/sign-in");
     }
 
     return (

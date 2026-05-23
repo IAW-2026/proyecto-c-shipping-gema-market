@@ -11,7 +11,7 @@ export default async function OperatorLayout({ children }: { children: ReactNode
     const result = await requireRole([ROLES.LOGISTICS]);
 
     if (!result) {
-        redirect("/login");
+        redirect("/sign-in");
     }
 
     // 2. Estructura Persistente
