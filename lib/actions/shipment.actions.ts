@@ -17,6 +17,14 @@ export async function takeShipmentAction(shipmentId: string) {
         
         const { userId } = await requireRole([ROLES.LOGISTICS]);
 
+        const user = await prisma.usuario.findUnique({
+            where: { id: userId },
+            select: { banned: true },
+        });
+        if (user?.banned) {
+            return { success: false, error: "Tu cuenta está suspendida. No puedes tomar nuevos envíos." };
+        }
+
         const parsed = TakeShipmentSchema.safeParse({ shipmentId });
         if (!parsed.success) {
             return { success: false, error: "ID de envío inválido" };

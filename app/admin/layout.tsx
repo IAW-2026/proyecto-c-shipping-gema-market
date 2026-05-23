@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 import { ROLES } from "@/lib/definitions/auth";
 import { requireRole } from "@/lib/auth/rbac";
 import { AdminSidebar } from "./_components/Sidebar";
+import { AdminMobileNav } from "./_components/MobileNav";
 
 export default async function AdminLayout({ children }: { children: ReactNode }) {
     const result = await requireRole([ROLES.ADMIN_LOGISTICS]);
@@ -18,6 +19,8 @@ export default async function AdminLayout({ children }: { children: ReactNode })
             <main className="flex-1 min-w-0 flex flex-col lgx:ml-[240px] lgx:w-[calc(100%-240px)] pb-[72px] lgx:pb-0">
                 {children}
             </main>
+
+            <AdminMobileNav />
         </div>
     );
 }

@@ -19,6 +19,7 @@ model Usuario {
   email         String
   full_name     String
   role          String   @default("logistics") // Solo roles relevantes para esta app
+  banned        Boolean  @default(false)
   created_at    DateTime @default(now())
 
   // Relaciones internas

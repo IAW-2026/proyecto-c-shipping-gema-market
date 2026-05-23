@@ -79,6 +79,7 @@ export const UsuarioScalarFieldEnum = {
   email: 'email',
   full_name: 'full_name',
   role: 'role',
+  banned: 'banned',
   created_at: 'created_at'
 } as const
 

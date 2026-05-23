@@ -1,7 +1,9 @@
 import prisma from "@/lib/db/prisma";
+import type { Prisma } from "@/lib/generated/prisma/client";
 import { AddressSchema, ShippingStatusSchema } from "@/lib/definitions/shipment";
 import type { ShipmentSummary } from "@/lib/definitions/shipment";
 import type { DashboardMetrics, OperatorDashboardData, PerformanceData, WeekData } from "@/lib/definitions/dashboard-metrics";
+import type { AdminDashboardMetrics, AdminDriver, AdminShipment, AdminRate, AdminDriverDetail } from "@/lib/definitions/admin-dashboard-metrics";
 import { getSettlements } from "./settlement";
 
 const summarySelect = {
@@ -176,5 +178,134 @@ export async function getPerformanceData(operatorId: string): Promise<Performanc
         earningsChange: calcChange(weeklyEarnings, prevEarnings),
         tripsChange: calcChange(weeklyTrips, prevTrips),
         weeklyHistory,
+    };
+}
+
+export async function getAdminDashboardMetrics(): Promise<AdminDashboardMetrics> {
+    const todayStart = startOfToday();
+    const todayEnd = endOfToday();
+
+    const [
+        totalDrivers,
+        totalShipments,
+        shipmentsByStatus,
+        shipmentsToday,
+        totalRates,
+    ] = await Promise.all([
+        prisma.usuario.count({ where: { role: "logistics" } }),
+        prisma.envio.count(),
+        prisma.envio.groupBy({
+            by: ["status"],
+            _count: { id: true },
+        }),
+        prisma.envio.count({
+            where: { created_at: { gte: todayStart, lte: todayEnd } },
+        }),
+        prisma.tarifa.count(),
+    ]);
+
+    const byStatus: Record<string, number> = {};
+    for (const group of shipmentsByStatus) {
+        byStatus[group.status] = group._count.id;
+    }
+
+    const activeStatuses = ["pending_pickup", "picked_up", "in_transit"];
+    const activeShipments = Object.entries(byStatus)
+        .filter(([status]) => activeStatuses.includes(status))
+        .reduce((sum, [, count]) => sum + count, 0);
+
+    return {
+        totalDrivers,
+        totalShipments,
+        shipmentsByStatus: byStatus,
+        shipmentsToday,
+        totalRates,
+        activeShipments,
+    };
+}
+
+export async function getAllDrivers(
+    query?: string,
+    bannedFilter?: "all" | "banned" | "active"
+): Promise<AdminDriver[]> {
+    const where: Prisma.UsuarioWhereInput = { role: "logistics" };
+    if (query) where.full_name = { contains: query, mode: "insensitive" };
+    if (bannedFilter === "banned") where.banned = true;
+    else if (bannedFilter === "active") where.banned = false;
+
+    const drivers = await prisma.usuario.findMany({
+        where,
+        include: { _count: { select: { envios: true } } },
+        orderBy: { created_at: "desc" },
+    });
+
+    return drivers.map((d) => ({
+        id: d.id,
+        full_name: d.full_name,
+        email: d.email,
+        role: d.role,
+        banned: d.banned,
+        created_at: d.created_at,
+        totalEnvios: d._count.envios,
+    }));
+}
+
+export async function getAllShipments(): Promise<AdminShipment[]> {
+    const shipments = await prisma.envio.findMany({
+        orderBy: { created_at: "desc" },
+        include: { operador: { select: { full_name: true } } },
+    });
+
+    return shipments.map((e) => ({
+        id: e.id,
+        order_id: e.order_id,
+        tracking_code: e.tracking_code,
+        status: e.status,
+        price: Number(e.price),
+        logistics_id: e.logistics_id,
+        logistics_name: e.operador?.full_name ?? null,
+        created_at: e.created_at,
+    }));
+}
+
+export async function getAllRates(): Promise<AdminRate[]> {
+    const rates = await prisma.tarifa.findMany({ orderBy: { id: "asc" } });
+
+    return rates.map((r) => {
+        const wr = r.weight_range as { min: number; max: number };
+        return {
+            id: r.id,
+            weight_min: wr.min,
+            weight_max: wr.max,
+            price_per_km: Number(r.price_per_km),
+        };
+    });
+}
+
+export async function getDriverById(driverId: string): Promise<AdminDriverDetail | null> {
+    const driver = await prisma.usuario.findUnique({
+        where: { id: driverId },
+        include: {
+            envios: { orderBy: { created_at: "desc" } },
+        },
+    });
+
+    if (!driver) return null;
+
+    return {
+        id: driver.id,
+        full_name: driver.full_name,
+        email: driver.email,
+        role: driver.role,
+        banned: driver.banned,
+        created_at: driver.created_at,
+        envios: driver.envios.map((e) => ({
+            id: e.id,
+            order_id: e.order_id,
+            tracking_code: e.tracking_code,
+            status: e.status,
+            price: Number(e.price),
+            created_at: e.created_at,
+        })),
     };
 }

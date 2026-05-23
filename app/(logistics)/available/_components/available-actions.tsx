@@ -47,6 +47,12 @@ export function ViewDetailsButton({ shippingId }: { shippingId: string }) {
 export function TakeShipmentButton({ shippingId }: { shippingId: string }) {
     const router = useRouter();
     const [isPending, setIsPending] = useState(false);
+    const [toast, setToast] = useState<{ message: string; type: "error" | "success" } | null>(null);
+
+    const showToast = (message: string, type: "error" | "success") => {
+        setToast({ message, type });
+        setTimeout(() => setToast(null), 4000);
+    };
 
     const handleTakeShipment = async () => {
         setIsPending(true);
@@ -55,27 +61,38 @@ export function TakeShipmentButton({ shippingId }: { shippingId: string }) {
             if (result.success) {
                 router.refresh();
             } else {
-                console.error("Error al tomar envío:", result.error);
+                showToast(result.error || "Error al tomar el envío", "error");
             }
         } catch (error) {
-            console.error("Error crítico al tomar envío:", error);
+            showToast("Error inesperado al tomar el envío", "error");
         } finally {
             setIsPending(false);
         }
     };
 
     return (
-        <button
-            onClick={handleTakeShipment}
-            disabled={isPending}
-            className="flex-1 bg-clay text-paper h-11 rounded-full text-xs font-bold hover:bg-cocoa transition-all flex items-center justify-center gap-2 active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed"
-        >
-            {isPending ? (
-                <Loader2 size={14} className="animate-spin" />
-            ) : (
-                <Check size={14} />
+        <>
+            {toast && (
+                <div className={`fixed top-4 right-4 z-[1200] px-4 py-3 rounded-xl shadow-lg text-sm font-medium transition-all ${
+                    toast.type === "error"
+                        ? "bg-red-600 text-white"
+                        : "bg-green-600 text-white"
+                }`}>
+                    {toast.message}
+                </div>
             )}
-            {isPending ? "Tomando..." : "Tomar envío"}
-        </button>
+            <button
+                onClick={handleTakeShipment}
+                disabled={isPending}
+                className="flex-1 bg-clay text-paper h-11 rounded-full text-xs font-bold hover:bg-cocoa transition-all flex items-center justify-center gap-2 active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+                {isPending ? (
+                    <Loader2 size={14} className="animate-spin" />
+                ) : (
+                    <Check size={14} />
+                )}
+                {isPending ? "Tomando..." : "Tomar envío"}
+            </button>
+        </>
     );
 }
