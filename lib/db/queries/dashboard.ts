@@ -60,7 +60,7 @@ export async function getDashboardData(operatorId: string): Promise<OperatorDash
             where: {
                 logistics_id: operatorId,
                 status: 'delivered',
-                created_at: { gte: todayStart, lte: todayEnd },
+                delivered_at: { gte: todayStart, lte: todayEnd },
             },
             _count: { id: true },
             _sum: { price: true, route_distance: true },
@@ -93,7 +93,7 @@ export async function getDashboardMetrics(operatorId: string): Promise<Dashboard
         where: {
             logistics_id: operatorId,
             status: 'delivered',
-            created_at: { gte: todayStart, lte: todayEnd },
+            delivered_at: { gte: todayStart, lte: todayEnd },
         },
         _count: { id: true },
         _sum: { price: true, route_distance: true },

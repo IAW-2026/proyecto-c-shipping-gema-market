@@ -15,16 +15,16 @@ export async function getSettlements(
 ): Promise<SettlementPeriod[]> {
     const rows = await prisma.$queryRaw<WeeklySettlementRaw[]>`
         SELECT
-            date_trunc('week', created_at)::date AS week_start,
-            (date_trunc('week', created_at) + interval '6 days')::date AS week_end,
+            date_trunc('week', delivered_at)::date AS week_start,
+            (date_trunc('week', delivered_at) + interval '6 days')::date AS week_end,
             COUNT(*)::bigint AS trips,
             SUM(price)::text AS amount
         FROM "Envio"
         WHERE logistics_id = ${logisticsId}
-          AND created_at >= ${dateFrom}
-          AND created_at <= ${dateTo}
+          AND delivered_at >= ${dateFrom}
+          AND delivered_at <= ${dateTo}
           AND status = 'delivered'
-        GROUP BY date_trunc('week', created_at)
+        GROUP BY date_trunc('week', delivered_at)
         ORDER BY week_start DESC
     `;
 
@@ -57,10 +57,10 @@ export async function getSettlementsDetail(
         SELECT id, order_id, price, picked_up_at, delivered_at, created_at
         FROM "Envio"
         WHERE logistics_id = ${logisticsId}
-          AND created_at >= ${dateFrom}
-          AND created_at <= ${dateTo}
+          AND delivered_at >= ${dateFrom}
+          AND delivered_at <= ${dateTo}
           AND status = 'delivered'
-        ORDER BY created_at DESC
+        ORDER BY delivered_at DESC
     `;
 
     const weekMap = new Map<string, {
@@ -70,7 +70,7 @@ export async function getSettlementsDetail(
     }>();
 
     for (const s of rows) {
-        const d = new Date(s.created_at);
+        const d = new Date(s.delivered_at!);
         const day = d.getDay();
         const diff = day === 0 ? -6 : 1 - day;
         const monday = new Date(d);
@@ -107,7 +107,7 @@ export async function getSettlementsDetail(
 
         const dayMap = new Map<string, typeof weekData.shipments>();
         for (const s of weekData.shipments) {
-            const dayKey = s.created_at.toISOString().split('T')[0];
+            const dayKey = s.delivered_at!.toISOString().split('T')[0];
             if (!dayMap.has(dayKey)) {
                 dayMap.set(dayKey, []);
             }
