@@ -97,7 +97,6 @@ export function PerformanceModule({ data }: Props) {
                                     dataKey="earnings"
                                     fill="#936639"
                                     radius={[4, 4, 0, 0]}
-                                    maxBarSize={32}
                                 />
                             </BarChart>
                         </ResponsiveContainer>

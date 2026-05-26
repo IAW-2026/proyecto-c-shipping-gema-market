@@ -88,6 +88,7 @@ export async function TrackingDetail({ trackingCode }: { trackingCode: string })
                     status={shipment.status}
                     createdAt={shipment.createdAt ?? null}
                     pickedUpAt={shipment.pickedUpAt}
+                    deliveredAt={shipment.deliveredAt}
                 />
             </div>
 
