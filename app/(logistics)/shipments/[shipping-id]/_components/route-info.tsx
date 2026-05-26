@@ -1,5 +1,5 @@
 import { Card } from "@/components/ui/card";
-import { Address } from "@/lib/definitions/shipment";
+import { Address } from "@/lib/definitions/shipments";
 import { Tag, Home } from "lucide-react";
 
 interface RouteInfoProps {

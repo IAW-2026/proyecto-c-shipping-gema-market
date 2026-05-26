@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { ChevronDown, X, Loader2 } from "lucide-react";
 import { cn } from "@/lib/shared/utils";
 import { transitionShipmentAction } from "@/lib/actions/shipment.actions";
-import type { ShipmentSummary } from "@/lib/definitions/shipment";
+import type { ShipmentSummary } from "@/lib/definitions/shipments";
 
 // --- Cancel button (recibe props, no contexto) ---
 
@@ -83,7 +83,7 @@ export function useCourierActions() {
     const router = useRouter();
     const [isPending, setIsPending] = useState(false);
 
-    const handleAction = async (shippingId: string, transition: "pickup" | "deliver") => {
+    const handleAction = async (shippingId: string, transition: "pickup" | "transit" | "deliver") => {
         setIsPending(true);
         try {
             const result = await transitionShipmentAction(shippingId, transition);

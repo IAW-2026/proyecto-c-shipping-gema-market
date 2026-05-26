@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { validateApiKey } from "@/lib/auth/api-key";
 import { createShipmentSchema } from "@/lib/validations/api-schemas";
 import { createShipment } from "@/lib/services/shipment";
 import { fetchAndPersistRouteGeometry } from "@/lib/services/map-services";
@@ -9,6 +10,9 @@ import { fetchAndPersistRouteGeometry } from "@/lib/services/map-services";
  * Solicita la creación y gestión logística de un envío para una orden específica.
  */
 export async function POST(request: NextRequest) {
+    if (!validateApiKey(request)) {
+        return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
     try {
         const body = await request.json();
 

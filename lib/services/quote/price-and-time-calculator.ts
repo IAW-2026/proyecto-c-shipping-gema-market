@@ -5,6 +5,8 @@ export { DEFAULT_DISTANCE_KM };
 const DEFAULT_PRICE_PER_KM = 200;
 export const CURRENCY = "ARS";
 
+import { ADMIN_DAYS, SECONDS_PER_TRANSIT_DAY, MAX_TRANSIT_DAYS } from "@/lib/shared/shipment-constants";
+
 export function calculateVolume(height_cm: number, width_cm: number, depth_cm: number): number {
     return height_cm * width_cm * depth_cm / 1_000_000;
 }
@@ -22,8 +24,9 @@ export function calculatePrice(pricePerKm: number, distanceKm: number): number {
 }
 
 export function calculateEstimatedDays(durationSeconds?: number): number {
-    if (!durationSeconds) return 3;
-    return Math.max(1, Math.min(7, Math.round(durationSeconds / 14400)));
+    if (!durationSeconds) return 2;
+    const transitDays = Math.ceil(durationSeconds / SECONDS_PER_TRANSIT_DAY);
+    return ADMIN_DAYS + Math.min(transitDays, MAX_TRANSIT_DAYS);
 }
 
 export function getDefaultPricePerKm(): number {

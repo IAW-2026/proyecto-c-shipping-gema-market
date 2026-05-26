@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { validateApiKey } from "@/lib/auth/api-key";
 import { quoteRequestSchema } from "@/lib/validations/api-schemas";
 import { calculateQuote } from "@/lib/services/quote";
 import { createTraceIfDebug, withTrace } from "@/lib/shared/api-handler";
@@ -9,6 +10,9 @@ import { createTraceIfDebug, withTrace } from "@/lib/shared/api-handler";
  * Calcula el costo y tiempo estimado de envío logístico entre dos domicilios.
  */
 export async function POST(request: NextRequest) {
+    if (!validateApiKey(request)) {
+        return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
     try {
         const body = await request.json();
         const parsed = quoteRequestSchema.safeParse(body);
@@ -26,8 +30,13 @@ export async function POST(request: NextRequest) {
         return NextResponse.json(withTrace(result, trace), { status: 200 });
 
     } catch (error) {
-        console.error("[COTIZACIONES] Error:", error);
-        const message = error instanceof Error ? error.message : "Error interno del servidor";
-        return NextResponse.json({ error: message }, { status: 500 });
+        const err = error as Error & { statusCode?: number; code?: string };
+        console.error("[COTIZACIONES] Error:", err.message);
+
+        if (err.statusCode) {
+            return NextResponse.json({ error: err.message }, { status: err.statusCode });
+        }
+
+        return NextResponse.json({ error: "Error interno del servidor" }, { status: 500 });
     }
 }

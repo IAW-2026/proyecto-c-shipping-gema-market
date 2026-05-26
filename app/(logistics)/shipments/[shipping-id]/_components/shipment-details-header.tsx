@@ -3,15 +3,17 @@ import { Header } from "@/app/(logistics)/_components/page-layout";
 
 interface ShipmentDetailsHeaderProps {
     shippingId: string;
-    orderId: string;
+    trackingCode: string;
+    action?: React.ReactNode;
 }
 
-export async function ShipmentDetailsHeader({ shippingId, orderId }: ShipmentDetailsHeaderProps) {
+export async function ShipmentDetailsHeader({ shippingId, trackingCode, action }: ShipmentDetailsHeaderProps) {
 
     return (
         <Header
             title={`Envío: ${shippingId}`}
-            subtitle={`Orden: ${orderId}`}
+            subtitle={`Código: ${trackingCode}`}
+            action={action}
         />
     );
 }

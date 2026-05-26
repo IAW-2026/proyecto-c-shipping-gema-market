@@ -5,26 +5,23 @@
  * lo cual es un requisito estricto para integrarlo con Zod y ORMs.
  */
 export const SHIPMENT_STATUSES = [
+    'waiting_for_courier',
     'pending_pickup',
+    'picked_up',
     'in_transit',
     'delivered',
-    'failed',
-    'cancelled'
 ] as const;
 
-/**
- * Tipo inferido para uso en interfaces, Server Actions y componentes React.
- * Tipo resultante: 'pending_pickup' | 'in_transit' | 'delivered' | 'failed' | 'cancelled'
- */
 export type ShipmentStatus = typeof SHIPMENT_STATUSES[number];
 
-/**
- * Diccionario de mapeo para la UI (Frontend).
- */
+export const ADMIN_DAYS = 1;
+export const SECONDS_PER_TRANSIT_DAY = 28800;
+export const MAX_TRANSIT_DAYS = 5;
+
 export const SHIPMENT_STATUS_LABELS: Record<ShipmentStatus, string> = {
-    pending_pickup: "Pendiente de retiro",
-    in_transit: "En camino",
+    waiting_for_courier: "En espera",
+    pending_pickup: "Todavía no fue retirado",
+    picked_up: "Retirado",
+    in_transit: "En viaje",
     delivered: "Entregado",
-    failed: "Intento fallido",
-    cancelled: "Cancelado",
 } as const;

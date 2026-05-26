@@ -9,6 +9,33 @@ import { getUsdToArsRate } from "@/lib/services/exchange-rate";
 import { validateQuoteForReservation, validateQuoteForRelease } from "./state-validations";
 import { findMatchingTarifa, findQuoteById, findQuoteForRelease, createQuoteRecord, reserveQuoteInDb, releaseQuoteInDb, type CreateQuoteData } from "@/lib/db/queries/quote";
 
+const COVERAGE_CITY = "Bahía Blanca";
+
+function throwWithStatus(message: string, statusCode: number): never {
+    throw Object.assign(new Error(message), { statusCode, code: "VALIDATION_ERROR" });
+}
+
+function validateGeocode(
+    result: { coordinates: [number, number]; displayName: string } | null,
+    labelOrigen: boolean
+): [number, number] {
+    if (!result) {
+        if (labelOrigen) {
+            throwWithStatus("No se pudo calcular la cotización", 400);
+        } else {
+            throwWithStatus("La dirección de destino ingresada no existe. Revisá los datos.", 400);
+        }
+    }
+    if (!result.displayName.includes(COVERAGE_CITY)) {
+        if (labelOrigen) {
+            throwWithStatus("El producto está fuera del área de cobertura.", 400);
+        } else {
+            throwWithStatus("La dirección de destino está fuera del área de cobertura (Bahía Blanca).", 400);
+        }
+    }
+    return result.coordinates;
+}
+
 type QuoteRequest = z.infer<typeof quoteRequestSchema>;
 
 export interface QuoteResult {
@@ -28,7 +55,10 @@ export async function calculateQuote(
 
     const originResult = await sellerApiClient.getOriginAddress(product_id, trace, req);
     if (!originResult?.data) {
-        throw new Error("No se pudo obtener la dirección de origen del producto");
+        throw Object.assign(
+            new Error("No se pudo calcular la cotización"),
+            { statusCode: 502, code: "UPSTREAM_ERROR" }
+        );
     }
     const origin = originResult.data.origin_address;
 
@@ -36,7 +66,7 @@ export async function calculateQuote(
         street: addr.street, number: addr.number, zip: addr.zip
     });
 
-    const [originCoords, destCoords] = await Promise.all([
+    const [originGeocode, destGeocode] = await Promise.all([
         getCoordinatesFromAddress(toAddressInput(origin)),
         getCoordinatesFromAddress({
             street: destination_address.street,
@@ -44,6 +74,9 @@ export async function calculateQuote(
             zip: destination_address.zip,
         }),
     ]);
+
+    const originCoords = validateGeocode(originGeocode, true);
+    const destCoords = validateGeocode(destGeocode, false);
 
     const volume_m3 = calculateVolume(height_cm, width_cm, depth_cm);
     const volumetricKg = calculateVolumetricWeight(volume_m3);
@@ -85,10 +118,10 @@ export async function calculateQuote(
         currency: CURRENCY,
         estimated_days: estimatedDays,
         valid_until,
-        pickup_lat: originCoords?.[1] ?? null,
-        pickup_lng: originCoords?.[0] ?? null,
-        delivery_lat: destCoords?.[1] ?? null,
-        delivery_lng: destCoords?.[0] ?? null,
+        pickup_lat: originCoords[1] ?? null,
+        pickup_lng: originCoords[0] ?? null,
+        delivery_lat: destCoords[1] ?? null,
+        delivery_lng: destCoords[0] ?? null,
         route_distance: distanceKm * 1000,
         route_duration: durationSeconds ?? null,
     };

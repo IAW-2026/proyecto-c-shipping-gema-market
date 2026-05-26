@@ -19,9 +19,14 @@ export const HistorySearchParamsSchema = z.object({
 export type HistorySearchParams = z.infer<typeof HistorySearchParamsSchema>;
 
 export const AvailableSearchParamsSchema = z.object({
-    search: z.string().optional().default(''),
-    sortBy: z.enum(['price', 'distance', 'created_at']).optional().default('created_at'),
+    sortBy: z.enum(['price', 'distance', 'weight', 'created_at']).optional().default('created_at'),
     sortOrder: z.enum(['asc', 'desc']).optional().default('desc'),
+    weightMin: z.coerce.number().nonnegative().optional(),
+    weightMax: z.coerce.number().nonnegative().optional(),
+    priceMin: z.coerce.number().nonnegative().optional(),
+    priceMax: z.coerce.number().nonnegative().optional(),
+    distanceMin: z.coerce.number().nonnegative().optional(),
+    distanceMax: z.coerce.number().nonnegative().optional(),
 });
 
 export type AvailableSearchParams = z.infer<typeof AvailableSearchParamsSchema>;

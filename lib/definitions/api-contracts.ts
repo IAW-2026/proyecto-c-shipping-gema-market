@@ -1,5 +1,5 @@
 // lib/definitions/api-contracts.ts
-import { ShippingStatus } from './shipment';
+import { ShippingStatus } from './shipments';
 
 /**
  * Contrato: POST /api/buyer/ordenes/:order_id/estado-envio

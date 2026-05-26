@@ -1,9 +1,9 @@
-import { auth, clerkClient } from "@clerk/nextjs/server";
+import { currentUser } from "@clerk/nextjs/server";
 import { ROLES, UserRole } from "../definitions/auth";
 import { redirect } from "next/navigation";
 import { isNextDynamicServerError } from "@/lib/shared/utils";
 import prisma from "@/lib/db/prisma";
-import { generatePrefixedId } from "@/lib/shared/utils";
+import getCurrentUserId from "./getCurrentUserId";
 
 export async function requireRole(allowedRoles: UserRole[]) {
     const bypass = process.env.BYPASS_RBAC;
@@ -24,30 +24,13 @@ export async function requireRole(allowedRoles: UserRole[]) {
     }
 
     try {
-        const { userId: clerkUserId } = await auth();
+        const clerkUser = await currentUser();
 
-        if (!clerkUserId) {
-            redirect("/login");
+        if (!clerkUser) {
+            redirect("/sign-in");
         }
 
-        const client = await clerkClient();
-
-        let userRole: UserRole | undefined;
-        let email = "";
-        let full_name = "";
-
-        try {
-            const clerkUser = await client.users.getUser(clerkUserId);
-            userRole = clerkUser.publicMetadata?.role as UserRole | undefined;
-            email = clerkUser.emailAddresses?.[0]?.emailAddress ?? "";
-            full_name = `${clerkUser.firstName ?? ""} ${clerkUser.lastName ?? ""}`.trim();
-        } catch {
-            redirect("/unauthorized");
-        }
-
-        if (!userRole) {
-            redirect("/unauthorized");
-        }
+        const userRole = clerkUser.publicMetadata?.role as UserRole | undefined ?? ROLES.LOGISTICS;
 
         if (!allowedRoles.includes(userRole)) {
             if (userRole === ROLES.ADMIN_LOGISTICS) {
@@ -59,28 +42,13 @@ export async function requireRole(allowedRoles: UserRole[]) {
             redirect("/unauthorized");
         }
 
-        await prisma.usuario.upsert({
-            where: { clerk_user_id: clerkUserId },
-            update: { email, full_name, role: userRole },
-            create: {
-                id: generatePrefixedId("usr"),
-                clerk_user_id: clerkUserId,
-                email,
-                full_name,
-                role: userRole,
-            },
-        });
+        const userId = await getCurrentUserId();
 
-        const usuario = await prisma.usuario.findUnique({
-            where: { clerk_user_id: clerkUserId },
-            select: { id: true },
-        });
-
-        if (!usuario) {
+        if (!userId) {
             redirect("/unauthorized");
         }
 
-        return { userId: usuario.id, role: userRole };
+        return { userId, role: userRole };
     } catch (error) {
         if (isNextDynamicServerError(error)) {
             throw error;

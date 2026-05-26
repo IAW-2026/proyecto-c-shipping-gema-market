@@ -1,53 +1,60 @@
 import { ApiResult } from "../types";
-import { SellerOrderDetails, SellerNotificationResponse, OriginAddressResponse } from "./seller-api.types";
+import { OriginAddressResponse, SellerNotificationResponse, SellerStatusUpdate } from "./seller-api.types";
 import type { ApiTrace } from "@/lib/shared/api-trace";
+import { hashApiKey } from "@/lib/auth/api-key";
 
-/**
- * Cliente para la comunicación con el microservicio de Seller.
- * 
- * NOTA: Los endpoints externos (Seller App) aún no están disponibles.
- * Todos los métodos retornan datos simulados directamente.
- * TODO: Integrar con Seller App cuando esté disponible.
- */
+const SELLER_API_URL = process.env.SELLER_API_URL;
+const API_KEY_HASH = hashApiKey(process.env.INTERNAL_API_KEY ?? "");
+
 export const sellerApiClient = {
-    /**
-     * Obtiene la dirección de origen del vendedor para un producto.
-     * GET /api/seller/productos/:product_id/direccion-origen
-     * TODO: Reemplazar mock con fetch real a Seller App.
-     */
-    getOriginAddress: async (_productId: string, _trace?: ApiTrace, req?: Request): ApiResult<OriginAddressResponse> => {
-        await new Promise(resolve => setTimeout(resolve, 200));
-        return {
-            data: {
-                origin_address: {
-                    street: req?.headers.get("X-Mock-Origin-Street") ?? "San Martín",
-                    number: req?.headers.get("X-Mock-Origin-Number") ?? "123",
-                    zip: req?.headers.get("X-Mock-Origin-Zip") ?? "8000",
-                }
-            },
-            status: 200
-        };
+    getOriginAddress: async (productId: string, _trace?: ApiTrace, _req?: Request): ApiResult<OriginAddressResponse> => {
+        const mockStreet = _req?.headers.get("X-Mock-Origin-Street");
+        const mockNumber = _req?.headers.get("X-Mock-Origin-Number");
+        const mockZip = _req?.headers.get("X-Mock-Origin-Zip");
+
+        if (mockStreet && mockNumber && mockZip) {
+            return {
+                data: {
+                    origin_address: {
+                        street: mockStreet,
+                        number: mockNumber,
+                        zip: mockZip,
+                    },
+                },
+                status: 200,
+            };
+        }
+
+        try {
+            const res = await fetch(`${SELLER_API_URL}/api/seller/productos/${productId}/direccion-origen`, {
+                headers: { "x-api-key-hash": API_KEY_HASH },
+            });
+            if (!res.ok) {
+                return { error: { message: `Seller API error: ${res.status}` }, status: res.status };
+            }
+            const data = await res.json();
+            return { data, status: res.status };
+        } catch (error) {
+            console.error("[SELLER CLIENT] getOriginAddress error:", error);
+            return { error: { message: "Error contacting Seller API" }, status: 503 };
+        }
     },
 
-    /**
-     * Obtiene detalles adicionales de una orden desde el vendedor para logística.
-     * GET /api/seller/ordenes/:order_id
-     * TODO: Reemplazar mock con fetch real a Seller App.
-     */
-    getOrderDetails: async (orderId: string, _trace?: ApiTrace): ApiResult<SellerOrderDetails> => {
-        const fallback = { order_id: orderId, product_name: "Producto Mock", quantity: 1, pickup_address: "Calle Falsa 123" };
-
-        await new Promise(resolve => setTimeout(resolve, 400));
-        return { data: fallback, status: 200 };
-    },
-
-    /**
-     * Notifica al Seller que un envío ha sido tomado por un repartidor.
-     * POST /api/seller/envios/:order_id/tomado
-     * TODO: Reemplazar mock con fetch real a Seller App.
-     */
-    notifyShipmentTaken: async (_orderId: string, _trace?: ApiTrace): ApiResult<SellerNotificationResponse> => {
-        await new Promise(resolve => setTimeout(resolve, 300));
-        return { data: { success: true }, status: 200 };
+    notifyStatusChange: async (orderId: string, payload: SellerStatusUpdate): ApiResult<SellerNotificationResponse> => {
+        try {
+            const res = await fetch(`${SELLER_API_URL}/api/seller/ventas/${orderId}/estado-envio`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json", "x-api-key-hash": API_KEY_HASH },
+                body: JSON.stringify(payload),
+            });
+            if (!res.ok) {
+                return { error: { message: `Seller API error: ${res.status}` }, status: res.status };
+            }
+            const data = await res.json();
+            return { data, status: res.status };
+        } catch (error) {
+            console.error("[SELLER CLIENT] notifyStatusChange error:", error);
+            return { error: { message: "Error contacting Seller API" }, status: 503 };
+        }
     }
 };

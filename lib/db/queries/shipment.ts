@@ -4,7 +4,7 @@ import {
     Shipment, ShipmentSummary, ShipmentOffer,
     ShipmentFilterParams, PaginatedResult,
     ShippingStatusSchema, AddressSchema, DimensionsSchema,
-} from "@/lib/definitions/shipment";
+} from "@/lib/definitions/shipments";
 
 const summarySelect = {
     id: true,
@@ -54,6 +54,8 @@ function buildOrderBy(sortBy?: string, sortOrder?: 'asc' | 'desc'): Prisma.Envio
     const dir = sortOrder ?? 'desc';
     switch (sortBy) {
         case 'price': return { price: dir };
+        case 'distance': return { route_distance: dir };
+        case 'weight': return { weight: dir };
         case 'tracking_code': return { tracking_code: dir };
         case 'status': return { status: dir };
         default: return { created_at: dir };
@@ -193,6 +195,16 @@ export async function getShipmentDetails(shippingId: string): Promise<Shipment |
     return toShipmentDetail(envio);
 }
 
+export async function getShipmentByTrackingCode(code: string): Promise<Shipment | null> {
+    const envio = await prisma.envio.findUnique({
+        where: { tracking_code: code },
+        select: detailSelect,
+    });
+
+    if (!envio) return null;
+    return toShipmentDetail(envio);
+}
+
 export async function getFilteredShipments(params: ShipmentFilterParams): Promise<PaginatedResult<ShipmentSummary>> {
     const page = params.page ?? 1;
     const pageSize = params.pageSize ?? 20;
@@ -232,7 +244,7 @@ export async function getShipmentHistory(userId: string): Promise<ShipmentSummar
 
 export async function getAvailableShipments(params?: ShipmentFilterParams): Promise<ShipmentOffer[]> {
     const where: Prisma.EnvioWhereInput = {
-        status: 'pending_pickup',
+        status: 'waiting_for_courier',
         logistics_id: null,
     };
 
@@ -241,6 +253,29 @@ export async function getAvailableShipments(params?: ShipmentFilterParams): Prom
             { tracking_code: { contains: params.query, mode: 'insensitive' } },
             { id: { contains: params.query, mode: 'insensitive' } },
         ];
+    }
+
+    const rangeFilters: Prisma.EnvioWhereInput[] = [];
+    if (params?.weightMin !== undefined || params?.weightMax !== undefined) {
+        const wf: { gte?: number; lte?: number } = {};
+        if (params.weightMin !== undefined) wf.gte = params.weightMin;
+        if (params.weightMax !== undefined) wf.lte = params.weightMax;
+        rangeFilters.push({ weight: wf });
+    }
+    if (params?.priceMin !== undefined || params?.priceMax !== undefined) {
+        const pf: { gte?: number; lte?: number } = {};
+        if (params.priceMin !== undefined) pf.gte = params.priceMin;
+        if (params.priceMax !== undefined) pf.lte = params.priceMax;
+        rangeFilters.push({ price: pf });
+    }
+    if (params?.distanceMin !== undefined || params?.distanceMax !== undefined) {
+        const df: { gte?: number; lte?: number } = {};
+        if (params.distanceMin !== undefined) df.gte = params.distanceMin * 1000;
+        if (params.distanceMax !== undefined) df.lte = params.distanceMax * 1000;
+        rangeFilters.push({ route_distance: df });
+    }
+    if (rangeFilters.length > 0) {
+        where.AND = rangeFilters;
     }
 
     const orderBy = params?.sortBy
@@ -315,7 +350,7 @@ export async function createEnvioRecord(data: CreateEnvioData) {
       pickup_address: data.pickup_address,
       delivery_address: data.delivery_address,
       tracking_code: data.tracking_code,
-      status: "pending_pickup",
+      status: "waiting_for_courier",
       price: data.price,
       pickup_lat: data.pickup_lat,
       pickup_lng: data.pickup_lng,

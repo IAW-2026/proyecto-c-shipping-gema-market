@@ -3,31 +3,38 @@ import { clerkMiddleware, createRouteMatcher } from "@clerk/nextjs/server";
 import { NextResponse } from "next/server";
 
 // Rutas que no requieren autenticación (ej: tracking público)
-const isPublicRoute = createRouteMatcher(['/tracking(.*)']);
+const isPublicRoute = createRouteMatcher(['/tracking(.*)', '/api/shipping(.*)']);
 
 // Rutas exclusivas para usuarios NO autenticados (Login/Registro)
-const isAuthRoute = createRouteMatcher(['/login(.*)', '/register(.*)']);
+const isAuthRoute = createRouteMatcher(['/sign-in(.*)', '/sign-up(.*)']);
+
+// Rutas viejas que redirigen a las nuevas
+const isOldAuthRoute = createRouteMatcher(['/login(.*)', '/register(.*)']);
 
 export default clerkMiddleware(async (auth, req) => {
   const { userId } = await auth();
   const { pathname } = req.nextUrl;
 
+  // 0. Redirigir rutas viejas /login y /register a /sign-in y /sign-up
+  if (isOldAuthRoute(req)) {
+    const newPath = pathname.replace('/login', '/sign-in').replace('/register', '/sign-up');
+    return NextResponse.redirect(new URL(newPath, req.url));
+  }
+
   // 1. Lógica para usuarios autenticados intentando entrar a Login o Registro
   if (userId && isAuthRoute(req)) {
-    // Redirigimos al dashboard porque el usuario ya tiene una sesión válida
     return NextResponse.redirect(new URL('/dashboard', req.url));
   }
 
   // 2. Lógica para usuarios NO autenticados intentando entrar a rutas protegidas
   if (!userId && !isPublicRoute(req) && !isAuthRoute(req)) {
-    // Si no está logueado y la ruta no es pública ni de auth, va a login
-    const loginUrl = new URL('/login', req.url);
+    const loginUrl = new URL('/sign-in', req.url);
     return NextResponse.redirect(loginUrl);
   }
 
   // 3. Redirección de la raíz / al contexto correspondiente
   if (pathname === '/') {
-    const target = userId ? '/dashboard' : '/login';
+    const target = userId ? '/dashboard' : '/sign-in';
     return NextResponse.redirect(new URL(target, req.url));
   }
 });

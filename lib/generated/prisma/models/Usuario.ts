@@ -30,6 +30,7 @@ export type UsuarioMinAggregateOutputType = {
   email: string | null
   full_name: string | null
   role: string | null
+  banned: boolean | null
   created_at: Date | null
 }
 
@@ -39,6 +40,7 @@ export type UsuarioMaxAggregateOutputType = {
   email: string | null
   full_name: string | null
   role: string | null
+  banned: boolean | null
   created_at: Date | null
 }
 
@@ -48,6 +50,7 @@ export type UsuarioCountAggregateOutputType = {
   email: number
   full_name: number
   role: number
+  banned: number
   created_at: number
   _all: number
 }
@@ -59,6 +62,7 @@ export type UsuarioMinAggregateInputType = {
   email?: true
   full_name?: true
   role?: true
+  banned?: true
   created_at?: true
 }
 
@@ -68,6 +72,7 @@ export type UsuarioMaxAggregateInputType = {
   email?: true
   full_name?: true
   role?: true
+  banned?: true
   created_at?: true
 }
 
@@ -77,6 +82,7 @@ export type UsuarioCountAggregateInputType = {
   email?: true
   full_name?: true
   role?: true
+  banned?: true
   created_at?: true
   _all?: true
 }
@@ -159,6 +165,7 @@ export type UsuarioGroupByOutputType = {
   email: string
   full_name: string
   role: string
+  banned: boolean
   created_at: Date
   _count: UsuarioCountAggregateOutputType | null
   _min: UsuarioMinAggregateOutputType | null
@@ -189,6 +196,7 @@ export type UsuarioWhereInput = {
   email?: Prisma.StringFilter<"Usuario"> | string
   full_name?: Prisma.StringFilter<"Usuario"> | string
   role?: Prisma.StringFilter<"Usuario"> | string
+  banned?: Prisma.BoolFilter<"Usuario"> | boolean
   created_at?: Prisma.DateTimeFilter<"Usuario"> | Date | string
   envios?: Prisma.EnvioListRelationFilter
 }
@@ -199,6 +207,7 @@ export type UsuarioOrderByWithRelationInput = {
   email?: Prisma.SortOrder
   full_name?: Prisma.SortOrder
   role?: Prisma.SortOrder
+  banned?: Prisma.SortOrder
   created_at?: Prisma.SortOrder
   envios?: Prisma.EnvioOrderByRelationAggregateInput
 }
@@ -212,6 +221,7 @@ export type UsuarioWhereUniqueInput = Prisma.AtLeast<{
   email?: Prisma.StringFilter<"Usuario"> | string
   full_name?: Prisma.StringFilter<"Usuario"> | string
   role?: Prisma.StringFilter<"Usuario"> | string
+  banned?: Prisma.BoolFilter<"Usuario"> | boolean
   created_at?: Prisma.DateTimeFilter<"Usuario"> | Date | string
   envios?: Prisma.EnvioListRelationFilter
 }, "id" | "clerk_user_id">
@@ -222,6 +232,7 @@ export type UsuarioOrderByWithAggregationInput = {
   email?: Prisma.SortOrder
   full_name?: Prisma.SortOrder
   role?: Prisma.SortOrder
+  banned?: Prisma.SortOrder
   created_at?: Prisma.SortOrder
   _count?: Prisma.UsuarioCountOrderByAggregateInput
   _max?: Prisma.UsuarioMaxOrderByAggregateInput
@@ -237,6 +248,7 @@ export type UsuarioScalarWhereWithAggregatesInput = {
   email?: Prisma.StringWithAggregatesFilter<"Usuario"> | string
   full_name?: Prisma.StringWithAggregatesFilter<"Usuario"> | string
   role?: Prisma.StringWithAggregatesFilter<"Usuario"> | string
+  banned?: Prisma.BoolWithAggregatesFilter<"Usuario"> | boolean
   created_at?: Prisma.DateTimeWithAggregatesFilter<"Usuario"> | Date | string
 }
 
@@ -246,6 +258,7 @@ export type UsuarioCreateInput = {
   email: string
   full_name: string
   role?: string
+  banned?: boolean
   created_at?: Date | string
   envios?: Prisma.EnvioCreateNestedManyWithoutOperadorInput
 }
@@ -256,6 +269,7 @@ export type UsuarioUncheckedCreateInput = {
   email: string
   full_name: string
   role?: string
+  banned?: boolean
   created_at?: Date | string
   envios?: Prisma.EnvioUncheckedCreateNestedManyWithoutOperadorInput
 }
@@ -266,6 +280,7 @@ export type UsuarioUpdateInput = {
   email?: Prisma.StringFieldUpdateOperationsInput | string
   full_name?: Prisma.StringFieldUpdateOperationsInput | string
   role?: Prisma.StringFieldUpdateOperationsInput | string
+  banned?: Prisma.BoolFieldUpdateOperationsInput | boolean
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   envios?: Prisma.EnvioUpdateManyWithoutOperadorNestedInput
 }
@@ -276,6 +291,7 @@ export type UsuarioUncheckedUpdateInput = {
   email?: Prisma.StringFieldUpdateOperationsInput | string
   full_name?: Prisma.StringFieldUpdateOperationsInput | string
   role?: Prisma.StringFieldUpdateOperationsInput | string
+  banned?: Prisma.BoolFieldUpdateOperationsInput | boolean
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   envios?: Prisma.EnvioUncheckedUpdateManyWithoutOperadorNestedInput
 }
@@ -286,6 +302,7 @@ export type UsuarioCreateManyInput = {
   email: string
   full_name: string
   role?: string
+  banned?: boolean
   created_at?: Date | string
 }
 
@@ -295,6 +312,7 @@ export type UsuarioUpdateManyMutationInput = {
   email?: Prisma.StringFieldUpdateOperationsInput | string
   full_name?: Prisma.StringFieldUpdateOperationsInput | string
   role?: Prisma.StringFieldUpdateOperationsInput | string
+  banned?: Prisma.BoolFieldUpdateOperationsInput | boolean
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
@@ -304,6 +322,7 @@ export type UsuarioUncheckedUpdateManyInput = {
   email?: Prisma.StringFieldUpdateOperationsInput | string
   full_name?: Prisma.StringFieldUpdateOperationsInput | string
   role?: Prisma.StringFieldUpdateOperationsInput | string
+  banned?: Prisma.BoolFieldUpdateOperationsInput | boolean
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
@@ -313,6 +332,7 @@ export type UsuarioCountOrderByAggregateInput = {
   email?: Prisma.SortOrder
   full_name?: Prisma.SortOrder
   role?: Prisma.SortOrder
+  banned?: Prisma.SortOrder
   created_at?: Prisma.SortOrder
 }
 
@@ -322,6 +342,7 @@ export type UsuarioMaxOrderByAggregateInput = {
   email?: Prisma.SortOrder
   full_name?: Prisma.SortOrder
   role?: Prisma.SortOrder
+  banned?: Prisma.SortOrder
   created_at?: Prisma.SortOrder
 }
 
@@ -331,6 +352,7 @@ export type UsuarioMinOrderByAggregateInput = {
   email?: Prisma.SortOrder
   full_name?: Prisma.SortOrder
   role?: Prisma.SortOrder
+  banned?: Prisma.SortOrder
   created_at?: Prisma.SortOrder
 }
 
@@ -341,6 +363,10 @@ export type UsuarioNullableScalarRelationFilter = {
 
 export type StringFieldUpdateOperationsInput = {
   set?: string
+}
+
+export type BoolFieldUpdateOperationsInput = {
+  set?: boolean
 }
 
 export type DateTimeFieldUpdateOperationsInput = {
@@ -369,6 +395,7 @@ export type UsuarioCreateWithoutEnviosInput = {
   email: string
   full_name: string
   role?: string
+  banned?: boolean
   created_at?: Date | string
 }
 
@@ -378,6 +405,7 @@ export type UsuarioUncheckedCreateWithoutEnviosInput = {
   email: string
   full_name: string
   role?: string
+  banned?: boolean
   created_at?: Date | string
 }
 
@@ -403,6 +431,7 @@ export type UsuarioUpdateWithoutEnviosInput = {
   email?: Prisma.StringFieldUpdateOperationsInput | string
   full_name?: Prisma.StringFieldUpdateOperationsInput | string
   role?: Prisma.StringFieldUpdateOperationsInput | string
+  banned?: Prisma.BoolFieldUpdateOperationsInput | boolean
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
@@ -412,6 +441,7 @@ export type UsuarioUncheckedUpdateWithoutEnviosInput = {
   email?: Prisma.StringFieldUpdateOperationsInput | string
   full_name?: Prisma.StringFieldUpdateOperationsInput | string
   role?: Prisma.StringFieldUpdateOperationsInput | string
+  banned?: Prisma.BoolFieldUpdateOperationsInput | boolean
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
@@ -452,6 +482,7 @@ export type UsuarioSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs 
   email?: boolean
   full_name?: boolean
   role?: boolean
+  banned?: boolean
   created_at?: boolean
   envios?: boolean | Prisma.Usuario$enviosArgs<ExtArgs>
   _count?: boolean | Prisma.UsuarioCountOutputTypeDefaultArgs<ExtArgs>
@@ -463,6 +494,7 @@ export type UsuarioSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Exten
   email?: boolean
   full_name?: boolean
   role?: boolean
+  banned?: boolean
   created_at?: boolean
 }, ExtArgs["result"]["usuario"]>
 
@@ -472,6 +504,7 @@ export type UsuarioSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Exten
   email?: boolean
   full_name?: boolean
   role?: boolean
+  banned?: boolean
   created_at?: boolean
 }, ExtArgs["result"]["usuario"]>
 
@@ -481,10 +514,11 @@ export type UsuarioSelectScalar = {
   email?: boolean
   full_name?: boolean
   role?: boolean
+  banned?: boolean
   created_at?: boolean
 }
 
-export type UsuarioOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "clerk_user_id" | "email" | "full_name" | "role" | "created_at", ExtArgs["result"]["usuario"]>
+export type UsuarioOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "clerk_user_id" | "email" | "full_name" | "role" | "banned" | "created_at", ExtArgs["result"]["usuario"]>
 export type UsuarioInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   envios?: boolean | Prisma.Usuario$enviosArgs<ExtArgs>
   _count?: boolean | Prisma.UsuarioCountOutputTypeDefaultArgs<ExtArgs>
@@ -503,6 +537,7 @@ export type $UsuarioPayload<ExtArgs extends runtime.Types.Extensions.InternalArg
     email: string
     full_name: string
     role: string
+    banned: boolean
     created_at: Date
   }, ExtArgs["result"]["usuario"]>
   composites: {}
@@ -933,6 +968,7 @@ export interface UsuarioFieldRefs {
   readonly email: Prisma.FieldRef<"Usuario", 'String'>
   readonly full_name: Prisma.FieldRef<"Usuario", 'String'>
   readonly role: Prisma.FieldRef<"Usuario", 'String'>
+  readonly banned: Prisma.FieldRef<"Usuario", 'Boolean'>
   readonly created_at: Prisma.FieldRef<"Usuario", 'DateTime'>
 }
     

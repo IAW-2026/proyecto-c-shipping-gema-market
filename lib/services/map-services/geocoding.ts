@@ -1,8 +1,13 @@
 import type { ORSCoordinate } from "./config";
 
+export interface GeocodeResult {
+    coordinates: ORSCoordinate;
+    displayName: string;
+}
+
 export async function getCoordinatesFromAddress(
   address: { street: string; number: string; city?: string | null; zip?: string | null }
-): Promise<ORSCoordinate | null> {
+): Promise<GeocodeResult | null> {
   const params = new URLSearchParams({
     street: `${address.street} ${address.number}`,
     city: "Bahía Blanca",
@@ -26,5 +31,8 @@ export async function getCoordinatesFromAddress(
   const data = await res.json();
   if (!data?.length) return null;
 
-  return [parseFloat(data[0].lon), parseFloat(data[0].lat)];
+  return {
+    coordinates: [parseFloat(data[0].lon), parseFloat(data[0].lat)],
+    displayName: data[0].display_name ?? "",
+  };
 }
