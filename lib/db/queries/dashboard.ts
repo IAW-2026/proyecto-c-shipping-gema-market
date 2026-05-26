@@ -1,7 +1,7 @@
 import prisma from "@/lib/db/prisma";
 import type { Prisma } from "@/lib/generated/prisma/client";
-import { AddressSchema, ShippingStatusSchema } from "@/lib/definitions/shipment";
-import type { ShipmentSummary } from "@/lib/definitions/shipment";
+import { AddressSchema, ShippingStatusSchema } from "@/lib/definitions/shipments";
+import type { ShipmentSummary } from "@/lib/definitions/shipments";
 import type { DashboardMetrics, OperatorDashboardData, PerformanceData, WeekData } from "@/lib/definitions/dashboard-metrics";
 import type { AdminDashboardMetrics, AdminDriver, AdminShipment, AdminRate, AdminDriverDetail } from "@/lib/definitions/admin-dashboard-metrics";
 import { getSettlements } from "./settlement";

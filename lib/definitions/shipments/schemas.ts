@@ -1,8 +1,6 @@
 import { z } from "zod";
+import { SHIPMENT_STATUSES } from "@/lib/shared/shipment-constants";
 
-// --- 1. ESQUEMAS BASE ---
-
-import { SHIPMENT_STATUSES, ShipmentStatus } from "../shared/shipment-constants";
 export const ShippingStatusSchema = z.enum(SHIPMENT_STATUSES);
 
 export const AddressSchema = z.object({
@@ -13,8 +11,6 @@ export const AddressSchema = z.object({
     apartment: z.string().nullish(),
 });
 
-// --- 2. ESQUEMA PRINCIPAL DEL DOMINIO ---
-// Alineado 100% al modelo de base de datos
 const UserIdSchema = z.string()
     .length(30, "El ID debe tener 30 caracteres")
     .startsWith("usr_", "El ID debe empezar con usr_");
@@ -39,14 +35,10 @@ export const ShipmentSchema = z.object({
     pickedUpAt: z.date().nullable(),
     deliveredAt: z.date().nullable(),
     createdAt: z.date().optional(),
-    
-    // Atributos físicos (Snapshot del Pedido)
     weight: z.number().describe("Peso en kg"),
     height: z.number().int().positive().describe("Altura en cm"),
     width: z.number().int().positive().describe("Ancho en cm"),
     depth: z.number().int().positive().describe("Profundidad en cm"),
-    
-    // Atributo logístico (Snapshot de API de mapas)
     distance: z.number().optional().describe("Distancia calculada en km"),
 });
 
@@ -58,18 +50,11 @@ export const DimensionsSchema = z.object({
     depth: toIntCm.describe("Profundidad en cm"),
 });
 
-// --- 3. INFERENCIA DE TIPOS ---
-
 export type ShippingStatus = z.infer<typeof ShippingStatusSchema>;
 export type Address = z.infer<typeof AddressSchema>;
 export type Dimensions = z.infer<typeof DimensionsSchema>;
 export type Shipment = z.infer<typeof ShipmentSchema>;
 
-// --- 4. DTOs (DATA TRANSFER OBJECTS) ---
-
-/**
- * ShipmentSummary: Para vistas de listas generales.
- */
 export const ShipmentSummarySchema = ShipmentSchema.pick({
     shippingId: true,
     orderId: true,
@@ -83,9 +68,6 @@ export const ShipmentSummarySchema = ShipmentSchema.pick({
 
 export type ShipmentSummary = z.infer<typeof ShipmentSummarySchema>;
 
-/**
- * CreateShipmentPayload: Validación para el POST recibido desde Seller App.
- */
 export const CreateShipmentPayloadSchema = ShipmentSchema.omit({
     shippingId: true,
     logisticsId: true,
@@ -98,11 +80,6 @@ export const CreateShipmentPayloadSchema = ShipmentSchema.omit({
 
 export type CreateShipmentPayload = z.infer<typeof CreateShipmentPayloadSchema>;
 
-/**
- * ShipmentOffer: Representa la oferta visual para el repartidor.
- * Reutiliza las validaciones de ID y direcciones del esquema principal
- * y extiende con metadatos logísticos calculados.
- */
 export const ShipmentOfferSchema = ShipmentSchema.pick({
     shippingId: true,
     price: true,
@@ -118,39 +95,3 @@ export const ShipmentOfferSchema = ShipmentSchema.pick({
 });
 
 export type ShipmentOffer = z.infer<typeof ShipmentOfferSchema>;
-
-// --- 5. DTOs DE CONSULTA (FILTROS Y PAGINACIÓN) ---
-
-export interface ShipmentFilterParams {
-    logisticsId?: string;
-    status?: ShipmentStatus | ShipmentStatus[];
-    query?: string;
-    dateFrom?: Date;
-    dateTo?: Date;
-    page?: number;
-    pageSize?: number;
-    sortBy?: 'created_at' | 'price' | 'tracking_code' | 'status' | 'weight' | 'distance';
-    sortOrder?: 'asc' | 'desc';
-    weightMin?: number;
-    weightMax?: number;
-    priceMin?: number;
-    priceMax?: number;
-    distanceMin?: number;
-    distanceMax?: number;
-}
-
-export interface PaginatedResult<T> {
-    data: T[];
-    total: number;
-    page: number;
-    pageSize: number;
-    totalPages: number;
-}
-
-export interface SettlementPeriod {
-    period: string;
-    weekStart: Date;
-    weekEnd: Date;
-    trips: number;
-    amount: number;
-}

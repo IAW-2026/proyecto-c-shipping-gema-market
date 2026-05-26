@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { ShippingStatusSchema } from "../definitions/shipment";
+import { ShippingStatusSchema } from "../definitions/shipments";
 
 // --- Esquemas de dirección ---
 

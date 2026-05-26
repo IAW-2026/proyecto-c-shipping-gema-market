@@ -4,7 +4,7 @@ import { useState, useCallback, ReactNode } from "react";
 import { createPortal } from "react-dom";
 import { useRouter } from "next/navigation";
 import { Tag, Home } from "lucide-react";
-import type { ShipmentSummary } from "@/lib/definitions/shipment";
+import type { ShipmentSummary } from "@/lib/definitions/shipments";
 import { transitionShipmentAction } from "@/lib/actions/shipment.actions";
 import { CourierHeader } from "./courier-header";
 import { CourierMap } from "./courier-map";

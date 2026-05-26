@@ -2,7 +2,7 @@ import { getShipmentByTrackingCode } from "@/lib/db/queries/shipment";
 import { notFound } from "next/navigation";
 import { TrackingTimeline } from "./tracking-timeline";
 import { MapWrapper } from "./map-wrapper";
-import type { Shipment } from "@/lib/definitions/shipment";
+import type { Shipment } from "@/lib/definitions/shipments";
 import { SHIPMENT_STATUS_LABELS } from "@/lib/shared/shipment-constants";
 
 function formatDateTime(date: Date | null | undefined): string {

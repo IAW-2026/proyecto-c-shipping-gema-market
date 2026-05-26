@@ -1,4 +1,4 @@
-import { ShipmentSummary } from "./shipment";
+import { ShipmentSummary } from "./shipments";
 
 export interface DashboardMetrics {
     shipmentToday: number;

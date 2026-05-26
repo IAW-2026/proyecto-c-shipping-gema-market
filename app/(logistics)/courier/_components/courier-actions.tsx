@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { ChevronDown, X, Loader2 } from "lucide-react";
 import { cn } from "@/lib/shared/utils";
 import { transitionShipmentAction } from "@/lib/actions/shipment.actions";
-import type { ShipmentSummary } from "@/lib/definitions/shipment";
+import type { ShipmentSummary } from "@/lib/definitions/shipments";
 
 // --- Cancel button (recibe props, no contexto) ---
 

@@ -4,7 +4,7 @@ import {
     Shipment, ShipmentSummary, ShipmentOffer,
     ShipmentFilterParams, PaginatedResult,
     ShippingStatusSchema, AddressSchema, DimensionsSchema,
-} from "@/lib/definitions/shipment";
+} from "@/lib/definitions/shipments";
 
 const summarySelect = {
     id: true,

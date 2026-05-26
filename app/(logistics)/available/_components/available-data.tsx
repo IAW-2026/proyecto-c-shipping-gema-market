@@ -1,5 +1,5 @@
 import { getAvailableShipments } from "@/lib/db/queries/shipment";
-import type { ShipmentFilterParams } from "@/lib/definitions/shipment";
+import type { ShipmentFilterParams } from "@/lib/definitions/shipments";
 import { AvailableShipmentCard } from "./shipment-card";
 import { requireRole } from "@/lib/auth/rbac";
 import { ROLES } from "@/lib/definitions/auth";

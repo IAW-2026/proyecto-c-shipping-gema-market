@@ -5,7 +5,7 @@ import { EarningsMetrics } from "./_components/earnings-metrics";
 import { EarningsList } from "./_components/earnings-list";
 import { requireRole } from "@/lib/auth/rbac";
 import { ROLES } from "@/lib/definitions/auth";
-import { getSettlements } from "@/lib/db/queries/settlement";
+import { getSettlementsDetail } from "@/lib/db/queries/settlement";
 
 export const metadata: Metadata = {
     title: "Liquidaciones | UniHousing Shipping",
@@ -23,7 +23,7 @@ export default async function SettlementsPage() {
     const { userId } = await requireRole([ROLES.LOGISTICS]);
     const { start, end } = currentMonthRange();
 
-    const settlements = await getSettlements(userId, start, end);
+    const { settlements, dailyByWeek, ordersByDay } = await getSettlementsDetail(userId, start, end);
 
     const monthTrips = settlements.reduce((sum, s) => sum + s.trips, 0);
     const monthTotal = settlements.reduce((sum, s) => sum + s.amount, 0);
@@ -38,7 +38,11 @@ export default async function SettlementsPage() {
             <SettlementsHeader />
             <Content className="flex flex-col p-4 lgx:p-7 gap-6">
                 <EarningsMetrics metrics={metrics} />
-                <EarningsList settlements={settlements} />
+                <EarningsList
+                    settlements={settlements}
+                    dailyByWeek={dailyByWeek}
+                    ordersByDay={ordersByDay}
+                />
             </Content>
         </PageWrapper>
     );
