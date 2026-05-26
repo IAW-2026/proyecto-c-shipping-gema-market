@@ -1,10 +1,13 @@
 import { cache } from "react";
 import { currentUser, clerkClient } from "@clerk/nextjs/server";
+import type { User } from "@clerk/nextjs/server";
 import prisma from "@/lib/db/prisma";
 import { generatePrefixedId } from "@/lib/shared/utils";
 
-const getCurrentUserId = cache(async (): Promise<string | null> => {
-    const clerkUser = await currentUser();
+const getCurrentUserId = cache(async (clerkUser?: User | null): Promise<string | null> => {
+    if (!clerkUser) {
+        clerkUser = await currentUser();
+    }
     if (!clerkUser) return null;
 
     const clerkUserId = clerkUser.id;

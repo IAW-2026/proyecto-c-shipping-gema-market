@@ -1,7 +1,5 @@
 import { Suspense } from "react";
 import { Metadata } from "next";
-import { requireRole } from "@/lib/auth/rbac";
-import { ROLES } from "@/lib/definitions/auth";
 import { AvailableSearchParamsSchema } from "@/lib/validations/shipment";
 import { PageWrapper, Content } from "../_components/page-layout";
 import { AvailableHeader } from "./_components/available-header";
@@ -19,7 +17,6 @@ export const metadata: Metadata = {
 export default async function AvailablePage(props: {
     searchParams: Promise<{ [key: string]: string | undefined }>
 }) {
-    await requireRole([ROLES.LOGISTICS]);
     const raw = await props.searchParams;
     const params = AvailableSearchParamsSchema.parse(raw);
 

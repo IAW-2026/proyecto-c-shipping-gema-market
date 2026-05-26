@@ -1,11 +1,13 @@
 import Link from "next/link";
 import { Plus } from "lucide-react";
 import { Header } from "../../_components/page-layout";
-import { currentUser } from "@clerk/nextjs/server";
+import { auth } from "@clerk/nextjs/server";
+import { getUserFromCache } from "@/lib/auth/user-cache";
 
 export async function DashboardHeader() {
-    const user = await currentUser();
-    const firstName = user?.firstName || "Operador";
+    const { userId: clerkUserId } = await auth();
+    const cached = clerkUserId ? getUserFromCache(clerkUserId) : null;
+    const firstName = cached?.firstName || "Operador";
 
     const takeShipmentButton = (
         <Link

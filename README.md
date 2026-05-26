@@ -11,4 +11,17 @@ Siempre sumamos 1 día por procesamiento administrativo. Después, por cada 8 ho
 
 ---
 
+## Caché
+
+**Sesión:** el `userId` interno se cachea en memoria con TTL de 30s para evitar llamar a `currentUser()` (Clerk API) en cada navegación.
+
+- **Cache hit:** devuelve `userId` directo del Map — 0ms, sin Clerk API ni Prisma
+- **Cache miss:** `auth()` → `currentUser()` (HTTP Clerk) → Prisma lookup → guarda en Map
+- **TTL expirado:** próximo request refresca automáticamente
+- **Mutaciones de admin:** limpian la entrada del caché vía `invalidateUserCache(clerkUserId)`
+
+**Dólar (USD/ARS):** misma estrategia con TTL de 5 min — evita llamar a dolarapi.com en cada cotización. Ver `lib/services/exchange-rate/`.
+
+---
+
 Enunciado completo: <https://iaw-2026.github.io/proyecto/>

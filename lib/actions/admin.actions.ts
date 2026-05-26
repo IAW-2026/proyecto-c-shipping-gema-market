@@ -6,6 +6,7 @@ import { revalidatePath } from "next/cache";
 import prisma from "@/lib/db/prisma";
 import { isNextDynamicServerError } from "@/lib/shared/utils";
 import { generatePrefixedId } from "@/lib/shared/utils";
+import { invalidateUserCache } from "@/lib/auth/user-cache";
 
 export async function deleteDriverAction(driverId: string) {
     try {
@@ -191,10 +192,13 @@ export async function toggleBanAction(driverId: string, banned: boolean) {
             return { success: false, error: "No puedes banearte a ti mismo" };
         }
 
-        await prisma.usuario.update({
+        const updated = await prisma.usuario.update({
             where: { id: driverId },
             data: { banned },
+            select: { clerk_user_id: true },
         });
+
+        invalidateUserCache(updated.clerk_user_id);
 
         revalidatePath("/admin/drivers");
         revalidatePath(`/admin/drivers/${driverId}`);
