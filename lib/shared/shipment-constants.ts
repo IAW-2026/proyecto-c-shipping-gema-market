@@ -25,3 +25,19 @@ export const SHIPMENT_STATUS_LABELS: Record<ShipmentStatus, string> = {
     in_transit: "En viaje",
     delivered: "Entregado",
 } as const;
+
+export const ADMIN_SHIPMENT_STATUS_LABELS: Record<ShipmentStatus, string> = {
+    waiting_for_courier: "Esperando repartidor",
+    pending_pickup: "Pendiente de retiro",
+    picked_up: "Retirado",
+    in_transit: "En viaje",
+    delivered: "Entregado",
+} as const;
+
+export const STATUS_VARIANT_MAP: Record<ShipmentStatus, "default" | "success" | "warning" | "danger" | "neutral"> = {
+    waiting_for_courier: "neutral",
+    pending_pickup: "default",
+    picked_up: "warning",
+    in_transit: "warning",
+    delivered: "success",
+} as const;
