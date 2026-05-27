@@ -27,6 +27,8 @@ export const AvailableSearchParamsSchema = z.object({
     priceMax: z.coerce.number().nonnegative().optional(),
     distanceMin: z.coerce.number().nonnegative().optional(),
     distanceMax: z.coerce.number().nonnegative().optional(),
+    page: z.coerce.number().int().positive().optional().default(1),
+    pageSize: z.coerce.number().int().positive().optional().default(20),
 });
 
 export type AvailableSearchParams = z.infer<typeof AvailableSearchParamsSchema>;

@@ -5,6 +5,7 @@ import { DeleteShipmentButton } from "./delete-shipment-button";
 import { UnassignShipmentButton } from "./unassign-shipment-button";
 import { SortableHeader } from "./sortable-header";
 import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from "@/components/ui/table";
+import { Pagination } from "@/components/ui/pagination";
 import { AdminShipmentStatusBadge } from "../../_components/admin-shipment-status-badge";
 import { Edit3 } from "lucide-react";
 
@@ -14,7 +15,8 @@ interface AdminShipmentsTableDataProps {
 
 export async function AdminShipmentsTableData({ searchParams }: AdminShipmentsTableDataProps) {
     const raw = await searchParams;
-    const shipments = await getAllShipments(raw.status, raw.sortBy, raw.sortOrder);
+    const page = parseInt(raw.page || "1", 10) || 1;
+    const result = await getAllShipments(raw.status, raw.sortBy, raw.sortOrder, page);
 
     return (
         <div className="bg-paper border border-line rounded-r2 overflow-hidden">
@@ -30,14 +32,14 @@ export async function AdminShipmentsTableData({ searchParams }: AdminShipmentsTa
                     </TableRow>
                 </TableHeader>
                 <TableBody>
-                    {shipments.length === 0 ? (
+                    {result.data.length === 0 ? (
                         <TableRow>
                             <TableCell colSpan={6} className="text-center text-ink-2">
                                 No hay envíos registrados.
                             </TableCell>
                         </TableRow>
                     ) : (
-                        shipments.map((s) => (
+                        result.data.map((s) => (
                             <TableRow key={s.id}>
                                 <TableCell className="text-ink-3 font-mono text-xs">
                                     {s.tracking_code}
@@ -91,6 +93,7 @@ export async function AdminShipmentsTableData({ searchParams }: AdminShipmentsTa
                     )}
                 </TableBody>
             </Table>
+            <Pagination currentPage={result.page} totalPages={result.totalPages} />
         </div>
     );
 }

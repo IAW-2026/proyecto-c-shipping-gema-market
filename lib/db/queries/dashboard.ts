@@ -3,7 +3,8 @@ import type { Prisma } from "@/lib/generated/prisma/client";
 import { AddressSchema, ShippingStatusSchema } from "@/lib/definitions/shipments";
 import type { ShipmentSummary } from "@/lib/definitions/shipments";
 import type { DashboardMetrics, OperatorDashboardData, PerformanceData, WeekData } from "@/lib/definitions/dashboard-metrics";
-import type { AdminDashboardMetrics, AdminDriver, AdminShipment, AdminRate, AdminDriverDetail } from "@/lib/definitions/admin-dashboard-metrics";
+import type { AdminDashboardMetrics, AdminDriver, AdminShipment, AdminRate, AdminDriverDetail, DriverEnvio } from "@/lib/definitions/admin-dashboard-metrics";
+import type { PaginatedResult } from "@/lib/definitions/shipments/filters";
 import { getSettlements } from "./settlement";
 import { cacheLife } from "next/cache";
 
@@ -241,8 +242,10 @@ export async function getAdminDashboardMetrics(): Promise<AdminDashboardMetrics>
 
 export async function getAllDrivers(
         query?: string,
-        bannedFilter?: "all" | "banned" | "active"
-    ): Promise<AdminDriver[]> {
+        bannedFilter?: "all" | "banned" | "active",
+        page: number = 1,
+        pageSize: number = 20,
+    ): Promise<PaginatedResult<AdminDriver>> {
     "use cache";
     cacheLife("minutes");
 
@@ -251,28 +254,41 @@ export async function getAllDrivers(
         if (bannedFilter === "banned") where.banned = true;
         else if (bannedFilter === "active") where.banned = false;
 
-        const drivers = await prisma.usuario.findMany({
-            where,
-            include: { _count: { select: { envios: true } } },
-            orderBy: { created_at: "desc" },
-        });
+        const [drivers, total] = await Promise.all([
+            prisma.usuario.findMany({
+                where,
+                include: { _count: { select: { envios: true } } },
+                orderBy: { created_at: "desc" },
+                skip: (page - 1) * pageSize,
+                take: pageSize,
+            }),
+            prisma.usuario.count({ where }),
+        ]);
 
-        return drivers.map((d) => ({
-            id: d.id,
-            full_name: d.full_name,
-            email: d.email,
-            role: d.role,
-            banned: d.banned,
-            created_at: d.created_at,
-            totalEnvios: d._count.envios,
-        }));
+        return {
+            data: drivers.map((d) => ({
+                id: d.id,
+                full_name: d.full_name,
+                email: d.email,
+                role: d.role,
+                banned: d.banned,
+                created_at: d.created_at,
+                totalEnvios: d._count.envios,
+            })),
+            total,
+            page,
+            pageSize,
+            totalPages: Math.ceil(total / pageSize),
+        };
 }
 
 export async function getAllShipments(
         status?: string,
         sortBy?: string,
-        sortOrder?: string
-    ): Promise<AdminShipment[]> {
+        sortOrder?: string,
+        page: number = 1,
+        pageSize: number = 20,
+    ): Promise<PaginatedResult<AdminShipment>> {
     "use cache";
     cacheLife("minutes");
 
@@ -288,11 +304,16 @@ export async function getAllShipments(
             ? { operador: { full_name: dir } }
             : { [field]: dir };
 
-        const shipments = await prisma.envio.findMany({
-            where,
-            orderBy,
-            include: { operador: { select: { full_name: true } } },
-        });
+        const [shipments, total] = await Promise.all([
+            prisma.envio.findMany({
+                where,
+                orderBy,
+                include: { operador: { select: { full_name: true } } },
+                skip: (page - 1) * pageSize,
+                take: pageSize,
+            }),
+            prisma.envio.count({ where }),
+        ]);
 
         const mapped = shipments.map((e) => ({
             id: e.id,
@@ -316,35 +337,54 @@ export async function getAllShipments(
             });
         }
 
-        return mapped;
+        return {
+            data: mapped,
+            total,
+            page,
+            pageSize,
+            totalPages: Math.ceil(total / pageSize),
+        };
 }
 
-export async function getAllRates(): Promise<AdminRate[]> {
+export async function getAllRates(
+        page: number = 1,
+        pageSize: number = 20,
+    ): Promise<PaginatedResult<AdminRate>> {
     "use cache";
     cacheLife("minutes");
 
-        const rates = await prisma.tarifa.findMany({ orderBy: { id: "asc" } });
+        const [rates, total] = await Promise.all([
+            prisma.tarifa.findMany({
+                orderBy: { id: "asc" },
+                skip: (page - 1) * pageSize,
+                take: pageSize,
+            }),
+            prisma.tarifa.count(),
+        ]);
 
-        return rates.map((r) => {
-            const wr = r.weight_range as { min: number; max: number };
-            return {
-                id: r.id,
-                weight_min: wr.min,
-                weight_max: wr.max,
-                price_per_km: Number(r.price_per_km),
-            };
-        });
+        return {
+            data: rates.map((r) => {
+                const wr = r.weight_range as { min: number; max: number };
+                return {
+                    id: r.id,
+                    weight_min: wr.min,
+                    weight_max: wr.max,
+                    price_per_km: Number(r.price_per_km),
+                };
+            }),
+            total,
+            page,
+            pageSize,
+            totalPages: Math.ceil(total / pageSize),
+        };
 }
 
-export async function getDriverById(driverId: string): Promise<AdminDriverDetail | null> {
+export async function getDriverById(driverId: string): Promise<Omit<AdminDriverDetail, "envios"> | null> {
     "use cache";
     cacheLife("minutes");
 
         const driver = await prisma.usuario.findUnique({
             where: { id: driverId },
-            include: {
-                envios: { orderBy: { created_at: "desc" } },
-            },
         });
 
         if (!driver) return null;
@@ -356,7 +396,31 @@ export async function getDriverById(driverId: string): Promise<AdminDriverDetail
             role: driver.role,
             banned: driver.banned,
             created_at: driver.created_at,
-            envios: driver.envios.map((e) => ({
+        };
+}
+
+export async function getDriverShipments(
+        driverId: string,
+        page: number = 1,
+        pageSize: number = 20,
+    ): Promise<PaginatedResult<DriverEnvio>> {
+    "use cache";
+    cacheLife("minutes");
+
+        const where: Prisma.EnvioWhereInput = { logistics_id: driverId };
+
+        const [envios, total] = await Promise.all([
+            prisma.envio.findMany({
+                where,
+                orderBy: { created_at: "desc" },
+                skip: (page - 1) * pageSize,
+                take: pageSize,
+            }),
+            prisma.envio.count({ where }),
+        ]);
+
+        return {
+            data: envios.map((e) => ({
                 id: e.id,
                 order_id: e.order_id,
                 tracking_code: e.tracking_code,
@@ -364,5 +428,9 @@ export async function getDriverById(driverId: string): Promise<AdminDriverDetail
                 price: Number(e.price),
                 created_at: e.created_at,
             })),
+            total,
+            page,
+            pageSize,
+            totalPages: Math.ceil(total / pageSize),
         };
 }

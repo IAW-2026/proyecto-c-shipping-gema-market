@@ -9,7 +9,9 @@ import { Plus } from "lucide-react";
 
 
 
-export default function AdminRatesPage() {
+export default function AdminRatesPage(props: {
+    searchParams: Promise<{ [key: string]: string | undefined }>
+}) {
     return (
         <PageWrapper>
             <Header title="Tarifas" subtitle="Configuración" />
@@ -22,7 +24,7 @@ export default function AdminRatesPage() {
                 </div>
 
                 <Suspense fallback={<AdminRatesTableSkeleton />}>
-                    <AdminRatesTableData />
+                    <AdminRatesTableData searchParams={props.searchParams} />
                 </Suspense>
             </Content>
         </PageWrapper>

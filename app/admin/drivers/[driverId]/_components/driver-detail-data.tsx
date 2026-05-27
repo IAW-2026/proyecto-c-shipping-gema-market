@@ -1,22 +1,30 @@
 import { notFound } from "next/navigation";
-import { getDriverById } from "@/lib/db/queries/dashboard";
+import { getDriverById, getDriverShipments } from "@/lib/db/queries/dashboard";
+import { getShipmentCountsByStatus } from "@/lib/db/queries/shipment";
 import { formatDate } from "@/lib/shared/date-utils";
 import { Package, CheckCircle, Clock } from "lucide-react";
 import { Header, Content, PageWrapper } from "../../../_components";
 import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from "@/components/ui/table";
+import { Pagination } from "@/components/ui/pagination";
 import { MetricCard } from "@/components/ui/metric-card";
 import { AdminShipmentStatusBadge } from "../../../_components/admin-shipment-status-badge";
 
-export async function DriverDetailData({ params }: { params: Promise<{ driverId: string }> }) {
+export async function DriverDetailData({ params, searchParams }: { params: Promise<{ driverId: string }>; searchParams: Promise<{ [key: string]: string | undefined }> }) {
     const { driverId } = await params;
-    const driver = await getDriverById(driverId);
+    const raw = await searchParams;
+    const page = parseInt(raw.page || "1", 10) || 1;
+
+    const [driver, shipmentsResult, countsByStatus] = await Promise.all([
+        getDriverById(driverId),
+        getDriverShipments(driverId, page),
+        getShipmentCountsByStatus(driverId),
+    ]);
+
     if (!driver) notFound();
 
-    const total = driver.envios.length;
-    const delivered = driver.envios.filter((e) => e.status === "delivered").length;
-    const active = driver.envios.filter((e) =>
-        ["pending_pickup", "picked_up", "in_transit"].includes(e.status)
-    ).length;
+    const total = shipmentsResult.total;
+    const delivered = countsByStatus.delivered ?? 0;
+    const active = (countsByStatus.pending_pickup ?? 0) + (countsByStatus.picked_up ?? 0) + (countsByStatus.in_transit ?? 0);
 
     return (
         <PageWrapper>
@@ -70,14 +78,14 @@ export async function DriverDetailData({ params }: { params: Promise<{ driverId:
                             </TableRow>
                         </TableHeader>
                         <TableBody>
-                            {driver.envios.length === 0 ? (
+                            {shipmentsResult.data.length === 0 ? (
                                 <TableRow>
                                     <TableCell colSpan={4} className="text-center text-ink-2">
                                         Este repartidor no tiene envíos registrados.
                                     </TableCell>
                                 </TableRow>
                             ) : (
-                                driver.envios.map((e) => (
+                                shipmentsResult.data.map((e) => (
                                     <TableRow key={e.id}>
                                         <TableCell className="text-ink-3 font-mono text-xs">{e.id}</TableCell>
                                         <TableCell>
@@ -92,6 +100,7 @@ export async function DriverDetailData({ params }: { params: Promise<{ driverId:
                             )}
                         </TableBody>
                     </Table>
+                    <Pagination currentPage={shipmentsResult.page} totalPages={shipmentsResult.totalPages} />
                 </div>
             </Content>
         </PageWrapper>

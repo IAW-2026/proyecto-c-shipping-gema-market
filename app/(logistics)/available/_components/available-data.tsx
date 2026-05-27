@@ -3,6 +3,7 @@ import type { ShipmentFilterParams } from "@/lib/definitions/shipments";
 import { AvailableShipmentCard } from "./shipment-card";
 import { getAuthenticatedUserId } from "@/lib/auth/get-authenticated-user";
 import { AvailableSearchParamsSchema } from "@/lib/validations/shipment";
+import { Pagination } from "@/components/ui/pagination";
 
 interface AvailableDataProps {
     searchParams: Promise<{ [key: string]: string | undefined }>;
@@ -37,23 +38,28 @@ export async function AvailableData({ searchParams }: AvailableDataProps) {
         priceMax: params.priceMax,
         distanceMin: params.distanceMin,
         distanceMax: params.distanceMax,
+        page: params.page,
+        pageSize: params.pageSize,
     };
 
-    const offers = await getAvailableShipments(filterParams);
+    const result = await getAvailableShipments(filterParams);
     return (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {offers.length === 0 ? (
-                <p className="col-span-full text-center text-ink-3 py-12">
-                    No hay envíos disponibles para tomar en este momento.
-                </p>
-            ) : (
-                offers.map((offer) => (
-                    <AvailableShipmentCard
-                        key={offer.shippingId}
-                        offer={offer}
-                    />
-                ))
-            )}
-        </div>
+        <>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {result.data.length === 0 ? (
+                    <p className="col-span-full text-center text-ink-3 py-12">
+                        No hay envíos disponibles para tomar en este momento.
+                    </p>
+                ) : (
+                    result.data.map((offer) => (
+                        <AvailableShipmentCard
+                            key={offer.shippingId}
+                            offer={offer}
+                        />
+                    ))
+                )}
+            </div>
+            <Pagination currentPage={result.page} totalPages={result.totalPages} />
+        </>
     );
 }

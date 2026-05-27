@@ -4,6 +4,7 @@ import { formatDate } from "@/lib/shared/date-utils";
 import { ToggleBanButton } from "./toggle-ban-button";
 import { DeleteDriverButton } from "./delete-driver-button";
 import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from "@/components/ui/table";
+import { Pagination } from "@/components/ui/pagination";
 import { Badge } from "@/components/ui/badge";
 
 interface AdminDriversTableDataProps {
@@ -12,7 +13,8 @@ interface AdminDriversTableDataProps {
 
 export async function AdminDriversTableData({ searchParams }: AdminDriversTableDataProps) {
     const raw = await searchParams;
-    const drivers = await getAllDrivers(raw.search, raw.banned as "all" | "banned" | "active" | undefined);
+    const page = parseInt(raw.page || "1", 10) || 1;
+    const result = await getAllDrivers(raw.search, raw.banned as "all" | "banned" | "active" | undefined, page);
 
     return (
         <div className="bg-paper border border-line rounded-r2 overflow-hidden">
@@ -28,14 +30,14 @@ export async function AdminDriversTableData({ searchParams }: AdminDriversTableD
                     </TableRow>
                 </TableHeader>
                 <TableBody>
-                    {drivers.length === 0 ? (
+                    {result.data.length === 0 ? (
                         <TableRow>
                             <TableCell colSpan={6} className="text-center text-ink-2">
                                 No hay repartidores registrados.
                             </TableCell>
                         </TableRow>
                     ) : (
-                        drivers.map((d) => (
+                        result.data.map((d) => (
                             <TableRow key={d.id}>
                                 <TableCell>
                                     <Link href={`/admin/drivers/${d.id}`} className="text-cocoa hover:underline font-medium">
@@ -66,6 +68,7 @@ export async function AdminDriversTableData({ searchParams }: AdminDriversTableD
                     )}
                 </TableBody>
             </Table>
+            <Pagination currentPage={result.page} totalPages={result.totalPages} />
         </div>
     );
 }

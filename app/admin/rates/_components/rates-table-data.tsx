@@ -2,9 +2,12 @@ import { getAllRates } from "@/lib/db/queries/dashboard";
 import { updateRateAction } from "@/lib/actions/admin.actions";
 import { DeleteRateButton } from "./delete-rate-button";
 import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from "@/components/ui/table";
+import { Pagination } from "@/components/ui/pagination";
 
-export async function AdminRatesTableData() {
-    const rates = await getAllRates();
+export async function AdminRatesTableData({ searchParams }: { searchParams: Promise<{ [key: string]: string | undefined }> }) {
+    const raw = await searchParams;
+    const page = parseInt(raw.page || "1", 10) || 1;
+    const result = await getAllRates(page);
 
     return (
         <div className="bg-paper border border-line rounded-r2 overflow-hidden">
@@ -17,14 +20,14 @@ export async function AdminRatesTableData() {
                     </TableRow>
                 </TableHeader>
                 <TableBody>
-                    {rates.length === 0 ? (
+                    {result.data.length === 0 ? (
                         <TableRow>
                             <TableCell colSpan={3} className="text-center text-ink-2">
                                 No hay tarifas configuradas.
                             </TableCell>
                         </TableRow>
                     ) : (
-                        rates.map((r) => (
+                        result.data.map((r) => (
                             <TableRow key={r.id}>
                                 <TableCell className="text-ink-3">
                                     {r.weight_min} — {r.weight_max} kg
@@ -60,6 +63,7 @@ export async function AdminRatesTableData() {
                     )}
                 </TableBody>
             </Table>
+            <Pagination currentPage={result.page} totalPages={result.totalPages} />
         </div>
     );
 }

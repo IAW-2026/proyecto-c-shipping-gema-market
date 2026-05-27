@@ -254,9 +254,12 @@ export async function getShipmentHistory(userId: string): Promise<ShipmentSummar
         return envios.map(toShipmentSummary);
 }
 
-export async function getAvailableShipments(params?: ShipmentFilterParams): Promise<ShipmentOffer[]> {
+export async function getAvailableShipments(params?: ShipmentFilterParams): Promise<PaginatedResult<ShipmentOffer>> {
     "use cache";
     cacheLife("minutes");
+
+        const page = params?.page ?? 1;
+        const pageSize = params?.pageSize ?? 20;
 
         const where: Prisma.EnvioWhereInput = {
             status: 'waiting_for_courier',
@@ -297,13 +300,24 @@ export async function getAvailableShipments(params?: ShipmentFilterParams): Prom
             ? buildOrderBy(params.sortBy, params.sortOrder)
             : { created_at: 'desc' as const };
 
-        const envios = await prisma.envio.findMany({
-            where,
-            orderBy,
-            select: offerSelect,
-        });
+        const [envios, total] = await Promise.all([
+            prisma.envio.findMany({
+                where,
+                orderBy,
+                select: offerSelect,
+                skip: (page - 1) * pageSize,
+                take: pageSize,
+            }),
+            prisma.envio.count({ where }),
+        ]);
 
-        return envios.map(toShipmentOffer);
+        return {
+            data: envios.map(toShipmentOffer),
+            total,
+            page,
+            pageSize,
+            totalPages: Math.ceil(total / pageSize),
+        };
 }
 
 export async function getEnvioCoords(envioId: string) {
