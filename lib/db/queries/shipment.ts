@@ -350,8 +350,8 @@ export interface CreateEnvioData {
   route_duration: number | null;
 }
 
-export async function createEnvioRecord(data: CreateEnvioData) {
-  return prisma.envio.create({
+export async function createEnvioRecord(data: CreateEnvioData, client: Prisma.TransactionClient | typeof prisma = prisma) {
+  return client.envio.create({
     data: {
       id: data.id,
       order_id: data.order_id,

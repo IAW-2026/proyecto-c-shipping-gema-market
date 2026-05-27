@@ -5,6 +5,7 @@ import type { z } from "zod";
 import type { createShipmentSchema } from "@/lib/validations/api-schemas";
 import { createEnvioRecord, type CreateEnvioData } from "@/lib/db/queries/shipment";
 import { findReservedCotizacion, confirmCotizacion } from "@/lib/db/queries/quote";
+import prisma from "@/lib/db/prisma";
 type CreateShipmentRequest = z.infer<typeof createShipmentSchema>;
 
 function generateTrackingCode(): string {
@@ -60,33 +61,37 @@ export async function createShipment(
         depth: number;
     };
 
-    const envio = await createEnvioRecord({
-        id: generatePrefixedId("shp"),
-        order_id,
-        quote_id: cotizacion.id,
-        buyer_id,
-        receiver_name: receiver_name ?? "Comprador",
-        receiver_phone: receiver_phone ?? "Sin teléfono",
-        seller_id,
-        weight: packageDetails.weight ?? 0,
-        dimensions: {
-            width: packageDetails.width ?? 0,
-            height: packageDetails.height ?? 0,
-            depth: packageDetails.depth ?? 0,
-        },
-        pickup_address: cotizacion.origin_address as any,
-        delivery_address: cotizacion.destination_address as any,
-        tracking_code,
-        price: cotizacion.price,
-        pickup_lat: (cotizacion.pickup_lat as number | undefined) ?? null,
-        pickup_lng: (cotizacion.pickup_lng as number | undefined) ?? null,
-        delivery_lat: (cotizacion.delivery_lat as number | undefined) ?? null,
-        delivery_lng: (cotizacion.delivery_lng as number | undefined) ?? null,
-        route_distance: (cotizacion.route_distance as number | undefined) ?? null,
-        route_duration: (cotizacion.route_duration as number | undefined) ?? null,
-    });
+    const [envio] = await prisma.$transaction(async (tx) => {
+        const e = await createEnvioRecord({
+            id: generatePrefixedId("shp"),
+            order_id,
+            quote_id: cotizacion.id,
+            buyer_id,
+            receiver_name: receiver_name ?? "Comprador",
+            receiver_phone: receiver_phone ?? "Sin teléfono",
+            seller_id,
+            weight: packageDetails.weight ?? 0,
+            dimensions: {
+                width: packageDetails.width ?? 0,
+                height: packageDetails.height ?? 0,
+                depth: packageDetails.depth ?? 0,
+            },
+            pickup_address: cotizacion.origin_address as any,
+            delivery_address: cotizacion.destination_address as any,
+            tracking_code,
+            price: cotizacion.price,
+            pickup_lat: (cotizacion.pickup_lat as number | undefined) ?? null,
+            pickup_lng: (cotizacion.pickup_lng as number | undefined) ?? null,
+            delivery_lat: (cotizacion.delivery_lat as number | undefined) ?? null,
+            delivery_lng: (cotizacion.delivery_lng as number | undefined) ?? null,
+            route_distance: (cotizacion.route_distance as number | undefined) ?? null,
+            route_duration: (cotizacion.route_duration as number | undefined) ?? null,
+        }, tx);
 
-    await confirmCotizacion(cotizacion.id);
+        await confirmCotizacion(cotizacion.id, tx);
+
+        return [e];
+    });
 
     return {
         shipping_id: envio.id,

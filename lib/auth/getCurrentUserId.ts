@@ -15,51 +15,27 @@ const getCurrentUserId = cache(async (clerkUser?: User | null): Promise<string |
     const full_name = `${clerkUser.firstName ?? ""} ${clerkUser.lastName ?? ""}`.trim();
     const clerkRole = (clerkUser.publicMetadata?.role as string) ?? "logistics";
 
-    const existing = await prisma.usuario.findUnique({
+    const user = await prisma.usuario.upsert({
         where: { clerk_user_id: clerkUserId },
-        select: { id: true, role: true },
+        update: { email, full_name, role: clerkRole },
+        create: {
+            id: generatePrefixedId("usr"),
+            clerk_user_id: clerkUserId,
+            email,
+            full_name,
+            role: clerkRole,
+        },
+        select: { id: true },
     });
 
-    if (existing) {
-        if (existing.role !== clerkRole) {
-            await prisma.usuario.update({
-                where: { id: existing.id },
-                data: { role: clerkRole, email, full_name },
-            });
-        }
-        return existing.id;
-    }
-
-    try {
-        const created = await prisma.usuario.create({
-            data: {
-                id: generatePrefixedId("usr"),
-                clerk_user_id: clerkUserId,
-                email,
-                full_name,
-                role: clerkRole,
-            },
-            select: { id: true },
+    if (!clerkUser.publicMetadata?.role) {
+        const client = await clerkClient();
+        await client.users.updateUser(clerkUserId, {
+            publicMetadata: { role: clerkRole },
         });
-
-        if (!clerkUser.publicMetadata?.role) {
-            const client = await clerkClient();
-            await client.users.updateUser(clerkUserId, {
-                publicMetadata: { role: clerkRole },
-            });
-        }
-
-        return created.id;
-    } catch (error: any) {
-        if (error?.code === "P2002") {
-            const refetched = await prisma.usuario.findUnique({
-                where: { clerk_user_id: clerkUserId },
-                select: { id: true },
-            });
-            return refetched?.id ?? null;
-        }
-        throw error;
     }
+
+    return user.id;
 });
 
 export default getCurrentUserId;

@@ -16,15 +16,17 @@ export async function deleteDriverAction(driverId: string) {
             return { success: false, error: "No puedes eliminarte a ti mismo" };
         }
 
-        await prisma.envio.updateMany({
-            where: {
-                logistics_id: driverId,
-                status: { in: ["pending_pickup", "picked_up", "in_transit"] },
-            },
-            data: { logistics_id: null, status: "waiting_for_courier", picked_up_at: null, delivered_at: null },
-        });
+        await prisma.$transaction(async (tx) => {
+            await tx.envio.updateMany({
+                where: {
+                    logistics_id: driverId,
+                    status: { in: ["pending_pickup", "picked_up", "in_transit"] },
+                },
+                data: { logistics_id: null, status: "waiting_for_courier", picked_up_at: null, delivered_at: null },
+            });
 
-        await prisma.usuario.delete({ where: { id: driverId } });
+            await tx.usuario.delete({ where: { id: driverId } });
+        });
 
         revalidatePath("/admin/drivers");
         revalidatePath("/admin/dashboard");
@@ -140,25 +142,30 @@ export async function createRateAction(weightMin: number, weightMax: number, pri
         }
         if (pricePerKm < 0) return { success: false, error: "El precio por km no puede ser negativo" };
 
-        const overlapping = await prisma.tarifa.findFirst({
-            where: {
-                AND: [
-                    { weight_range: { path: ["max"], gte: weightMin } },
-                    { weight_range: { path: ["min"], lte: weightMax } },
-                ],
-            },
-        });
-        if (overlapping) {
-            return { success: false, error: "El rango de peso se superpone con una tarifa existente" };
-        }
+        await prisma.$transaction(
+            async (tx) => {
+                const overlapping = await tx.tarifa.findFirst({
+                    where: {
+                        AND: [
+                            { weight_range: { path: ["max"], gte: weightMin } },
+                            { weight_range: { path: ["min"], lte: weightMax } },
+                        ],
+                    },
+                });
+                if (overlapping) {
+                    throw new Error("El rango de peso se superpone con una tarifa existente");
+                }
 
-        await prisma.tarifa.create({
-            data: {
-                id: generatePrefixedId("trf"),
-                weight_range: { min: weightMin, max: weightMax },
-                price_per_km: pricePerKm,
+                await tx.tarifa.create({
+                    data: {
+                        id: generatePrefixedId("trf"),
+                        weight_range: { min: weightMin, max: weightMax },
+                        price_per_km: pricePerKm,
+                    },
+                });
             },
-        });
+            { isolationLevel: "Serializable" }
+        );
 
         revalidatePath("/admin/rates");
         return { success: true };

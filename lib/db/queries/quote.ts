@@ -1,4 +1,5 @@
 import prisma from "@/lib/db/prisma";
+import { Prisma } from "@/lib/generated/prisma/client";
 import { generatePrefixedId } from "@/lib/shared/utils";
 
 export interface TarifaRecord {
@@ -92,8 +93,8 @@ export async function findReservedCotizacion(orderId: string) {
     });
 }
 
-export async function confirmCotizacion(quoteId: string) {
-    return prisma.cotizacion.update({
+export async function confirmCotizacion(quoteId: string, client: Prisma.TransactionClient | typeof prisma = prisma) {
+    return client.cotizacion.update({
         where: { id: quoteId },
         data: { status: "confirmed" },
     });
