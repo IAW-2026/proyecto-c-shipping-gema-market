@@ -1,27 +1,18 @@
 import { getAvailableShipments } from "@/lib/db/queries/shipment";
 import type { ShipmentFilterParams } from "@/lib/definitions/shipments";
 import { AvailableShipmentCard } from "./shipment-card";
-import { getAuthContext } from "@/lib/auth/context";
-import { getInternalUserId } from "@/lib/auth/get-internal-user-id";
+import { getAuthenticatedUserId } from "@/lib/auth/get-authenticated-user";
 import { AvailableSearchParamsSchema } from "@/lib/validations/shipment";
-import prisma from "@/lib/db/prisma";
 
 interface AvailableDataProps {
     searchParams: Promise<{ [key: string]: string | undefined }>;
 }
 
 export async function AvailableData({ searchParams }: AvailableDataProps) {
-    const { clerkUserId } = await getAuthContext();
-    if (!clerkUserId) return null;
-    const user = await getInternalUserId(clerkUserId);
+    const user = await getAuthenticatedUserId();
     if (!user) return null;
 
-    const dbUser = await prisma.usuario.findUnique({
-        where: { id: user.id },
-        select: { banned: true },
-    });
-
-    if (dbUser?.banned) {
+    if (user.banned) {
         return (
             <div className="col-span-full text-center py-12">
                 <p className="text-red-600 font-semibold text-lg mb-2">

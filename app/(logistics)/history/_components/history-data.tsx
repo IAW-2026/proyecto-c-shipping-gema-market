@@ -2,8 +2,7 @@ import { getFilteredShipments, getShipmentCountsByStatus } from "@/lib/db/querie
 import type { ShipmentFilterParams } from "@/lib/definitions/shipments";
 import type { ShipmentStatus } from "@/lib/shared/shipment-constants";
 import { HistorySearchParamsSchema } from "@/lib/validations/shipment";
-import { getAuthContext } from "@/lib/auth/context";
-import { getInternalUserId } from "@/lib/auth/get-internal-user-id";
+import { getAuthenticatedUserId } from "@/lib/auth/get-authenticated-user";
 import { HistoryTabs } from "./history-tabs";
 import { HistoryTable } from "./history-table";
 import { Pagination } from "@/components/ui/pagination";
@@ -22,9 +21,7 @@ interface HistoryDataProps {
 }
 
 export async function HistoryData({ searchParams }: HistoryDataProps) {
-    const { clerkUserId } = await getAuthContext();
-    if (!clerkUserId) return null;
-    const user = await getInternalUserId(clerkUserId);
+    const user = await getAuthenticatedUserId();
     if (!user) return null;
 
     const raw = await searchParams;

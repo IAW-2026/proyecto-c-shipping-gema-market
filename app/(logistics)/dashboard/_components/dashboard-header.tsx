@@ -1,8 +1,7 @@
 import Link from "next/link";
 import { Plus } from "lucide-react";
 import { Header } from "../../_components/page-layout";
-import { auth } from "@clerk/nextjs/server";
-import { getUserFromCache } from "@/lib/auth/user-cache";
+import { getAuthenticatedUserId } from "@/lib/auth/get-authenticated-user";
 
 export function DashboardHeaderSkeleton() {
     return (
@@ -14,9 +13,8 @@ export function DashboardHeaderSkeleton() {
 }
 
 export async function DashboardHeader() {
-    const { userId: clerkUserId } = await auth();
-    const cached = clerkUserId ? getUserFromCache(clerkUserId) : null;
-    const firstName = cached?.firstName || "Operador";
+    const user = await getAuthenticatedUserId();
+    const firstName = user?.full_name?.split(" ")[0] || "Operador";
 
     const takeShipmentButton = (
         <Link

@@ -1,6 +1,5 @@
 import { getActiveShipments } from "@/lib/db/queries/dashboard";
-import { getAuthContext } from "@/lib/auth/context";
-import { getInternalUserId } from "@/lib/auth/get-internal-user-id";
+import { getAuthenticatedUserId } from "@/lib/auth/get-authenticated-user";
 import { CourierData } from "./courier-data";
 import { CourierEmpty } from "./courier-empty";
 
@@ -9,9 +8,7 @@ interface CourierContentProps {
 }
 
 export async function CourierContent({ searchParams }: CourierContentProps) {
-    const { clerkUserId } = await getAuthContext();
-    if (!clerkUserId) return null;
-    const user = await getInternalUserId(clerkUserId);
+    const user = await getAuthenticatedUserId();
     if (!user) return null;
 
     const shipments = await getActiveShipments(user.id);
