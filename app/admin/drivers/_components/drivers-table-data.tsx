@@ -1,16 +1,16 @@
 import Link from "next/link";
 import { getAllDrivers } from "@/lib/db/queries/dashboard";
+import { formatDate } from "@/lib/shared/date-utils";
 import { ToggleBanButton } from "./toggle-ban-button";
 import { DeleteDriverButton } from "./delete-driver-button";
 
-export async function AdminDriversTableData({
-    search,
-    banned,
-}: {
-    search?: string;
-    banned?: "all" | "banned" | "active";
-}) {
-    const drivers = await getAllDrivers(search, banned);
+interface AdminDriversTableDataProps {
+    searchParams: Promise<{ [key: string]: string | undefined }>;
+}
+
+export async function AdminDriversTableData({ searchParams }: AdminDriversTableDataProps) {
+    const raw = await searchParams;
+    const drivers = await getAllDrivers(raw.search, raw.banned as "all" | "banned" | "active" | undefined);
 
     return (
         <div className="bg-paper border border-line rounded-r2 overflow-hidden">
@@ -50,7 +50,7 @@ export async function AdminDriversTableData({
                                 </td>
                                 <td className="px-4 py-3 text-ink-3">{d.totalEnvios}</td>
                                 <td className="px-4 py-3 text-ink-2">
-                                    {d.created_at.toLocaleDateString("es-AR")}
+                                    {formatDate(d.created_at, { day: "2-digit", month: "2-digit", year: "numeric" })} 
                                 </td>
                                 <td className="px-4 py-3 text-center">
                                     <div className="flex items-center justify-center gap-2">

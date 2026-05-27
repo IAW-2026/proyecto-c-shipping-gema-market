@@ -1,39 +1,27 @@
 import { getAvailableShipments } from "@/lib/db/queries/shipment";
 import type { ShipmentFilterParams } from "@/lib/definitions/shipments";
 import { AvailableShipmentCard } from "./shipment-card";
-import { requireRole } from "@/lib/auth/rbac";
-import { ROLES } from "@/lib/definitions/auth";
+import { getAuthContext } from "@/lib/auth/context";
+import { getInternalUserId } from "@/lib/auth/get-internal-user-id";
+import { AvailableSearchParamsSchema } from "@/lib/validations/shipment";
 import prisma from "@/lib/db/prisma";
 
 interface AvailableDataProps {
-    sortBy?: string;
-    sortOrder?: "asc" | "desc";
-    weightMin?: number;
-    weightMax?: number;
-    priceMin?: number;
-    priceMax?: number;
-    distanceMin?: number;
-    distanceMax?: number;
+    searchParams: Promise<{ [key: string]: string | undefined }>;
 }
 
-export async function AvailableData({
-    sortBy,
-    sortOrder,
-    weightMin,
-    weightMax,
-    priceMin,
-    priceMax,
-    distanceMin,
-    distanceMax,
-}: AvailableDataProps) {
-    const { userId } = await requireRole([ROLES.LOGISTICS]);
+export async function AvailableData({ searchParams }: AvailableDataProps) {
+    const { clerkUserId } = await getAuthContext();
+    if (!clerkUserId) return null;
+    const user = await getInternalUserId(clerkUserId);
+    if (!user) return null;
 
-    const user = await prisma.usuario.findUnique({
-        where: { id: userId },
+    const dbUser = await prisma.usuario.findUnique({
+        where: { id: user.id },
         select: { banned: true },
     });
 
-    if (user?.banned) {
+    if (dbUser?.banned) {
         return (
             <div className="col-span-full text-center py-12">
                 <p className="text-red-600 font-semibold text-lg mb-2">
@@ -46,18 +34,21 @@ export async function AvailableData({
         );
     }
 
-    const params: ShipmentFilterParams = {
-        sortBy: sortBy as ShipmentFilterParams["sortBy"],
-        sortOrder,
-        weightMin,
-        weightMax,
-        priceMin,
-        priceMax,
-        distanceMin,
-        distanceMax,
+    const raw = await searchParams;
+    const params = AvailableSearchParamsSchema.parse(raw);
+
+    const filterParams: ShipmentFilterParams = {
+        sortBy: params.sortBy as ShipmentFilterParams["sortBy"],
+        sortOrder: params.sortOrder,
+        weightMin: params.weightMin,
+        weightMax: params.weightMax,
+        priceMin: params.priceMin,
+        priceMax: params.priceMax,
+        distanceMin: params.distanceMin,
+        distanceMax: params.distanceMax,
     };
 
-    const offers = await getAvailableShipments(params);
+    const offers = await getAvailableShipments(filterParams);
     return (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {offers.length === 0 ? (

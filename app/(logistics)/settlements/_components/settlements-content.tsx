@@ -1,4 +1,6 @@
 import { getSettlementsDetail } from "@/lib/db/queries/settlement";
+import { getAuthContext } from "@/lib/auth/context";
+import { getInternalUserId } from "@/lib/auth/get-internal-user-id";
 import { EarningsMetrics } from "./earnings-metrics";
 import { EarningsList } from "./earnings-list";
 
@@ -9,9 +11,14 @@ function currentMonthRange(): { start: Date; end: Date } {
     return { start, end };
 }
 
-export async function SettlementsContent({ userId }: { userId: string }) {
+export async function SettlementsContent() {
+    const { clerkUserId } = await getAuthContext();
+    if (!clerkUserId) return null;
+    const user = await getInternalUserId(clerkUserId);
+    if (!user) return null;
+
     const { start, end } = currentMonthRange();
-    const { settlements, dailyByWeek, ordersByDay } = await getSettlementsDetail(userId, start, end);
+    const { settlements, dailyByWeek, ordersByDay } = await getSettlementsDetail(user.id, start, end);
 
     const monthTrips = settlements.reduce((sum, s) => sum + s.trips, 0);
     const monthTotal = settlements.reduce((sum, s) => sum + s.amount, 0);

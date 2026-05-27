@@ -3,6 +3,7 @@
 import { useState, useCallback, Fragment } from "react";
 import { ChevronRight } from "lucide-react";
 import { cn } from "@/lib/shared/utils";
+import { toDate } from "@/lib/shared/date-utils";
 import { Card } from "@/components/ui/card";
 import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from "@/components/ui/table";
 import type { SettlementPeriod, DailyEarnings, DayOrder } from "@/lib/definitions/shipments";
@@ -21,9 +22,10 @@ function getDayKey(date: Date): string {
     return new Date(date).toISOString().split("T")[0];
 }
 
-function formatDate(date: Date | null): string {
+function formatDate(date: Date | string | null): string {
     if (!date) return "-";
-    return date.toLocaleDateString("es-AR", {
+    const d = toDate(date)!;
+    return d.toLocaleDateString("es-AR", {
         day: "2-digit",
         month: "2-digit",
         hour: "2-digit",

@@ -1,16 +1,10 @@
 import { getShipmentByTrackingCode } from "@/lib/db/queries/shipment";
 import { notFound } from "next/navigation";
+import { formatDateTime } from "@/lib/shared/date-utils";
 import { TrackingTimeline } from "./tracking-timeline";
 import { MapWrapper } from "./map-wrapper";
 import type { Shipment } from "@/lib/definitions/shipments";
 import { SHIPMENT_STATUS_LABELS } from "@/lib/shared/shipment-constants";
-
-function formatDateTime(date: Date | null | undefined): string {
-    if (!date) return "";
-    const d = date.toLocaleDateString("es-AR", { day: "2-digit", month: "2-digit" });
-    const t = date.toLocaleTimeString("es-AR", { hour: "2-digit", minute: "2-digit" });
-    return `${d} ${t}`;
-}
 
 function InfoCard({ shipment }: { shipment: Shipment }) {
     return (
@@ -62,8 +56,9 @@ function InfoCard({ shipment }: { shipment: Shipment }) {
     );
 }
 
-export async function TrackingDetail({ trackingCode }: { trackingCode: string }) {
-    const shipment = await getShipmentByTrackingCode(trackingCode);
+export async function TrackingDetail({ params }: { params: Promise<{ code: string }> }) {
+    const { code } = await params;
+    const shipment = await getShipmentByTrackingCode(code);
 
     if (!shipment) notFound();
 

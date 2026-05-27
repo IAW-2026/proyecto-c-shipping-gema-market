@@ -1,6 +1,9 @@
 import { getFilteredShipments, getShipmentCountsByStatus } from "@/lib/db/queries/shipment";
 import type { ShipmentFilterParams } from "@/lib/definitions/shipments";
 import type { ShipmentStatus } from "@/lib/shared/shipment-constants";
+import { HistorySearchParamsSchema } from "@/lib/validations/shipment";
+import { getAuthContext } from "@/lib/auth/context";
+import { getInternalUserId } from "@/lib/auth/get-internal-user-id";
 import { HistoryTabs } from "./history-tabs";
 import { HistoryTable } from "./history-table";
 import { Pagination } from "@/components/ui/pagination";
@@ -15,29 +18,35 @@ function mapTabToFilter(tabId: string): ShipmentStatus[] | undefined {
 }
 
 interface HistoryDataProps {
-    userId: string;
-    currentStatus: string;
-    searchQuery: string;
-    page: number;
-    pageSize: number;
+    searchParams: Promise<{ [key: string]: string | undefined }>;
 }
 
-export async function HistoryData({ userId, currentStatus, searchQuery, page, pageSize }: HistoryDataProps) {
+export async function HistoryData({ searchParams }: HistoryDataProps) {
+    const { clerkUserId } = await getAuthContext();
+    if (!clerkUserId) return null;
+    const user = await getInternalUserId(clerkUserId);
+    if (!user) return null;
+
+    const raw = await searchParams;
+    const params = HistorySearchParamsSchema.parse(raw);
+    const currentStatus = params.status;
+    const searchQuery = params.search;
+
     const statusFilter = mapTabToFilter(currentStatus);
 
-    const params: ShipmentFilterParams = {
-        logisticsId: userId,
+    const filterParams: ShipmentFilterParams = {
+        logisticsId: user.id,
         status: statusFilter,
         query: searchQuery || undefined,
-        page,
-        pageSize,
+        page: params.page,
+        pageSize: params.pageSize,
         sortBy: 'created_at',
         sortOrder: 'desc',
     };
 
     const [result, countsByStatus] = await Promise.all([
-        getFilteredShipments(params),
-        getShipmentCountsByStatus(userId),
+        getFilteredShipments(filterParams),
+        getShipmentCountsByStatus(user.id),
     ]);
 
     const counts = {

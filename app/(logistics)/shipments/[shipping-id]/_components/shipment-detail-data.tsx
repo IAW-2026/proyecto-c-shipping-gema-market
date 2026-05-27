@@ -11,10 +11,12 @@ import { PackageInfo } from "./package-info";
 
 
 interface ShipmentDetailDataProps {
-    shippingId: string;
+    params: Promise<{ "shipping-id": string }>;
 }
 
-export async function ShipmentDetailData({ shippingId }: ShipmentDetailDataProps) {
+export async function ShipmentDetailData({ params }: ShipmentDetailDataProps) {
+    const resolvedParams = await params;
+    const shippingId = resolvedParams["shipping-id"];
     const shipment = await getShipmentDetails(shippingId);
 
     if (!shipment) {

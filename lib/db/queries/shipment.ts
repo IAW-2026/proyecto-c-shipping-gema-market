@@ -5,6 +5,7 @@ import {
     ShipmentFilterParams, PaginatedResult,
     ShippingStatusSchema, AddressSchema, DimensionsSchema,
 } from "@/lib/definitions/shipments";
+import { cacheLife } from "next/cache";
 
 const summarySelect = {
     id: true,
@@ -186,109 +187,123 @@ function toShipmentOffer(row: {
 }
 
 export async function getShipmentDetails(shippingId: string): Promise<Shipment | null> {
-    const envio = await prisma.envio.findUnique({
-        where: { id: shippingId },
-        select: detailSelect,
-    });
+    "use cache";
+    cacheLife("minutes");
 
-    if (!envio) return null;
-    return toShipmentDetail(envio);
+        const envio = await prisma.envio.findUnique({
+            where: { id: shippingId },
+            select: detailSelect,
+        });
+
+        if (!envio) return null;
+        return toShipmentDetail(envio);
 }
 
 export async function getShipmentByTrackingCode(code: string): Promise<Shipment | null> {
-    const envio = await prisma.envio.findUnique({
-        where: { tracking_code: code },
-        select: detailSelect,
-    });
+    "use cache";
+    cacheLife("minutes");
 
-    if (!envio) return null;
-    return toShipmentDetail(envio);
+        const envio = await prisma.envio.findUnique({
+            where: { tracking_code: code },
+            select: detailSelect,
+        });
+
+        if (!envio) return null;
+        return toShipmentDetail(envio);
 }
 
 export async function getFilteredShipments(params: ShipmentFilterParams): Promise<PaginatedResult<ShipmentSummary>> {
-    const page = params.page ?? 1;
-    const pageSize = params.pageSize ?? 20;
+    "use cache";
+    cacheLife("minutes");
+        const page = params.page ?? 1;
+        const pageSize = params.pageSize ?? 20;
 
-    const where = buildWhere(params);
-    const orderBy = buildOrderBy(params.sortBy, params.sortOrder);
+        const where = buildWhere(params);
+        const orderBy = buildOrderBy(params.sortBy, params.sortOrder);
 
-    const [data, total] = await Promise.all([
-        prisma.envio.findMany({
-            where,
-            orderBy,
-            skip: (page - 1) * pageSize,
-            take: pageSize,
-            select: summarySelect,
-        }),
-        prisma.envio.count({ where }),
-    ]);
+        const [data, total] = await Promise.all([
+            prisma.envio.findMany({
+                where,
+                orderBy,
+                skip: (page - 1) * pageSize,
+                take: pageSize,
+                select: summarySelect,
+            }),
+            prisma.envio.count({ where }),
+        ]);
 
-    return {
-        data: data.map(toShipmentSummary),
-        total,
-        page,
-        pageSize,
-        totalPages: Math.ceil(total / pageSize),
-    };
+        return {
+            data: data.map(toShipmentSummary),
+            total,
+            page,
+            pageSize,
+            totalPages: Math.ceil(total / pageSize),
+        };
 }
 
 export async function getShipmentHistory(userId: string): Promise<ShipmentSummary[]> {
-    const envios = await prisma.envio.findMany({
-        where: { logistics_id: userId },
-        orderBy: { created_at: 'desc' },
-        select: summarySelect,
-    });
+    "use cache";
+    cacheLife("minutes");
 
-    return envios.map(toShipmentSummary);
+        const envios = await prisma.envio.findMany({
+            where: { logistics_id: userId },
+            orderBy: { created_at: 'desc' },
+            select: summarySelect,
+        });
+
+        return envios.map(toShipmentSummary);
 }
 
 export async function getAvailableShipments(params?: ShipmentFilterParams): Promise<ShipmentOffer[]> {
-    const where: Prisma.EnvioWhereInput = {
-        status: 'waiting_for_courier',
-        logistics_id: null,
-    };
+    "use cache";
+    cacheLife("minutes");
 
-    if (params?.query) {
-        where.OR = [
-            { tracking_code: { contains: params.query, mode: 'insensitive' } },
-            { id: { contains: params.query, mode: 'insensitive' } },
-        ];
-    }
+        const where: Prisma.EnvioWhereInput = {
+            status: 'waiting_for_courier',
+            logistics_id: null,
+        };
 
-    const rangeFilters: Prisma.EnvioWhereInput[] = [];
-    if (params?.weightMin !== undefined || params?.weightMax !== undefined) {
-        const wf: { gte?: number; lte?: number } = {};
-        if (params.weightMin !== undefined) wf.gte = params.weightMin;
-        if (params.weightMax !== undefined) wf.lte = params.weightMax;
-        rangeFilters.push({ weight: wf });
-    }
-    if (params?.priceMin !== undefined || params?.priceMax !== undefined) {
-        const pf: { gte?: number; lte?: number } = {};
-        if (params.priceMin !== undefined) pf.gte = params.priceMin;
-        if (params.priceMax !== undefined) pf.lte = params.priceMax;
-        rangeFilters.push({ price: pf });
-    }
-    if (params?.distanceMin !== undefined || params?.distanceMax !== undefined) {
-        const df: { gte?: number; lte?: number } = {};
-        if (params.distanceMin !== undefined) df.gte = params.distanceMin * 1000;
-        if (params.distanceMax !== undefined) df.lte = params.distanceMax * 1000;
-        rangeFilters.push({ route_distance: df });
-    }
-    if (rangeFilters.length > 0) {
-        where.AND = rangeFilters;
-    }
+        if (params?.query) {
+            where.OR = [
+                { tracking_code: { contains: params.query, mode: 'insensitive' } },
+                { id: { contains: params.query, mode: 'insensitive' } },
+            ];
+        }
 
-    const orderBy = params?.sortBy
-        ? buildOrderBy(params.sortBy, params.sortOrder)
-        : { created_at: 'desc' as const };
+        const rangeFilters: Prisma.EnvioWhereInput[] = [];
+        if (params?.weightMin !== undefined || params?.weightMax !== undefined) {
+            const wf: { gte?: number; lte?: number } = {};
+            if (params.weightMin !== undefined) wf.gte = params.weightMin;
+            if (params.weightMax !== undefined) wf.lte = params.weightMax;
+            rangeFilters.push({ weight: wf });
+        }
+        if (params?.priceMin !== undefined || params?.priceMax !== undefined) {
+            const pf: { gte?: number; lte?: number } = {};
+            if (params.priceMin !== undefined) pf.gte = params.priceMin;
+            if (params.priceMax !== undefined) pf.lte = params.priceMax;
+            rangeFilters.push({ price: pf });
+        }
+        if (params?.distanceMin !== undefined || params?.distanceMax !== undefined) {
+            const df: { gte?: number; lte?: number } = {};
+            if (params.distanceMin !== undefined) df.gte = params.distanceMin * 1000;
+            if (params.distanceMax !== undefined) df.lte = params.distanceMax * 1000;
+            rangeFilters.push({ route_distance: df });
+        }
+        if (rangeFilters.length > 0) {
+            where.AND = rangeFilters;
+        }
 
-    const envios = await prisma.envio.findMany({
-        where,
-        orderBy,
-        select: offerSelect,
-    });
+        const orderBy = params?.sortBy
+            ? buildOrderBy(params.sortBy, params.sortOrder)
+            : { created_at: 'desc' as const };
 
-    return envios.map(toShipmentOffer);
+        const envios = await prisma.envio.findMany({
+            where,
+            orderBy,
+            select: offerSelect,
+        });
+
+        return envios.map(toShipmentOffer);
 }
 
 export async function getEnvioCoords(envioId: string) {
@@ -364,16 +379,19 @@ export async function createEnvioRecord(data: CreateEnvioData) {
 }
 
 export async function getShipmentCountsByStatus(userId: string): Promise<Record<string, number>> {
-    const counts = await prisma.envio.groupBy({
-        by: ['status'],
-        where: { logistics_id: userId },
-        _count: { id: true },
-    });
+    "use cache";
+    cacheLife("minutes");
 
-    const result: Record<string, number> = { todos: 0 };
-    for (const group of counts) {
-        result[group.status] = group._count.id;
-        result.todos += group._count.id;
-    }
-    return result;
+        const counts = await prisma.envio.groupBy({
+            by: ['status'],
+            where: { logistics_id: userId },
+            _count: { id: true },
+        });
+
+        const result: Record<string, number> = { todos: 0 };
+        for (const group of counts) {
+            result[group.status] = group._count.id;
+            result.todos += group._count.id;
+        }
+        return result;
 }

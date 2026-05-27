@@ -13,10 +13,7 @@ interface ShipmentDetailPageProps {
     params: Promise<{ "shipping-id": string }>;
 }
 
-export default async function ShipmentDetailPage({ params }: ShipmentDetailPageProps) {
-    const resolvedParams = await params;
-    const shippingId = resolvedParams["shipping-id"];
-
+export default function ShipmentDetailPage({ params }: ShipmentDetailPageProps) {
     return (
         <PageWrapper>
             <Suspense fallback={
@@ -24,7 +21,7 @@ export default async function ShipmentDetailPage({ params }: ShipmentDetailPageP
                     <ShipmentDetailSkeleton />
                 </Content>
             }>
-                <ShipmentDetailData shippingId={shippingId} />
+                <ShipmentDetailData params={params} />
             </Suspense>
         </PageWrapper>
     );

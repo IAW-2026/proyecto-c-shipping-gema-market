@@ -1,4 +1,5 @@
 import { getAllShipments } from "@/lib/db/queries/dashboard";
+import { formatDate } from "@/lib/shared/date-utils";
 import { updateShipmentPriceAction } from "@/lib/actions/admin.actions";
 import { DeleteShipmentButton } from "./delete-shipment-button";
 import { UnassignShipmentButton } from "./unassign-shipment-button";
@@ -21,16 +22,13 @@ const STATUS_COLORS: Record<string, string> = {
     delivered: "bg-green-100 text-green-700",
 };
 
-export async function AdminShipmentsTableData({
-    status,
-    sortBy,
-    sortOrder,
-}: {
-    status?: string;
-    sortBy?: string;
-    sortOrder?: string;
-}) {
-    const shipments = await getAllShipments(status, sortBy, sortOrder);
+interface AdminShipmentsTableDataProps {
+    searchParams: Promise<{ [key: string]: string | undefined }>;
+}
+
+export async function AdminShipmentsTableData({ searchParams }: AdminShipmentsTableDataProps) {
+    const raw = await searchParams;
+    const shipments = await getAllShipments(raw.status, raw.sortBy, raw.sortOrder);
 
     return (
         <div className="bg-paper border border-line rounded-r2 overflow-hidden">
@@ -95,7 +93,7 @@ export async function AdminShipmentsTableData({
                                         {s.logistics_name ?? <span className="italic">Sin asignar</span>}
                                     </td>
                                     <td className="px-4 py-3 text-ink-2 whitespace-nowrap text-xs">
-                                        {s.created_at.toLocaleDateString("es-AR")}
+                                        {formatDate(s.created_at, { day: "2-digit", month: "2-digit", year: "numeric" })}
                                     </td>
                                     <td className="px-4 py-3 text-right">
                                         <div className="flex items-center justify-end gap-1">

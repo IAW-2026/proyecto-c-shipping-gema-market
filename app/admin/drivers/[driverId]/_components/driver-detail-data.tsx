@@ -1,5 +1,6 @@
 import { notFound } from "next/navigation";
 import { getDriverById } from "@/lib/db/queries/dashboard";
+import { formatDate } from "@/lib/shared/date-utils";
 import { Package, CheckCircle, Clock } from "lucide-react";
 import { Header, Content, PageWrapper } from "../../../_components";
 
@@ -19,7 +20,8 @@ const STATUS_COLORS: Record<string, string> = {
     delivered: "bg-green-100 text-green-700",
 };
 
-export async function DriverDetailData({ driverId }: { driverId: string }) {
+export async function DriverDetailData({ params }: { params: Promise<{ driverId: string }> }) {
+    const { driverId } = await params;
     const driver = await getDriverById(driverId);
     if (!driver) notFound();
 
@@ -33,7 +35,7 @@ export async function DriverDetailData({ driverId }: { driverId: string }) {
         <PageWrapper>
             <Header
                 title={driver.full_name}
-                subtitle={`${driver.email} · Registrado el ${driver.created_at.toLocaleDateString("es-AR")}${driver.banned ? " · BANEADO" : ""}`}
+                subtitle={`${driver.email} · Registrado el ${formatDate(driver.created_at, { day: "2-digit", month: "2-digit", year: "numeric" })}${driver.banned ? " · BANEADO" : ""}`}
             />
             <Content className="p-4 lgx:p-7">
                 {driver.banned && (
@@ -99,7 +101,7 @@ export async function DriverDetailData({ driverId }: { driverId: string }) {
                                             </td>
                                             <td className="px-4 py-3 text-ink-3">${e.price.toFixed(2)}</td>
                                             <td className="px-4 py-3 text-ink-2 whitespace-nowrap text-xs">
-                                                {e.created_at.toLocaleDateString("es-AR")}
+                                                {formatDate(e.created_at, { day: "2-digit", month: "2-digit", year: "numeric" })}
                                             </td>
                                         </tr>
                                     ))

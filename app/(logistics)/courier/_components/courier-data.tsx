@@ -3,6 +3,7 @@
 import { useState, useCallback, ReactNode } from "react";
 import { createPortal } from "react-dom";
 import { useRouter } from "next/navigation";
+import Image from "next/image";
 import { Tag, Home } from "lucide-react";
 import type { ShipmentSummary } from "@/lib/definitions/shipments";
 import { transitionShipmentAction } from "@/lib/actions/shipment.actions";
@@ -163,7 +164,7 @@ function GoogleMapsLink({ origin, destination }: { origin: string; destination: 
             className="w-10 h-10 rounded-full bg-white hover:bg-gray-100 flex items-center justify-center shrink-0 transition-colors shadow-sm"
             title="Abrir en Google Maps"
         >
-            <img src="/images/google_maps_icon.png" alt="Google Maps" className="w-5 h-5" />
+            <Image src="/images/google_maps_icon.png" alt="Google Maps" width={20} height={20} className="w-5 h-5" />
         </button>
     );
 }

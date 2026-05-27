@@ -4,6 +4,15 @@ import { Header } from "../../_components/page-layout";
 import { auth } from "@clerk/nextjs/server";
 import { getUserFromCache } from "@/lib/auth/user-cache";
 
+export function DashboardHeaderSkeleton() {
+    return (
+        <div className="px-4 lgx:px-7 py-5 border-b border-line animate-pulse">
+            <div className="h-6 bg-bone rounded w-48 mb-2" />
+            <div className="h-4 bg-bone rounded w-32" />
+        </div>
+    );
+}
+
 export async function DashboardHeader() {
     const { userId: clerkUserId } = await auth();
     const cached = clerkUserId ? getUserFromCache(clerkUserId) : null;

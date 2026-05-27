@@ -11,16 +11,35 @@ Siempre sumamos 1 día por procesamiento administrativo. Después, por cada 8 ho
 
 ---
 
-## Caché
+## Rendimiento
 
-**Sesión:** el `userId` interno se cachea en memoria con TTL de 30s para evitar llamar a `currentUser()` (Clerk API) en cada navegación.
+### Caché de aplicación
 
-- **Cache hit:** devuelve `userId` directo del Map — 0ms, sin Clerk API ni Prisma
-- **Cache miss:** `auth()` → `currentUser()` (HTTP Clerk) → Prisma lookup → guarda en Map
-- **TTL expirado:** próximo request refresca automáticamente
-- **Mutaciones de admin:** limpian la entrada del caché vía `invalidateUserCache(clerkUserId)`
+**Sesión:** el `userId` interno se cachea en memoria con TTL de 30s para evitar llamar a `currentUser()` (Clerk API) en cada navegación. El dólar (USD/ARS) se cachea con TTL de 5 min. Ver `lib/services/exchange-rate/`.
 
-**Dólar (USD/ARS):** misma estrategia con TTL de 5 min — evita llamar a dolarapi.com en cada cotización. Ver `lib/services/exchange-rate/`.
+### Caché de queries
+
+Las queries de Prisma se cachean con `'use cache'` y `cacheLife()` (Next.js 16) con TTLs graduados según volatilidad:
+
+| Función | TTL |
+|---------|-----|
+| `getAvailableShipments` | 30s |
+| `getDashboardMetrics`, `getActiveShipments`, `getAllShipments` | 1 min |
+| `getPerformanceData`, `getSettlements`, `getAdminDashboardMetrics`, `getAllDrivers`, `getAllRates`, `getDriverById` | 5 min |
+
+### Middleware-first Auth
+
+La autenticación y autorización por rol se ejecutan en el middleware de Next.js **antes** del renderizado. Esto permite que layouts y páginas sean estáticos y cacheables. Los data components leen la identidad del usuario desde headers inyectados y resuelven el `userId` interno de Prisma dentro de `<Suspense>` boundaries.
+
+**Redirecciones:** el middleware enruta automáticamente según el rol — `logistics` a `/dashboard`, `admin_logistics` a `/admin/dashboard`, usuarios sin rol a `/unauthorized`.
+
+### Partial Prerendering (PPR)
+
+Habilitamos `cacheComponents: true` en `next.config.ts`. El shell estático (layouts, sidebars, navegación) se sirve instantáneamente desde el edge de Vercel, mientras que el contenido dinámico hace streaming progresivamente dentro de los `Suspense` boundaries.
+
+### Reducción de bundle
+
+- **Leaflet** y **Recharts** se cargan bajo demanda con `next/dynamic` para minimizar Total Blocking Time (TBT) en mobile.
 
 ---
 

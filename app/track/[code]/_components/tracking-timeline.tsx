@@ -1,20 +1,21 @@
 "use client";
 
 import { Check, Package, MapPin, Truck, Navigation, Home } from "lucide-react";
+import { toDate } from "@/lib/shared/date-utils";
 import type { ShipmentStatus } from "@/lib/shared/shipment-constants";
 
 interface TrackingTimelineProps {
     status: ShipmentStatus;
-    createdAt: Date | null;
-    pickedUpAt: Date | null;
-    deliveredAt: Date | null;
+    createdAt: Date | string | null;
+    pickedUpAt: Date | string | null;
+    deliveredAt: Date | string | null;
 }
 
 interface StepDef {
     status: ShipmentStatus;
     label: string;
     Icon: typeof Package;
-    getDate: (props: TrackingTimelineProps) => Date | null;
+    getDate: (props: TrackingTimelineProps) => Date | string | null;
 }
 
 const STEPS: StepDef[] = [
@@ -29,11 +30,12 @@ function getStepIndex(currentStatus: ShipmentStatus): number {
     return STEPS.findIndex((s) => s.status === currentStatus);
 }
 
-function formatDate(date: Date | null): string {
+function formatDate(date: Date | string | null): string {
     if (!date) return "\u2014";
-    const d = date.toLocaleDateString("es-AR", { day: "2-digit", month: "2-digit" });
-    const t = date.toLocaleTimeString("es-AR", { hour: "2-digit", minute: "2-digit" });
-    return `${d} ${t}`;
+    const d = toDate(date)!;
+    const dateStr = d.toLocaleDateString("es-AR", { day: "2-digit", month: "2-digit" });
+    const timeStr = d.toLocaleTimeString("es-AR", { hour: "2-digit", minute: "2-digit" });
+    return `${dateStr} ${timeStr}`;
 }
 
 function StepCircle({ step, isCompleted, isCurrent }: { step: StepDef; isCompleted: boolean; isCurrent: boolean }) {

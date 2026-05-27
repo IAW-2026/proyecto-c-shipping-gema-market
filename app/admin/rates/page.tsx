@@ -1,9 +1,13 @@
 import { Suspense } from "react";
+
 import { PageWrapper, Header, Content } from "../_components";
 import { CreateRateForm } from "./_components/create-rate-form";
 import { AdminRatesTableData } from "./_components/rates-table-data";
 import { AdminRatesTableSkeleton } from "./_components/rates-table-skeleton";
 import { Plus } from "lucide-react";
+
+
+
 
 export default function AdminRatesPage() {
     return (
