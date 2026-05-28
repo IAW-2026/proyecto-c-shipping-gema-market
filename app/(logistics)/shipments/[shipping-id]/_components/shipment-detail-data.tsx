@@ -1,4 +1,4 @@
-import { getShipmentDetails } from "@/lib/db/queries/shipment";
+import { getShipmentDetails } from "@/lib/db/queries/logistics/shipments";
 import { notFound } from "next/navigation";
 import { Content } from "../../../_components/page-layout";
 import { ShipmentDetailsHeader } from "./shipment-details-header";

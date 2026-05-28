@@ -1,4 +1,4 @@
-import { getAdminDashboardMetrics } from "@/lib/db/queries/dashboard";
+import { getAdminDashboardMetrics } from "@/lib/db/queries/admin/dashboard";
 import { Truck, Package, TrendingUp, ClipboardList, DollarSign } from "lucide-react";
 import { MetricCard } from "@/components/ui/metric-card";
 import { Card } from "@/components/ui/card";

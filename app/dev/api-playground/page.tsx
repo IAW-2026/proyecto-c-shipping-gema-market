@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { generatePrefixedId } from "@/lib/shared/utils";
+import { generatePrefixedId } from "@/lib/shared/server-utils";
 import { TrafficLog, type LogEntry, type LogInternalCall } from "./_components/traffic-log";
 
 type RequestState = "idle" | "loading" | "success" | "error";

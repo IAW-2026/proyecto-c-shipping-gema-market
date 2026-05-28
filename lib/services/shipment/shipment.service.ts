@@ -1,10 +1,11 @@
 /** Servicio de creación de envíos: valida datos del comprador, busca cotización reservada y persiste el envío. */
-import { generatePrefixedId } from "@/lib/shared/utils";
+import { generatePrefixedId } from "@/lib/shared/server-utils";
 import { buyerApiClient } from "@/lib/clients/buyer-api/buyer-api.client";
 import type { z } from "zod";
 import type { createShipmentSchema } from "@/lib/validations/api-schemas";
-import { createEnvioRecord, type CreateEnvioData } from "@/lib/db/queries/shipment";
-import { findReservedCotizacion, confirmCotizacion } from "@/lib/db/queries/quote";
+import { createShipmentRecord, type CreateShipmentData } from "@/lib/db/mutations/shared";
+import { findReservedQuote } from "@/lib/db/queries/quote";
+import { confirmQuote } from "@/lib/db/mutations/quote";
 import prisma from "@/lib/db/prisma";
 type CreateShipmentRequest = z.infer<typeof createShipmentSchema>;
 
@@ -44,7 +45,7 @@ export async function createShipment(
         }
     }
 
-    const cotizacion = await findReservedCotizacion(order_id);
+    const cotizacion = await findReservedQuote(order_id);
 
     if (!cotizacion) {
         throw Object.assign(
@@ -62,7 +63,7 @@ export async function createShipment(
     };
 
     const [envio] = await prisma.$transaction(async (tx) => {
-        const e = await createEnvioRecord({
+        const e = await createShipmentRecord({
             id: generatePrefixedId("shp"),
             order_id,
             quote_id: cotizacion.id,
@@ -88,7 +89,7 @@ export async function createShipment(
             route_duration: (cotizacion.route_duration as number | undefined) ?? null,
         }, tx);
 
-        await confirmCotizacion(cotizacion.id, tx);
+        await confirmQuote(cotizacion.id, tx);
 
         return [e];
     });

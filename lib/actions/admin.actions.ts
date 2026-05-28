@@ -4,9 +4,11 @@ import { requireRole } from "@/lib/auth/rbac";
 import { ROLES } from "@/lib/definitions/auth";
 import { revalidatePath } from "next/cache";
 import prisma from "@/lib/db/prisma";
-import { isNextDynamicServerError } from "@/lib/shared/utils";
-import { generatePrefixedId } from "@/lib/shared/utils";
+import { isNextDynamicServerError } from "@/lib/shared/server-utils";
 import { invalidateUserCache } from "@/lib/auth/user-cache";
+import { deleteDriver, toggleBan } from "@/lib/db/mutations/admin/drivers";
+import { updateShipmentPrice, unassignDriver, deleteShipment } from "@/lib/db/mutations/admin/shipments";
+import { createRate, updateRate, deleteRate } from "@/lib/db/mutations/admin/rates";
 
 export async function deleteDriverAction(driverId: string) {
     try {
@@ -16,17 +18,7 @@ export async function deleteDriverAction(driverId: string) {
             return { success: false, error: "No puedes eliminarte a ti mismo" };
         }
 
-        await prisma.$transaction(async (tx) => {
-            await tx.envio.updateMany({
-                where: {
-                    logistics_id: driverId,
-                    status: { in: ["pending_pickup", "picked_up", "in_transit"] },
-                },
-                data: { logistics_id: null, status: "waiting_for_courier", picked_up_at: null, delivered_at: null },
-            });
-
-            await tx.usuario.delete({ where: { id: driverId } });
-        });
+        await deleteDriver(driverId);
 
         revalidatePath("/admin/drivers");
         revalidatePath("/admin/dashboard");
@@ -54,10 +46,7 @@ export async function updateShipmentPriceAction(shipmentId: string, price: numbe
 
         if (price < 0) return { success: false, error: "El precio no puede ser negativo" };
 
-        await prisma.envio.update({
-            where: { id: shipmentId },
-            data: { price },
-        });
+        await updateShipmentPrice(shipmentId, price);
 
         revalidatePath("/admin/shipments");
         return { success: true };
@@ -82,10 +71,7 @@ export async function unassignDriverAction(shipmentId: string) {
             return { success: false, error: "Solo se puede desasignar pedidos pendientes de retiro" };
         }
 
-        await prisma.envio.update({
-            where: { id: shipmentId },
-            data: { logistics_id: null, status: "waiting_for_courier", picked_up_at: null, delivered_at: null },
-        });
+        await unassignDriver(shipmentId);
 
         revalidatePath("/admin/shipments");
         revalidatePath("/admin/drivers");
@@ -101,7 +87,7 @@ export async function deleteShipmentAction(shipmentId: string) {
     try {
         await requireRole([ROLES.ADMIN_LOGISTICS]);
 
-        await prisma.envio.delete({ where: { id: shipmentId } });
+        await deleteShipment(shipmentId);
 
         revalidatePath("/admin/shipments");
         revalidatePath("/admin/dashboard");
@@ -119,10 +105,7 @@ export async function updateRateAction(rateId: string, pricePerKm: number) {
 
         if (pricePerKm < 0) return { success: false, error: "El precio por km no puede ser negativo" };
 
-        await prisma.tarifa.update({
-            where: { id: rateId },
-            data: { price_per_km: pricePerKm },
-        });
+        await updateRate(rateId, pricePerKm);
 
         revalidatePath("/admin/rates");
         return { success: true };
@@ -156,13 +139,7 @@ export async function createRateAction(weightMin: number, weightMax: number, pri
                     throw new Error("El rango de peso se superpone con una tarifa existente");
                 }
 
-                await tx.tarifa.create({
-                    data: {
-                        id: generatePrefixedId("trf"),
-                        weight_range: { min: weightMin, max: weightMax },
-                        price_per_km: pricePerKm,
-                    },
-                });
+                await createRate(weightMin, weightMax, pricePerKm, tx);
             },
             { isolationLevel: "Serializable" }
         );
@@ -180,7 +157,7 @@ export async function deleteRateAction(rateId: string) {
     try {
         await requireRole([ROLES.ADMIN_LOGISTICS]);
 
-        await prisma.tarifa.delete({ where: { id: rateId } });
+        await deleteRate(rateId);
 
         revalidatePath("/admin/rates");
         return { success: true };
@@ -199,11 +176,7 @@ export async function toggleBanAction(driverId: string, banned: boolean) {
             return { success: false, error: "No puedes banearte a ti mismo" };
         }
 
-        const updated = await prisma.usuario.update({
-            where: { id: driverId },
-            data: { banned },
-            select: { clerk_user_id: true },
-        });
+        const updated = await toggleBan(driverId, banned);
 
         invalidateUserCache(updated.clerk_user_id);
 

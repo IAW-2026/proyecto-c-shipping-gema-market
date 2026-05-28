@@ -1,15 +1,16 @@
-import { getEnvioCoords, persistRouteGeometry } from "@/lib/db/queries/shipment";
+import { getShipmentCoords } from "@/lib/db/queries/shared";
+import { persistRouteGeometry } from "@/lib/db/mutations/shared";
 import { Prisma } from "@/lib/generated/prisma/client";
 import { getRoute } from "@/lib/services/map-services";
 
-export async function fetchAndPersistRouteGeometry(envioId: string): Promise<void> {
-  const envio = await getEnvioCoords(envioId);
-  if (!envio?.pickup_lat || !envio?.delivery_lat) return;
+export async function fetchAndPersistRouteGeometry(shipmentId: string): Promise<void> {
+  const shipment = await getShipmentCoords(shipmentId);
+  if (!shipment?.pickup_lat || !shipment?.delivery_lat) return;
 
   const route = await getRoute(
-    [envio.pickup_lng!, envio.pickup_lat!],
-    [envio.delivery_lng!, envio.delivery_lat!]
+    [shipment.pickup_lng!, shipment.pickup_lat!],
+    [shipment.delivery_lng!, shipment.delivery_lat!]
   );
 
-  await persistRouteGeometry(envioId, route.geometry as Prisma.InputJsonValue);
+  await persistRouteGeometry(shipmentId, route.geometry as Prisma.InputJsonValue);
 }

@@ -1,6 +1,6 @@
 import { notFound } from "next/navigation";
-import { getDriverById, getDriverShipments } from "@/lib/db/queries/dashboard";
-import { getShipmentCountsByStatus } from "@/lib/db/queries/shipment";
+import { getDriverById, getDriverShipments } from "@/lib/db/queries/admin/drivers";
+import { getShipmentCountsByStatus } from "@/lib/db/queries/shared";
 import { formatDate } from "@/lib/shared/date-utils";
 import { Package, CheckCircle, Clock } from "lucide-react";
 import { Header, Content, PageWrapper } from "../../../_components";

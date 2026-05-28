@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { ChevronDown, X, Loader2 } from "lucide-react";
-import { cn } from "@/lib/shared/utils";
+import { cn } from "@/lib/shared/classnames";
 import { transitionShipmentAction } from "@/lib/actions/shipment.actions";
 import type { ShipmentSummary } from "@/lib/definitions/shipments";
 

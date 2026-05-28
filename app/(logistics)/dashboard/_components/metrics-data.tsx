@@ -1,4 +1,4 @@
-import { getDashboardMetrics } from "@/lib/db/queries/dashboard";
+import { getDashboardMetrics } from "@/lib/db/queries/logistics/dashboard";
 import { getAuthenticatedUserId } from "@/lib/auth/get-authenticated-user";
 import { MetricsGrid } from "./metrics-grid";
 

@@ -1,5 +1,5 @@
 import { LucideIcon } from "lucide-react";
-import { cn } from "@/lib/shared/utils";
+import { cn } from "@/lib/shared/classnames";
 
 interface InfoTagProps {
     label: string;

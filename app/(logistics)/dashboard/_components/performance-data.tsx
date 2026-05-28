@@ -1,4 +1,4 @@
-import { getPerformanceData } from "@/lib/db/queries/dashboard";
+import { getPerformanceData } from "@/lib/db/queries/logistics/dashboard";
 import { getAuthenticatedUserId } from "@/lib/auth/get-authenticated-user";
 import { PerformanceModuleWrapper } from "./performance-module-wrapper";
 

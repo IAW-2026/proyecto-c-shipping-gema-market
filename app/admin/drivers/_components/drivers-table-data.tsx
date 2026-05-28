@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { getAllDrivers } from "@/lib/db/queries/dashboard";
+import { getAllDrivers } from "@/lib/db/queries/admin/drivers";
 import { formatDate } from "@/lib/shared/date-utils";
 import { ToggleBanButton } from "./toggle-ban-button";
 import { DeleteDriverButton } from "./delete-driver-button";

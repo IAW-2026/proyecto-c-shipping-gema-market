@@ -35,14 +35,6 @@ export default clerkMiddleware(async (auth, req) => {
 
     const response = NextResponse.next();
 
-    // Si hay usuario autenticado, inyectar headers
-    if (userId) {
-        response.headers.set("x-clerk-user-id", userId);
-        if (role) {
-            response.headers.set("x-user-role", role);
-        }
-    }
-
     // 1. Rutas públicas: permitir sin importar auth
     if (isPublicRoute(req)) {
         return response;

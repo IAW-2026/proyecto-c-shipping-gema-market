@@ -1,4 +1,4 @@
-import { getActiveShipments } from "@/lib/db/queries/dashboard";
+import { getActiveShipments } from "@/lib/db/queries/logistics/dashboard";
 import { getAuthenticatedUserId } from "@/lib/auth/get-authenticated-user";
 import { CourierData } from "./courier-data";
 import { CourierEmpty } from "./courier-empty";

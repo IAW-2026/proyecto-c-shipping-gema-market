@@ -5,16 +5,12 @@ import { ROLES } from "@/lib/definitions/auth";
 import { TakeShipmentSchema } from "@/lib/validations/shipment";
 import { revalidatePath } from "next/cache";
 import prisma from "@/lib/db/prisma";
-import { isNextDynamicServerError } from "@/lib/shared/utils";
+import { isNextDynamicServerError } from "@/lib/shared/server-utils";
 import { notifyTransition } from "@/lib/services/notification/notification.service";
+import { assignShipmentToDriver, transitionShipmentStatus } from "@/lib/db/mutations/logistics/shipments";
 
-/**
- * Server Action para que un repartidor tome posesión de un envío disponible.
- */
 export async function takeShipmentAction(shipmentId: string) {
     try {
-        console.log(`[ACTION] Iniciando takeShipmentAction para: ${shipmentId}`);
-        
         const { userId } = await requireRole([ROLES.LOGISTICS]);
 
         const user = await prisma.usuario.findUnique({
@@ -30,11 +26,7 @@ export async function takeShipmentAction(shipmentId: string) {
             return { success: false, error: "ID de envío inválido" };
         }
 
-        const envio = await prisma.envio.update({
-            where: { id: shipmentId, logistics_id: null, status: "waiting_for_courier" },
-            data: { logistics_id: userId, status: "pending_pickup" },
-            select: { order_id: true, tracking_code: true, status: true },
-        });
+        const envio = await assignShipmentToDriver(shipmentId, userId);
 
         await notifyTransition({
             orderId: envio.order_id,
@@ -48,23 +40,20 @@ export async function takeShipmentAction(shipmentId: string) {
         revalidatePath("/dashboard");
         revalidatePath("/history");
 
-        return { 
+        return {
             success: true,
             message: "Envío asignado correctamente"
         };
     } catch (error) {
         if (isNextDynamicServerError(error)) throw error;
         console.error("[ACTION] Error en takeShipmentAction:", error);
-        return { 
-            success: false, 
-            error: error instanceof Error ? error.message : "Error desconocido" 
+        return {
+            success: false,
+            error: error instanceof Error ? error.message : "Error desconocido"
         };
     }
 }
 
-/**
- * Server Action para que un repartidor avance en el estado de un envío activo.
- */
 export async function transitionShipmentAction(
     shipmentId: string,
     transition: 'pickup' | 'transit' | 'deliver' | 'cancel'
@@ -118,10 +107,7 @@ export async function transitionShipmentAction(
             updateData.delivered_at = null;
         }
 
-        await prisma.envio.update({
-            where: { id: shipmentId },
-            data: updateData,
-        });
+        await transitionShipmentStatus(shipmentId, updateData);
 
         await notifyTransition({
             orderId: envio.order_id,
@@ -146,5 +132,3 @@ export async function transitionShipmentAction(
         };
     }
 }
-
-

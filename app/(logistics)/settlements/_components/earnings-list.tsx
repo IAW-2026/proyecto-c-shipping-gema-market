@@ -2,7 +2,7 @@
 
 import { useState, useCallback, Fragment } from "react";
 import { ChevronRight } from "lucide-react";
-import { cn } from "@/lib/shared/utils";
+import { cn } from "@/lib/shared/classnames";
 import { toDate } from "@/lib/shared/date-utils";
 import { Card } from "@/components/ui/card";
 import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from "@/components/ui/table";

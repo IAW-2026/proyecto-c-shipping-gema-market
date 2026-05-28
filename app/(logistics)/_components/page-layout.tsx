@@ -1,5 +1,5 @@
 import { ReactNode } from "react";
-import { cn } from "@/lib/shared/utils";
+import { cn } from "@/lib/shared/classnames";
 
 export function PageWrapper({ children, className }: { children: ReactNode; className?: string }) {
     return (

@@ -1,4 +1,4 @@
-import { getShipmentByTrackingCode } from "@/lib/db/queries/shipment";
+import { getShipmentByTrackingCode } from "@/lib/db/queries/public/tracking";
 import { notFound } from "next/navigation";
 import { formatDateTime } from "@/lib/shared/date-utils";
 import { TrackingTimeline } from "./tracking-timeline";

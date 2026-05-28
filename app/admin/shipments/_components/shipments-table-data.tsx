@@ -1,4 +1,4 @@
-import { getAllShipments } from "@/lib/db/queries/dashboard";
+import { getAllShipments } from "@/lib/db/queries/admin/shipments";
 import { formatDate } from "@/lib/shared/date-utils";
 import { updateShipmentPriceAction } from "@/lib/actions/admin.actions";
 import { DeleteShipmentButton } from "./delete-shipment-button";

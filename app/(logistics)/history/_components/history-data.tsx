@@ -1,4 +1,5 @@
-import { getFilteredShipments, getShipmentCountsByStatus } from "@/lib/db/queries/shipment";
+import { getFilteredShipments } from "@/lib/db/queries/logistics/history";
+import { getShipmentCountsByStatus } from "@/lib/db/queries/shared";
 import type { ShipmentFilterParams } from "@/lib/definitions/shipments";
 import type { ShipmentStatus } from "@/lib/shared/shipment-constants";
 import { HistorySearchParamsSchema } from "@/lib/validations/shipment";
@@ -47,7 +48,7 @@ export async function HistoryData({ searchParams }: HistoryDataProps) {
     ]);
 
     const counts = {
-        all: countsByStatus.todos ?? 0,
+        all: countsByStatus.all ?? 0,
         active: (countsByStatus.pending_pickup ?? 0) + (countsByStatus.picked_up ?? 0) + (countsByStatus.in_transit ?? 0),
         delivered: countsByStatus.delivered ?? 0,
     };

@@ -17,6 +17,6 @@ const PerformanceModule = dynamic(() => import("./performance-module").then((m) 
     ),
 });
 
-export function PerformanceModuleWrapper({ data }: { data: Awaited<ReturnType<typeof import("@/lib/db/queries/dashboard").getPerformanceData>> }) {
+export function PerformanceModuleWrapper({ data }: { data: Awaited<ReturnType<typeof import("@/lib/db/queries/logistics/dashboard").getPerformanceData>> }) {
     return <PerformanceModule data={data} />;
 }

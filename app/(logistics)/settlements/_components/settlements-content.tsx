@@ -1,4 +1,4 @@
-import { getSettlementsDetail } from "@/lib/db/queries/settlement";
+import { getSettlementsDetail } from "@/lib/db/queries/logistics/settlements";
 import { getAuthenticatedUserId } from "@/lib/auth/get-authenticated-user";
 import { EarningsMetrics } from "./earnings-metrics";
 import { EarningsList } from "./earnings-list";
