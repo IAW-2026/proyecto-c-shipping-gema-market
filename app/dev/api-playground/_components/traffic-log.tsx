@@ -1,37 +1,13 @@
 "use client";
 
 import { useState } from "react";
-
-export interface LogInternalCall {
-    target: string;
-    method: string;
-    url: string;
-    status: number;
-    responseBody?: string;
-}
-
-export interface LogEntry {
-    id: string;
-    timestamp: string;
-    method: string;
-    url: string;
-    endpointLabel: string;
-    requestBody?: string;
-    responseStatus: number;
-    responseBody: string;
-    internalCalls?: LogInternalCall[];
-}
+import { TARGET_COLORS } from "./constants";
+import type { LogInternalCall, LogEntry } from "./types";
 
 interface TrafficLogProps {
     entries: LogEntry[];
     onClear: () => void;
 }
-
-const TARGET_COLORS: Record<string, string> = {
-    Seller: "border-l-sand text-sand",
-    Buyer: "border-l-mist text-mist",
-    Payments: "border-l-stone text-stone",
-};
 
 function MethodBadge({ method }: { method: string }) {
     const colors: Record<string, string> = {
