@@ -2,6 +2,7 @@ import { getSettlementsDetail } from "@/lib/db/queries/logistics/settlements";
 import { getAuthenticatedUserId } from "@/lib/auth/get-authenticated-user";
 import { EarningsMetrics } from "./earnings-metrics";
 import { EarningsList } from "./earnings-list";
+import { computeEarningsMetrics } from "./earnings-list-utils";
 
 function currentMonthRange(): { start: Date; end: Date } {
     const now = new Date();
@@ -17,13 +18,7 @@ export async function SettlementsContent() {
     const { start, end } = currentMonthRange();
     const { settlements, dailyByWeek, ordersByDay } = await getSettlementsDetail(user.id, start, end);
 
-    const monthTrips = settlements.reduce((sum, s) => sum + s.trips, 0);
-    const monthTotal = settlements.reduce((sum, s) => sum + s.amount, 0);
-    const metrics = {
-        monthTotal,
-        monthTrips,
-        averagePerTrip: monthTrips > 0 ? Math.round(monthTotal / monthTrips) : 0,
-    };
+    const metrics = computeEarningsMetrics(settlements);
 
     return (
         <>
