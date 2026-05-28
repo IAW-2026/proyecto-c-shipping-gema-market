@@ -14,7 +14,7 @@ export interface AdminDriver {
     role: string;
     banned: boolean;
     created_at: Date;
-    totalEnvios: number;
+    totalShipments: number;
 }
 
 export interface AdminShipment {
@@ -35,7 +35,7 @@ export interface AdminRate {
     price_per_km: number;
 }
 
-export interface DriverEnvio {
+export interface DriverShipment {
     id: string;
     order_id: string;
     tracking_code: string;
@@ -51,5 +51,5 @@ export interface AdminDriverDetail {
     role: string;
     banned: boolean;
     created_at: Date;
-    envios: DriverEnvio[];
+    shipments: DriverShipment[];
 }

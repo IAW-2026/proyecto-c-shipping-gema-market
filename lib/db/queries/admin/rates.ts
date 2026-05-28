@@ -11,12 +11,12 @@ export async function getAllRates(
     cacheLife("minutes");
 
     const [rates, total] = await Promise.all([
-        prisma.tarifa.findMany({
+        prisma.rate.findMany({
             orderBy: { id: "asc" },
             skip: (page - 1) * pageSize,
             take: pageSize,
         }),
-        prisma.tarifa.count(),
+        prisma.rate.count(),
     ]);
 
     return {

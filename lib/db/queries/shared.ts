@@ -51,7 +51,7 @@ export const offerSelect = {
     route_duration: true,
 } as const;
 
-export function buildOrderBy(sortBy?: string, sortOrder?: 'asc' | 'desc'): Prisma.EnvioOrderByWithRelationInput {
+export function buildOrderBy(sortBy?: string, sortOrder?: 'asc' | 'desc'): Prisma.ShipmentOrderByWithRelationInput {
     const dir = sortOrder ?? 'desc';
     switch (sortBy) {
         case 'price': return { price: dir };
@@ -63,7 +63,7 @@ export function buildOrderBy(sortBy?: string, sortOrder?: 'asc' | 'desc'): Prism
     }
 }
 
-export function buildWhere(params: ShipmentFilterParams): Prisma.EnvioWhereInput {
+export function buildWhere(params: ShipmentFilterParams): Prisma.ShipmentWhereInput {
     const dateFilter: Record<string, Date> = {};
     if (params.dateFrom) dateFilter.gte = params.dateFrom;
     if (params.dateTo) dateFilter.lte = params.dateTo;
@@ -90,7 +90,7 @@ export function buildWhere(params: ShipmentFilterParams): Prisma.EnvioWhereInput
         where.created_at = dateFilter;
     }
 
-    return where as Prisma.EnvioWhereInput;
+    return where as Prisma.ShipmentWhereInput;
 }
 
 export function toShipmentSummary(row: {
@@ -190,7 +190,7 @@ export async function getShipmentCountsByStatus(userId: string): Promise<Record<
     "use cache";
     cacheLife("minutes");
 
-    const counts = await prisma.envio.groupBy({
+    const counts = await prisma.shipment.groupBy({
         by: ['status'],
         where: { logistics_id: userId },
         _count: { id: true },
@@ -205,7 +205,7 @@ export async function getShipmentCountsByStatus(userId: string): Promise<Record<
 }
 
 export async function getShipmentCoords(shipmentId: string) {
-    return prisma.envio.findUnique({
+    return prisma.shipment.findUnique({
         where: { id: shipmentId },
         select: {
             pickup_lat: true,

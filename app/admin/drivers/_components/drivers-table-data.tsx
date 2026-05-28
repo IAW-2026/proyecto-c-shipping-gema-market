@@ -52,7 +52,7 @@ export async function AdminDriversTableData({ searchParams }: AdminDriversTableD
                                         <Badge variant="success">Activo</Badge>
                                     )}
                                 </TableCell>
-                                <TableCell className="text-ink-3">{d.totalEnvios}</TableCell>
+                                <TableCell className="text-ink-3">{d.totalShipments}</TableCell>
                                 <TableCell className="text-ink-2">
                                     {formatDate(d.created_at, { day: "2-digit", month: "2-digit", year: "numeric" })}
                                 </TableCell>

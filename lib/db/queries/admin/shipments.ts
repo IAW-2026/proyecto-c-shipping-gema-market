@@ -14,7 +14,7 @@ export async function getAllShipments(
     "use cache";
     cacheLife("minutes");
 
-    const where: Prisma.EnvioWhereInput = {};
+    const where: Prisma.ShipmentWhereInput = {};
     if (status && status !== "all") {
         where.status = status;
     }
@@ -23,18 +23,18 @@ export async function getAllShipments(
 
     const field = sortBy || "created_at";
     const orderBy: Record<string, unknown> = sortBy === "logistics_id"
-        ? { operador: { full_name: dir } }
+        ? { operator: { full_name: dir } }
         : { [field]: dir };
 
     const [shipments, total] = await Promise.all([
-        prisma.envio.findMany({
+        prisma.shipment.findMany({
             where,
             orderBy,
-            include: { operador: { select: { full_name: true } } },
+            include: { operator: { select: { full_name: true } } },
             skip: (page - 1) * pageSize,
             take: pageSize,
         }),
-        prisma.envio.count({ where }),
+        prisma.shipment.count({ where }),
     ]);
 
     const mapped = shipments.map((e) => ({
@@ -44,7 +44,7 @@ export async function getAllShipments(
         status: e.status,
         price: Number(e.price),
         logistics_id: e.logistics_id,
-        logistics_name: e.operador?.full_name ?? null,
+        logistics_name: e.operator?.full_name ?? null,
         created_at: e.created_at,
     }));
 

@@ -26,16 +26,16 @@ export async function getAdminDashboardMetrics(): Promise<AdminDashboardMetrics>
         shipmentsToday,
         totalRates,
     ] = await Promise.all([
-        prisma.usuario.count({ where: { role: "logistics" } }),
-        prisma.envio.count(),
-        prisma.envio.groupBy({
+        prisma.user.count({ where: { role: "logistics" } }),
+        prisma.shipment.count(),
+        prisma.shipment.groupBy({
             by: ["status"],
             _count: { id: true },
         }),
-        prisma.envio.count({
+        prisma.shipment.count({
             where: { created_at: { gte: todayStart, lte: todayEnd } },
         }),
-        prisma.tarifa.count(),
+        prisma.rate.count(),
     ]);
 
     const byStatus: Record<string, number> = {};

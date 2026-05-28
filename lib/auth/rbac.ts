@@ -10,7 +10,7 @@ export async function requireRole(allowedRoles: UserRole[]) {
     const bypass = process.env.BYPASS_RBAC;
     if (bypass) {
         const bypassUserId = bypass === "true" ? "usr_mock" : bypass;
-        await prisma.usuario.upsert({
+        await prisma.user.upsert({
             where: { id: bypassUserId },
             update: {},
             create: {

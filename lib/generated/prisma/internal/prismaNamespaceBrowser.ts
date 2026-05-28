@@ -51,10 +51,10 @@ export const AnyNull = runtime.AnyNull
 
 
 export const ModelName = {
-  Usuario: 'Usuario',
-  Cotizacion: 'Cotizacion',
-  Envio: 'Envio',
-  Tarifa: 'Tarifa'
+  User: 'User',
+  Quote: 'Quote',
+  Shipment: 'Shipment',
+  Rate: 'Rate'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -73,7 +73,7 @@ export const TransactionIsolationLevel = runtime.makeStrictEnum({
 export type TransactionIsolationLevel = (typeof TransactionIsolationLevel)[keyof typeof TransactionIsolationLevel]
 
 
-export const UsuarioScalarFieldEnum = {
+export const UserScalarFieldEnum = {
   id: 'id',
   clerk_user_id: 'clerk_user_id',
   email: 'email',
@@ -83,10 +83,10 @@ export const UsuarioScalarFieldEnum = {
   created_at: 'created_at'
 } as const
 
-export type UsuarioScalarFieldEnum = (typeof UsuarioScalarFieldEnum)[keyof typeof UsuarioScalarFieldEnum]
+export type UserScalarFieldEnum = (typeof UserScalarFieldEnum)[keyof typeof UserScalarFieldEnum]
 
 
-export const CotizacionScalarFieldEnum = {
+export const QuoteScalarFieldEnum = {
   id: 'id',
   product_id: 'product_id',
   status: 'status',
@@ -107,10 +107,10 @@ export const CotizacionScalarFieldEnum = {
   route_duration: 'route_duration'
 } as const
 
-export type CotizacionScalarFieldEnum = (typeof CotizacionScalarFieldEnum)[keyof typeof CotizacionScalarFieldEnum]
+export type QuoteScalarFieldEnum = (typeof QuoteScalarFieldEnum)[keyof typeof QuoteScalarFieldEnum]
 
 
-export const EnvioScalarFieldEnum = {
+export const ShipmentScalarFieldEnum = {
   id: 'id',
   order_id: 'order_id',
   quote_id: 'quote_id',
@@ -138,16 +138,16 @@ export const EnvioScalarFieldEnum = {
   route_duration: 'route_duration'
 } as const
 
-export type EnvioScalarFieldEnum = (typeof EnvioScalarFieldEnum)[keyof typeof EnvioScalarFieldEnum]
+export type ShipmentScalarFieldEnum = (typeof ShipmentScalarFieldEnum)[keyof typeof ShipmentScalarFieldEnum]
 
 
-export const TarifaScalarFieldEnum = {
+export const RateScalarFieldEnum = {
   id: 'id',
   weight_range: 'weight_range',
   price_per_km: 'price_per_km'
 } as const
 
-export type TarifaScalarFieldEnum = (typeof TarifaScalarFieldEnum)[keyof typeof TarifaScalarFieldEnum]
+export type RateScalarFieldEnum = (typeof RateScalarFieldEnum)[keyof typeof RateScalarFieldEnum]
 
 
 export const SortOrder = {

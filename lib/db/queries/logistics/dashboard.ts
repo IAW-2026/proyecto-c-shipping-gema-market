@@ -22,7 +22,7 @@ export async function getDashboardMetrics(operatorId: string): Promise<Dashboard
     const todayStart = startOfToday();
     const todayEnd = endOfToday();
 
-    const aggregation = await prisma.envio.aggregate({
+    const aggregation = await prisma.shipment.aggregate({
         where: {
             logistics_id: operatorId,
             status: 'delivered',
@@ -44,7 +44,7 @@ export async function getActiveShipments(operatorId: string): Promise<ShipmentSu
     "use cache";
     cacheLife("minutes");
 
-    const shipments = await prisma.envio.findMany({
+    const shipments = await prisma.shipment.findMany({
         where: {
             logistics_id: operatorId,
             status: { in: ['pending_pickup', 'picked_up', 'in_transit'] },

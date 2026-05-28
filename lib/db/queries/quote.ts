@@ -23,7 +23,7 @@ export interface CreateQuoteData {
 }
 
 export async function findMatchingRate(billableWeightKg: number): Promise<RateRecord | null> {
-    const rate = await prisma.tarifa.findFirst({
+    const rate = await prisma.rate.findFirst({
         where: {
             AND: [
                 { weight_range: { path: ["min"], lte: billableWeightKg } },
@@ -35,17 +35,17 @@ export async function findMatchingRate(billableWeightKg: number): Promise<RateRe
 }
 
 export async function findQuoteById(quoteId: string) {
-    return prisma.cotizacion.findUnique({ where: { id: quoteId } });
+    return prisma.quote.findUnique({ where: { id: quoteId } });
 }
 
 export async function findQuoteForRelease(quoteId: string, orderId: string) {
-    return prisma.cotizacion.findFirst({
+    return prisma.quote.findFirst({
         where: { id: quoteId, reserved_for_order_id: orderId },
     });
 }
 
 export async function findReservedQuote(orderId: string) {
-    return prisma.cotizacion.findFirst({
+    return prisma.quote.findFirst({
         where: { reserved_for_order_id: orderId, status: "reserved" },
     });
 }

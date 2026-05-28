@@ -35,7 +35,7 @@ export async function createShipment(
                 receiver_phone ??= buyerResult.data.phone_number;
             }
         } catch (e) {
-            console.warn("[Envio] Error al obtener datos del buyer:", e instanceof Error ? e.message : e);
+            console.warn("[Shipment] Error al obtener datos del buyer:", e instanceof Error ? e.message : e);
         }
         if (!receiver_name || !receiver_phone) {
             throw Object.assign(
@@ -62,7 +62,7 @@ export async function createShipment(
         depth: number;
     };
 
-    const [envio] = await prisma.$transaction(async (tx) => {
+    const [shipment] = await prisma.$transaction(async (tx) => {
         const e = await createShipmentRecord({
             id: generatePrefixedId("shp"),
             order_id,
@@ -95,8 +95,8 @@ export async function createShipment(
     });
 
     return {
-        shipping_id: envio.id,
-        status: envio.status,
-        tracking_code: envio.tracking_code,
+        shipping_id: shipment.id,
+        status: shipment.status,
+        tracking_code: shipment.tracking_code,
     };
 }

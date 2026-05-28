@@ -8,8 +8,8 @@
  *
  * 🟢 You can import this file directly.
  */
-export type * from './models/Usuario'
-export type * from './models/Cotizacion'
-export type * from './models/Envio'
-export type * from './models/Tarifa'
+export type * from './models/User'
+export type * from './models/Quote'
+export type * from './models/Shipment'
+export type * from './models/Rate'
 export type * from './commonInputTypes'

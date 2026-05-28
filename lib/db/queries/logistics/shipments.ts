@@ -7,7 +7,7 @@ export async function getShipmentDetails(shippingId: string): Promise<Shipment |
     "use cache";
     cacheLife("minutes");
 
-    const shipment = await prisma.envio.findUnique({
+    const shipment = await prisma.shipment.findUnique({
         where: { id: shippingId },
         select: detailSelect,
     });

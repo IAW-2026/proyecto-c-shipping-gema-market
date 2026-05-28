@@ -2,7 +2,7 @@ import prisma from "@/lib/db/prisma";
 
 export async function deleteDriver(driverId: string) {
     return prisma.$transaction(async (tx) => {
-        await tx.envio.updateMany({
+        await tx.shipment.updateMany({
             where: {
                 logistics_id: driverId,
                 status: { in: ["pending_pickup", "picked_up", "in_transit"] },
@@ -10,12 +10,12 @@ export async function deleteDriver(driverId: string) {
             data: { logistics_id: null, status: "waiting_for_courier", picked_up_at: null, delivered_at: null },
         });
 
-        await tx.usuario.delete({ where: { id: driverId } });
+        await tx.user.delete({ where: { id: driverId } });
     });
 }
 
 export async function toggleBan(driverId: string, banned: boolean) {
-    return prisma.usuario.update({
+    return prisma.user.update({
         where: { id: driverId },
         data: { banned },
         select: { clerk_user_id: true },

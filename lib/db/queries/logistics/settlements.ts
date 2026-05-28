@@ -23,7 +23,7 @@ export async function getSettlements(
             (date_trunc('week', delivered_at) + interval '6 days')::date AS week_end,
             COUNT(*)::bigint AS trips,
             SUM(price)::text AS amount
-        FROM "Envio"
+        FROM "Shipment"
         WHERE logistics_id = ${logisticsId}
           AND delivered_at >= ${dateFrom}
           AND delivered_at <= ${dateTo}
@@ -61,7 +61,7 @@ export async function getSettlementsDetail(
         created_at: Date;
     }>>`
         SELECT id, order_id, price, picked_up_at, delivered_at, created_at
-        FROM "Envio"
+        FROM "Shipment"
         WHERE logistics_id = ${logisticsId}
           AND delivered_at >= ${dateFrom}
           AND delivered_at <= ${dateTo}

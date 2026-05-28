@@ -13,7 +13,7 @@ export async function takeShipmentAction(shipmentId: string) {
     try {
         const { userId } = await requireRole([ROLES.LOGISTICS]);
 
-        const user = await prisma.usuario.findUnique({
+        const user = await prisma.user.findUnique({
             where: { id: userId },
             select: { banned: true },
         });
@@ -26,12 +26,12 @@ export async function takeShipmentAction(shipmentId: string) {
             return { success: false, error: "ID de envío inválido" };
         }
 
-        const envio = await assignShipmentToDriver(shipmentId, userId);
+        const shipment = await assignShipmentToDriver(shipmentId, userId);
 
         await notifyTransition({
-            orderId: envio.order_id,
+            orderId: shipment.order_id,
             shippingId: shipmentId,
-            trackingCode: envio.tracking_code,
+            trackingCode: shipment.tracking_code,
             oldStatus: "waiting_for_courier",
             newStatus: "pending_pickup",
         });
@@ -61,32 +61,32 @@ export async function transitionShipmentAction(
     try {
         const { userId } = await requireRole([ROLES.LOGISTICS]);
 
-        const envio = await prisma.envio.findUnique({
+        const shipment = await prisma.shipment.findUnique({
             where: { id: shipmentId },
             select: { id: true, status: true, logistics_id: true, order_id: true, tracking_code: true },
         });
 
-        if (!envio) return { success: false, error: "Envío no encontrado" };
+        if (!shipment) return { success: false, error: "Envío no encontrado" };
 
-        if (envio.logistics_id !== userId) {
+        if (shipment.logistics_id !== userId) {
             return { success: false, error: "Este envío no está asignado a ti" };
         }
 
-        if (transition === 'pickup' && envio.status !== 'pending_pickup') {
+        if (transition === 'pickup' && shipment.status !== 'pending_pickup') {
             return { success: false, error: "El envío debe estar pendiente de retiro para marcarlo como recogido" };
         }
 
-        if (transition === 'transit' && envio.status !== 'picked_up') {
+        if (transition === 'transit' && shipment.status !== 'picked_up') {
             return { success: false, error: "El envío debe estar retirado para iniciar el viaje" };
         }
 
-        if (transition === 'deliver' && envio.status !== 'in_transit') {
+        if (transition === 'deliver' && shipment.status !== 'in_transit') {
             return { success: false, error: "El envío debe estar en viaje para marcarlo como entregado" };
         }
 
         const now = new Date();
         const updateData: Record<string, unknown> = {};
-        let newStatus: string = envio.status;
+        let newStatus: string = shipment.status;
 
         if (transition === 'pickup') {
             newStatus = 'picked_up';
@@ -110,10 +110,10 @@ export async function transitionShipmentAction(
         await transitionShipmentStatus(shipmentId, updateData);
 
         await notifyTransition({
-            orderId: envio.order_id,
+            orderId: shipment.order_id,
             shippingId: shipmentId,
-            trackingCode: envio.tracking_code,
-            oldStatus: envio.status as import("@/lib/shared/shipment-constants").ShipmentStatus,
+            trackingCode: shipment.tracking_code,
+            oldStatus: shipment.status as import("@/lib/shared/shipment-constants").ShipmentStatus,
             newStatus: newStatus as import("@/lib/shared/shipment-constants").ShipmentStatus,
         });
 

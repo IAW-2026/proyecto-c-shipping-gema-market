@@ -12,7 +12,7 @@ export async function getAvailableShipments(params?: ShipmentFilterParams): Prom
     const page = params?.page ?? 1;
     const pageSize = params?.pageSize ?? 20;
 
-    const where: Prisma.EnvioWhereInput = {
+    const where: Prisma.ShipmentWhereInput = {
         status: 'waiting_for_courier',
         logistics_id: null,
     };
@@ -24,7 +24,7 @@ export async function getAvailableShipments(params?: ShipmentFilterParams): Prom
         ];
     }
 
-    const rangeFilters: Prisma.EnvioWhereInput[] = [];
+    const rangeFilters: Prisma.ShipmentWhereInput[] = [];
     if (params?.weightMin !== undefined || params?.weightMax !== undefined) {
         const wf: { gte?: number; lte?: number } = {};
         if (params.weightMin !== undefined) wf.gte = params.weightMin;
@@ -52,14 +52,14 @@ export async function getAvailableShipments(params?: ShipmentFilterParams): Prom
         : { created_at: 'desc' as const };
 
     const [shipments, total] = await Promise.all([
-        prisma.envio.findMany({
+        prisma.shipment.findMany({
             where,
             orderBy,
             select: offerSelect,
             skip: (page - 1) * pageSize,
             take: pageSize,
         }),
-        prisma.envio.count({ where }),
+        prisma.shipment.count({ where }),
     ]);
 
     return {

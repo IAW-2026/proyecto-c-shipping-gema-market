@@ -4,7 +4,7 @@ import { generatePrefixedId } from "@/lib/shared/server-utils";
 import type { CreateQuoteData } from "@/lib/db/queries/quote";
 
 export async function createQuoteRecord(data: CreateQuoteData) {
-    return prisma.cotizacion.create({
+    return prisma.quote.create({
         data: {
             id: generatePrefixedId("qte"),
             product_id: data.product_id,
@@ -27,14 +27,14 @@ export async function createQuoteRecord(data: CreateQuoteData) {
 }
 
 export async function reserveQuoteInDb(quoteId: string, orderId: string) {
-    return prisma.cotizacion.update({
+    return prisma.quote.update({
         where: { id: quoteId },
         data: { status: "reserved", reserved_for_order_id: orderId },
     });
 }
 
 export async function releaseQuoteInDb(quoteId: string, orderId: string) {
-    await prisma.cotizacion.update({
+    await prisma.quote.update({
         where: { id: quoteId },
         data: {
             status: "available",
@@ -45,7 +45,7 @@ export async function releaseQuoteInDb(quoteId: string, orderId: string) {
 }
 
 export async function confirmQuote(quoteId: string, client: Prisma.TransactionClient | typeof prisma = prisma) {
-    return client.cotizacion.update({
+    return client.quote.update({
         where: { id: quoteId },
         data: { status: "confirmed" },
     });

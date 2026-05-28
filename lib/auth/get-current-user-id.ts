@@ -15,7 +15,7 @@ const getCurrentUserId = cache(async (clerkUser?: User | null): Promise<string |
     const full_name = `${clerkUser.firstName ?? ""} ${clerkUser.lastName ?? ""}`.trim();
     const clerkRole = (clerkUser.publicMetadata?.role as string) ?? "logistics";
 
-    const user = await prisma.usuario.upsert({
+    const user = await prisma.user.upsert({
         where: { clerk_user_id: clerkUserId },
         update: { email, full_name, role: clerkRole },
         create: {

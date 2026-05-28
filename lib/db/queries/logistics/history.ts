@@ -13,14 +13,14 @@ export async function getFilteredShipments(params: ShipmentFilterParams): Promis
     const orderBy = buildOrderBy(params.sortBy, params.sortOrder);
 
     const [data, total] = await Promise.all([
-        prisma.envio.findMany({
+        prisma.shipment.findMany({
             where,
             orderBy,
             skip: (page - 1) * pageSize,
             take: pageSize,
             select: summarySelect,
         }),
-        prisma.envio.count({ where }),
+        prisma.shipment.count({ where }),
     ]);
 
     return {

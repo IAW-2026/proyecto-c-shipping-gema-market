@@ -35,12 +35,12 @@ export async function updateShipmentPriceAction(shipmentId: string, price: numbe
     try {
         await requireRole([ROLES.ADMIN_LOGISTICS]);
 
-        const envio = await prisma.envio.findUnique({
+        const shipment = await prisma.shipment.findUnique({
             where: { id: shipmentId },
             select: { status: true },
         });
-        if (!envio) return { success: false, error: "Envío no encontrado" };
-        if (envio.status !== "waiting_for_courier") {
+        if (!shipment) return { success: false, error: "Envío no encontrado" };
+        if (shipment.status !== "waiting_for_courier") {
             return { success: false, error: "Solo se puede editar el precio de envíos sin repartidor asignado" };
         }
 
@@ -61,13 +61,13 @@ export async function unassignDriverAction(shipmentId: string) {
     try {
         await requireRole([ROLES.ADMIN_LOGISTICS]);
 
-        const envio = await prisma.envio.findUnique({
+        const shipment = await prisma.shipment.findUnique({
             where: { id: shipmentId },
             select: { status: true },
         });
 
-        if (!envio) return { success: false, error: "Envío no encontrado" };
-        if (envio.status !== "pending_pickup") {
+        if (!shipment) return { success: false, error: "Envío no encontrado" };
+        if (shipment.status !== "pending_pickup") {
             return { success: false, error: "Solo se puede desasignar pedidos pendientes de retiro" };
         }
 
@@ -127,7 +127,7 @@ export async function createRateAction(weightMin: number, weightMax: number, pri
 
         await prisma.$transaction(
             async (tx) => {
-                const overlapping = await tx.tarifa.findFirst({
+                const overlapping = await tx.rate.findFirst({
                     where: {
                         AND: [
                             { weight_range: { path: ["max"], gte: weightMin } },

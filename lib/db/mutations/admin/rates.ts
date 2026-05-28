@@ -9,7 +9,7 @@ export async function createRate(
     tx?: Prisma.TransactionClient
 ) {
     const client = tx ?? prisma;
-    return client.tarifa.create({
+    return client.rate.create({
         data: {
             id: generatePrefixedId("trf"),
             weight_range: { min: weightMin, max: weightMax },
@@ -19,12 +19,12 @@ export async function createRate(
 }
 
 export async function updateRate(rateId: string, pricePerKm: number) {
-    return prisma.tarifa.update({
+    return prisma.rate.update({
         where: { id: rateId },
         data: { price_per_km: pricePerKm },
     });
 }
 
 export async function deleteRate(rateId: string) {
-    return prisma.tarifa.delete({ where: { id: rateId } });
+    return prisma.rate.delete({ where: { id: rateId } });
 }

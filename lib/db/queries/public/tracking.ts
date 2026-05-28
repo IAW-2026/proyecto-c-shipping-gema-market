@@ -7,7 +7,7 @@ export async function getShipmentByTrackingCode(code: string): Promise<Shipment 
     "use cache";
     cacheLife("minutes");
 
-    const shipment = await prisma.envio.findUnique({
+    const shipment = await prisma.shipment.findUnique({
         where: { tracking_code: code },
         select: detailSelect,
     });

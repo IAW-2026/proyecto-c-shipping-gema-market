@@ -24,7 +24,7 @@ export interface CreateShipmentData {
 }
 
 export async function createShipmentRecord(data: CreateShipmentData, client: Prisma.TransactionClient | typeof prisma = prisma) {
-    return client.envio.create({
+    return client.shipment.create({
         data: {
             id: data.id,
             order_id: data.order_id,
@@ -55,7 +55,7 @@ export async function persistRouteGeometry(
     shipmentId: string,
     routeGeometry: Prisma.InputJsonValue
 ): Promise<void> {
-    await prisma.envio.update({
+    await prisma.shipment.update({
         where: { id: shipmentId },
         data: { route_geometry: routeGeometry },
     });

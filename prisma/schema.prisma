@@ -12,22 +12,22 @@ datasource db {
   provider  = "postgresql"
 }
 
-// 1. Usuario: Cache sincronizado de Clerk
-model Usuario {
+// 1. User: Cache sincronizado de Clerk
+model User {
   id            String   @id // Generado en código: 'usr_' + ulid()
   clerk_user_id String   @unique // Fuente de verdad global
   email         String
   full_name     String
   role          String   @default("logistics") // Solo roles relevantes para esta app
   banned        Boolean  @default(false)
-  created_at    DateTime @default(now())
+  created_at    DateTime @default(now()) @db.Timestamptz()
 
   // Relaciones internas
-  envios Envio[]
+  shipments Shipment[]
 }
 
-// 2. Cotización: Datos previos al envío
-model Cotizacion {
+// 2. Quote: Datos previos al envío
+model Quote {
   id                    String   @id // Generado en código: 'qte_' + ulid()
   product_id            String // FK lógica -> Seller App
   status                String   @default("available") // available, reserved, confirmed
@@ -38,8 +38,8 @@ model Cotizacion {
   price                 Decimal  @db.Decimal(10, 2)
   currency              String   @default("ARS")
   estimated_days        Int
-  valid_until           DateTime
-  created_at            DateTime @default(now())
+  valid_until           DateTime @db.Timestamptz()
+  created_at            DateTime @default(now()) @db.Timestamptz()
 
   pickup_lat            Float?
   pickup_lng            Float?
@@ -49,8 +49,8 @@ model Cotizacion {
   route_duration        Float?
 }
 
-// 3. Envio: Entidad maestra de logística
-model Envio {
+// 3. Shipment: Entidad maestra de logística
+model Shipment {
   id               String    @id // Generado en código: 'shp_' + ulid()
   order_id         String    @unique // FK lógica -> Buyer App
   quote_id         String    // FK lógica para trazar el origen del envío
@@ -58,7 +58,7 @@ model Envio {
   receiver_name    String // Nombre de quien recibe
   receiver_phone   String // Teléfono de contacto para la entrega
   seller_id        String // FK lógica
-  logistics_id     String? // FK física -> Usuario local (fletero)
+  logistics_id     String? // FK física -> User local (fletero)
   weight           Decimal   @db.Decimal(10, 2)
   dimensions       Json // { "width": 20, "height": 10, "depth": 30 }
   pickup_address   Json
@@ -66,9 +66,9 @@ model Envio {
   tracking_code    String    @unique
   status           String    @default("waiting_for_courier") // waiting_for_courier, pending_pickup, picked_up, in_transit, delivered
   price            Decimal   @db.Decimal(10, 2)
-  picked_up_at     DateTime?
-  delivered_at     DateTime?
-  created_at       DateTime  @default(now())
+  picked_up_at     DateTime? @db.Timestamptz()
+  delivered_at     DateTime? @db.Timestamptz()
+  created_at       DateTime  @default(now()) @db.Timestamptz()
 
   pickup_lat       Float?
   pickup_lng       Float?
@@ -79,11 +79,11 @@ model Envio {
   route_duration   Float?
 
   // Relación con el fletero asignado
-  operador Usuario? @relation(fields: [logistics_id], references: [id])
+  operator User? @relation(fields: [logistics_id], references: [id])
 }
 
-// 4. Tarifa: Configuración de precios por peso facturable (USD/km)
-model Tarifa {
+// 4. Rate: Configuración de precios por peso facturable (USD/km)
+model Rate {
   id           String  @id // Generado en código: 'trf_' + ulid()
   weight_range Json // Ejemplo: { "min": 0, "max": 30 }
   price_per_km Decimal @db.Decimal(10, 2) // USD por km
