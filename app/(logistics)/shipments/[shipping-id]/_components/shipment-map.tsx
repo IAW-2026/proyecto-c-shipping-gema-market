@@ -1,5 +1,3 @@
-"use client";
-
 import dynamic from "next/dynamic";
 import type { ShipmentStatus } from "@/lib/shared/shipment-constants";
 import { ShipmentStatusBadge } from "@/app/(logistics)/_components/shipment-status-badge";

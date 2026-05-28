@@ -39,6 +39,7 @@ export async function takeShipmentAction(shipmentId: string) {
         revalidatePath("/available");
         revalidatePath("/dashboard");
         revalidatePath("/history");
+        revalidatePath("/courier");
 
         return {
             success: true,

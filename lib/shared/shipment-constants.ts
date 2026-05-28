@@ -41,3 +41,16 @@ export const STATUS_VARIANT_MAP: Record<ShipmentStatus, "default" | "success" | 
     in_transit: "warning",
     delivered: "success",
 } as const;
+
+type CourierActionTransition = "pickup" | "transit" | "deliver";
+
+export const COURIER_ACTION_MAP: Record<
+    ShipmentStatus,
+    { label: string; transition: CourierActionTransition; canCancel: boolean } | null
+> = {
+    waiting_for_courier: null,
+    pending_pickup: { label: "Recoger paquete", transition: "pickup", canCancel: true },
+    picked_up: { label: "Iniciar viaje", transition: "transit", canCancel: false },
+    in_transit: { label: "Marcar entregado", transition: "deliver", canCancel: false },
+    delivered: null,
+} as const;

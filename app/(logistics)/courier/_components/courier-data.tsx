@@ -1,16 +1,18 @@
 "use client";
 
-import { useState, useCallback, ReactNode } from "react";
+import { useState, useCallback, useEffect } from "react";
 import { createPortal } from "react-dom";
 import { useRouter } from "next/navigation";
-import Image from "next/image";
 import { Tag, Home } from "lucide-react";
 import type { ShipmentSummary } from "@/lib/definitions/shipments";
 import { transitionShipmentAction } from "@/lib/actions/shipment.actions";
+import { COURIER_ACTION_MAP } from "@/lib/shared/shipment-constants";
+import { formatAddress } from "@/lib/shared/address-utils";
 import { CourierHeader } from "./courier-header";
 import { CourierMap } from "./courier-map";
-import { ChangeStateButton } from "./courier-actions";
+import { ChangeStateButton } from "./change-state-button";
 import { CancelDialog } from "./cancel-dialog";
+import { GoogleMapsLink } from "./google-maps-link";
 
 interface CourierDataProps {
     shipment: ShipmentSummary;
@@ -20,8 +22,11 @@ interface CourierDataProps {
 
 export function CourierData({ shipment, shipments, selectedTracking }: CourierDataProps) {
     const router = useRouter();
+    const [mounted, setMounted] = useState(false);
     const [showCancel, setShowCancel] = useState(false);
     const [hasPendingAction, setHasPendingAction] = useState(false);
+
+    useEffect(() => { setMounted(true); }, []);
 
     const handleAction = useCallback(async (shippingId: string, transition: "pickup" | "transit" | "deliver") => {
         setHasPendingAction(true);
@@ -46,37 +51,11 @@ export function CourierData({ shipment, shipments, selectedTracking }: CourierDa
         } finally {
             router.refresh();
             setHasPendingAction(false);
+            setShowCancel(false);
         }
     }, [router]);
 
-    const formatGmaps = (address: ShipmentSummary["pickupAddress"]) =>
-        `${address.street}${address.number ? ` ${address.number}` : ""}, Bahía Blanca, Argentina`;
-
-    const formatAddress = (address: ShipmentSummary["pickupAddress"]) => {
-        let base = address.street;
-        if (address.number) base += ` ${address.number}`;
-        if (address.floor) base += `, Piso ${address.floor}`;
-        if (address.apartment) base += `, Depto ${address.apartment}`;
-        return base;
-    };
-
-    const isPendingPickup = shipment.status === "pending_pickup";
-    const isPickedUp = shipment.status === "picked_up";
-    const canCancel = isPendingPickup;
-
-    let mainActionLabel: string;
-    let mainActionTransition: "pickup" | "transit" | "deliver";
-
-    if (isPendingPickup) {
-        mainActionLabel = "Recoger paquete";
-        mainActionTransition = "pickup";
-    } else if (isPickedUp) {
-        mainActionLabel = "Iniciar viaje";
-        mainActionTransition = "transit";
-    } else {
-        mainActionLabel = "Marcar entregado";
-        mainActionTransition = "deliver";
-    }
+    const actionConfig = COURIER_ACTION_MAP[shipment.status];
 
     return (
         <>
@@ -85,13 +64,13 @@ export function CourierData({ shipment, shipments, selectedTracking }: CourierDa
                 selectedTracking={selectedTracking}
                 onCancelClick={() => setShowCancel(true)}
                 hasPendingAction={hasPendingAction}
-                canCancel={canCancel}
+                canCancel={!!actionConfig?.canCancel}
             />
 
             <section className="flex flex-col flex-1 px-4 lgx:px-0">
-                <CourierMapArea>
+                <div className="flex-1 relative min-h-0">
                     <CourierMap shipment={shipment} hasPendingAction={hasPendingAction} />
-                </CourierMapArea>
+                </div>
 
                 <div className="px-4 py-2 bg-paper border-t border-line">
                     <div className="flex items-center gap-3">
@@ -110,8 +89,8 @@ export function CourierData({ shipment, shipments, selectedTracking }: CourierDa
                         </div>
 
                         <GoogleMapsLink
-                            origin={formatGmaps(shipment.pickupAddress)}
-                            destination={formatGmaps(shipment.deliveryAddress)}
+                            origin={shipment.pickupAddress}
+                            destination={shipment.deliveryAddress}
                         />
                     </div>
 
@@ -124,16 +103,18 @@ export function CourierData({ shipment, shipments, selectedTracking }: CourierDa
                     </div>
                 </div>
 
-                <div className="border-t border-line px-0 pt-4 pb-6 bg-paper">
-                    <ChangeStateButton
-                        isPending={hasPendingAction}
-                        label={mainActionLabel}
-                        onClick={() => handleAction(shipment.shippingId, mainActionTransition)}
-                    />
-                </div>
+                {actionConfig && (
+                    <div className="border-t border-line px-0 pt-4 pb-6 bg-paper">
+                        <ChangeStateButton
+                            isPending={hasPendingAction}
+                            label={actionConfig.label}
+                            onClick={() => handleAction(shipment.shippingId, actionConfig.transition)}
+                        />
+                    </div>
+                )}
             </section>
 
-            {typeof window !== "undefined" && createPortal(
+            {mounted && createPortal(
                 <CancelDialog
                     open={showCancel}
                     hasPendingAction={hasPendingAction}
@@ -145,28 +126,3 @@ export function CourierData({ shipment, shipments, selectedTracking }: CourierDa
         </>
     );
 }
-
-// --- Layout helpers ---
-
-function CourierMapArea({ children }: { children: ReactNode }) {
-    return <div className="flex-1 relative min-h-0">{children}</div>;
-}
-
-function GoogleMapsLink({ origin, destination }: { origin: string; destination: string }) {
-    const handleClick = () => {
-        const url = `https://www.google.com/maps/dir/?api=1&origin=${encodeURIComponent(origin)}&destination=${encodeURIComponent(destination)}&travelmode=driving`;
-        window.open(url, "_blank", "noopener,noreferrer");
-    };
-
-    return (
-        <button
-            onClick={handleClick}
-            className="w-10 h-10 rounded-full bg-white hover:bg-gray-100 flex items-center justify-center shrink-0 transition-colors shadow-sm"
-            title="Abrir en Google Maps"
-        >
-            <Image src="/images/google_maps_icon.png" alt="Google Maps" width={20} height={20} className="w-5 h-5" />
-        </button>
-    );
-}
-
-

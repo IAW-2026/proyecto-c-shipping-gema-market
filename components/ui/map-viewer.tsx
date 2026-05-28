@@ -43,6 +43,24 @@ function FitBounds({ coords }: { coords: [number, number][] }) {
     return null;
 }
 
+function MapCleanup() {
+    const map = useMap();
+    useEffect(() => {
+        const container = map.getContainer();
+        return () => {
+            if (container && "_leaflet_id" in container) {
+                delete (container as Record<string, unknown>)._leaflet_id;
+            }
+            try {
+                map.remove();
+            } catch {
+                // ignore
+            }
+        };
+    }, [map]);
+    return null;
+}
+
 export default function MapViewer({ shippingId, className }: MapViewerProps) {
     const [route, setRoute] = useState<RouteData | null>(null);
     const [error, setError] = useState<string | null>(null);
@@ -126,6 +144,7 @@ export default function MapViewer({ shippingId, className }: MapViewerProps) {
                 </>
             )}
             <FitBounds coords={positions} />
+            <MapCleanup />
         </MapContainer>
     );
 }
