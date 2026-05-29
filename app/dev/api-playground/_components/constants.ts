@@ -22,7 +22,7 @@ export const ENDPOINTS: EndpointDef[] = [
         step: 1,
         label: "Cotizar envio",
         method: "POST",
-        url: "/api/shipping/quotes",
+        url: "/api/shipping/cotizaciones",
     },
     {
         id: "reservar",
@@ -30,7 +30,7 @@ export const ENDPOINTS: EndpointDef[] = [
         step: 2,
         label: "Reservar cotizacion",
         method: "POST",
-        url: "/api/shipping/quotes/reserve",
+        url: "/api/shipping/cotizaciones/reservar",
     },
     {
         id: "liberar",
@@ -38,7 +38,7 @@ export const ENDPOINTS: EndpointDef[] = [
         step: 2,
         label: "Liberar reserva",
         method: "POST",
-        url: "/api/shipping/quotes/release",
+        url: "/api/shipping/cotizaciones/liberar-reserva",
     },
     {
         id: "crear-envio",
@@ -46,7 +46,7 @@ export const ENDPOINTS: EndpointDef[] = [
         step: 3,
         label: "Crear envio",
         method: "POST",
-        url: "/api/shipping/shipments",
+        url: "/api/shipping/envios",
     },
 ];
 

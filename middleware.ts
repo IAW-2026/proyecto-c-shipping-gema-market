@@ -5,6 +5,7 @@ import { NextResponse } from "next/server";
 const isPublicRoute = createRouteMatcher([
     '/track(.*)',
     '/api(.*)',
+    '/dev(.*)',
     '/_next(.*)',
     '/favicon.ico',
 ]);

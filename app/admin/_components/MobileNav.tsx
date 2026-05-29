@@ -2,10 +2,12 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { UserButton, useUser } from "@clerk/nextjs";
 import { ADMIN_NAV } from "@/lib/config/admin-nav";
 
 export function AdminMobileNav() {
     const pathname = usePathname();
+    const { isLoaded } = useUser();
 
     return (
         <nav className="flex lgx:hidden fixed bottom-0 left-0 right-0 bg-paper/95 backdrop-blur-[12px] border-t border-line justify-around px-1 pt-2 pb-3 z-40">
@@ -28,6 +30,15 @@ export function AdminMobileNav() {
                     </Link>
                 );
             })}
+
+            <div className="flex flex-col items-center gap-[3px] px-1 py-1.5 flex-1 min-w-0 text-ink-3">
+                {isLoaded ? (
+                    <UserButton />
+                ) : (
+                    <div className="w-7 h-7 animate-pulse bg-line/50 rounded-full" />
+                )}
+                <span className="text-[9px] font-medium">Perfil</span>
+            </div>
         </nav>
     );
 }
