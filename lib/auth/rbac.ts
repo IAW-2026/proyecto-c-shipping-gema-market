@@ -9,7 +9,11 @@ import { getUserFromCache, setUserInCache } from "./user-cache";
 
 export async function requireRole(allowedRoles: UserRole[]) {
     const bypass = process.env.BYPASS_RBAC;
-    if (bypass) {
+    if (bypass && process.env.NODE_ENV !== "production") {
+        console.warn(
+            "\x1b[33m%s\x1b[0m",
+            "[RBAC BYPASS] BYPASS_RBAC está ACTIVO. Los chequeos de rol están deshabilitados."
+        );
         const bypassUserId = bypass === "true" ? "usr_mock" : bypass;
         await prisma.user.upsert({
             where: { id: bypassUserId },

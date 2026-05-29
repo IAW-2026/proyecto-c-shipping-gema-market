@@ -32,20 +32,12 @@ Los siguientes hallazgos críticos del audit previo (27/05/2026) **ya fueron cor
 
 ---
 
-### 2. [SECURITY] BYPASS_RBAC sin guard de entorno
+### 2. [SECURITY] BYPASS_RBAC sin guard de entorno *(CORREGIDO)*
 
-**Ubicación:** `lib/auth/rbac.ts:11-26`  
+**Ubicación:** `lib/auth/rbac.ts:11-26` → `lib/auth/rbac.ts:11-31`  
 **Principio:** Seguridad / Defense in depth  
 
-**Impacto:** Si `BYPASS_RBAC` se activa accidentalmente en producción (env var mal configurada, copy-paste de `.env.local`), **todos los chequeos de rol se omiten** y se auto-crea un usuario mock en la base de datos. No hay ninguna protección que impida esto fuera de development.
-
-**Refactor sugerido:**
-```typescript
-const bypass = process.env.BYPASS_RBAC;
-if (bypass && process.env.NODE_ENV !== "production") {
-  // ... lógica de bypass
-}
-```
+**Estado:** ✅ Corregido el 29/05/2026. Se agregó guard `process.env.NODE_ENV !== "production"` y `console.warn` prominente en amarillo cuando el bypass está activo.
 
 ---
 
