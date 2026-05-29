@@ -23,32 +23,12 @@ Los siguientes hallazgos críticos del audit previo (27/05/2026) **ya fueron cor
 
 ## Violaciones graves vigentes
 
-### 1. [SECURITY] Fail-open en validación de API Key
+### 1. [SECURITY] Fail-open en validación de API Key *(CORREGIDO)*
 
-**Ubicación:** `lib/auth/api-key.ts:7-9`  
+**Ubicación:** `lib/auth/api-key.ts:7-9` → `lib/auth/api-key.ts:7-25`  
 **Principio:** Seguridad / Fail-safe defaults  
 
-**Impacto:** Si `INTERNAL_API_KEY` es `undefined` (variable de entorno faltante), `hashApiKey("")` produce un hash válido. Cualquier request con header `x-api-key-hash: <hash-de-string-vacio>` sería aceptada. En un deployment donde la env var no está configurada, **todos los endpoints de la API quedan abiertos**.
-
-Adicionalmente, la comparación usa `===` en lugar de `crypto.timingSafeEqual`, lo que es vulnerable a timing attacks.
-
-**Refactor sugerido:**
-```typescript
-export function validateApiKey(request: Request): boolean {
-  const expected = process.env.INTERNAL_API_KEY;
-  if (!expected) {
-    console.error("[AUTH] INTERNAL_API_KEY no configurada");
-    return false;
-  }
-  const received = request.headers.get("x-api-key-hash")?.trim().toUpperCase();
-  if (!received) return false;
-  const expectedHash = hashApiKey(expected);
-  return crypto.timingSafeEqual(
-    Buffer.from(received, "hex"),
-    Buffer.from(expectedHash, "hex")
-  );
-}
-```
+**Estado:** ✅ Corregido el 29/05/2026. Se implementó: validación de que `INTERNAL_API_KEY` exista antes de comparar, uso de `crypto.timingSafeEqual`, hash cacheado como constante de módulo y `try/catch` ante entradas inesperadas.
 
 ---
 
