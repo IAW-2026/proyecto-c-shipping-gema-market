@@ -49,3 +49,7 @@ next-env.d.ts
 /lib/generated/prisma
 
 /docs
+
+# defensa oral (documento privado)
+defensa.md
+AUDIT.md
