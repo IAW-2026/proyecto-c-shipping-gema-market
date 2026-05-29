@@ -1,30 +1,21 @@
-import { ROLES } from "@/lib/definitions/auth";
-import { requireRole } from "@/lib/auth/rbac";
+import { Suspense } from "react";
 
-export default async function AdminDashboardPage() {
-    const { userId } = await requireRole([ROLES.ADMIN_LOGISTICS]);
+import { PageWrapper, Header, Content } from "../_components/page-layout";
+import { AdminDashboardMetrics } from "./_components/dashboard-metrics";
+import { AdminDashboardMetricsSkeleton } from "./_components/dashboard-metrics-skeleton";
 
+
+
+
+export default function AdminDashboardPage() {
     return (
-        <div className="p-4 md:p-6 max-w-6xl mx-auto w-full">
-            <h1 className="text-xl font-bold text-ink-3 mb-2">Panel de Administración</h1>
-            <p className="text-ink-2 text-sm mb-8">
-                Bienvenido al panel de administración. ID: {userId}
-            </p>
-
-            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-                <div className="bg-paper border border-line rounded-r2 p-5">
-                    <h2 className="text-sm font-semibold text-ink-3 mb-1">Gestión de usuarios</h2>
-                    <p className="text-xs text-ink-2">Próximamente</p>
-                </div>
-                <div className="bg-paper border border-line rounded-r2 p-5">
-                    <h2 className="text-sm font-semibold text-ink-3 mb-1">Métricas globales</h2>
-                    <p className="text-xs text-ink-2">Próximamente</p>
-                </div>
-                <div className="bg-paper border border-line rounded-r2 p-5">
-                    <h2 className="text-sm font-semibold text-ink-3 mb-1">Configuración</h2>
-                    <p className="text-xs text-ink-2">Próximamente</p>
-                </div>
-            </div>
-        </div>
+        <PageWrapper>
+            <Header title="Panel de Administración" subtitle="Dashboard" />
+            <Content className="p-4 lgx:p-7">
+                <Suspense fallback={<AdminDashboardMetricsSkeleton />}>
+                    <AdminDashboardMetrics />
+                </Suspense>
+            </Content>
+        </PageWrapper>
     );
 }

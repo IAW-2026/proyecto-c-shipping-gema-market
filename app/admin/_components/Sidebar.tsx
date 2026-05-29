@@ -4,7 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Shield, ArrowLeft } from "lucide-react";
 import { UserButton, useUser } from "@clerk/nextjs";
-import { ADMIN_NAV } from "@/config/admin-nav";
+import { ADMIN_NAV } from "@/lib/config/admin-nav";
 
 export function AdminSidebar() {
     const pathname = usePathname();

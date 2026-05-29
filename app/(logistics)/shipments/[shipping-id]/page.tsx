@@ -1,7 +1,5 @@
 import { Suspense } from "react";
 import { Metadata } from "next";
-import { requireRole } from "@/lib/auth/rbac";
-import { ROLES } from "@/lib/definitions/auth";
 import { PageWrapper, Content } from "../../_components/page-layout";
 import { ShipmentDetailData } from "./_components/shipment-detail-data";
 import { ShipmentDetailSkeleton } from "./_components/skeletons/shipment-detail-skeleton";
@@ -15,12 +13,7 @@ interface ShipmentDetailPageProps {
     params: Promise<{ "shipping-id": string }>;
 }
 
-export default async function ShipmentDetailPage({ params }: ShipmentDetailPageProps) {
-    await requireRole([ROLES.LOGISTICS]);
-
-    const resolvedParams = await params;
-    const shippingId = resolvedParams["shipping-id"];
-
+export default function ShipmentDetailPage({ params }: ShipmentDetailPageProps) {
     return (
         <PageWrapper>
             <Suspense fallback={
@@ -28,7 +21,7 @@ export default async function ShipmentDetailPage({ params }: ShipmentDetailPageP
                     <ShipmentDetailSkeleton />
                 </Content>
             }>
-                <ShipmentDetailData shippingId={shippingId} />
+                <ShipmentDetailData params={params} />
             </Suspense>
         </PageWrapper>
     );

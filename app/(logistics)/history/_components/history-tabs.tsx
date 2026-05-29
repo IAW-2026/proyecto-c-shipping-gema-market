@@ -8,16 +8,8 @@ interface HistoryTabsProps {
         all: number;
         active: number;
         delivered: number;
-        issues: number;
     };
 }
-
-const TAB_STATUS_MAP: Record<string, string | undefined> = {
-    todos: undefined,
-    active: undefined,
-    delivered: "delivered",
-    issues: undefined,
-};
 
 export function HistoryTabs({ counts }: HistoryTabsProps) {
     const router = useRouter();
@@ -29,7 +21,6 @@ export function HistoryTabs({ counts }: HistoryTabsProps) {
         { id: "todos", label: "Todos", count: counts.all },
         { id: "active", label: "Activos", count: counts.active },
         { id: "delivered", label: "Entregados", count: counts.delivered },
-        { id: "issues", label: "Con problemas", count: counts.issues },
     ];
 
     const handleTabChange = (id: string) => {

@@ -10,7 +10,7 @@ export function UnauthorizedContent() {
 
     const handleSignOut = () => {
         signOut().then(() => {
-            router.push("/login");
+            router.push("/sign-in");
         });
     };
 

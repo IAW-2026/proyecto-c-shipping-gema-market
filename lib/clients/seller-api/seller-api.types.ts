@@ -1,8 +1,11 @@
-export interface SellerOrderDetails {
+import type { ShipmentStatus } from "@/lib/constants/shipment";
+
+export interface SellerStatusUpdate {
     order_id: string;
-    product_name: string;
-    quantity: number;
-    pickup_address: string;
+    shipping_id: string;
+    status: ShipmentStatus;
+    tracking_code: string;
+    updated_at: string;
 }
 
 export interface SellerNotificationResponse {

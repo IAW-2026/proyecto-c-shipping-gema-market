@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
-import prisma from "@/lib/db/prisma";
-import { getCoordinatesFromAddress, getRoute } from "@/lib/services/map-services";
+import { validateApiKey } from "@/lib/auth/api-key";
+import { getCoordinatesFromAddress, getRoute } from "@/lib/clients/maps";
+import { getShipmentRouteData } from "@/lib/db/queries/public/shipment-route";
 
 interface RouteParams {
     params: Promise<{ shipmentId: string }>;
@@ -16,25 +17,15 @@ function makeWaypoints(origin: [number, number], destination: [number, number]) 
 }
 
 export async function GET(request: NextRequest, { params }: RouteParams) {
+    if (!validateApiKey(request)) {
+        return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
     try {
         const { shipmentId } = await params;
 
-        const envio = await prisma.envio.findUnique({
-            where: { id: shipmentId },
-            select: {
-                pickup_address: true,
-                delivery_address: true,
-                pickup_lat: true,
-                pickup_lng: true,
-                delivery_lat: true,
-                delivery_lng: true,
-                route_geometry: true,
-                route_distance: true,
-                route_duration: true,
-            },
-        });
+        const shipment = await getShipmentRouteData(shipmentId);
 
-        if (!envio) {
+        if (!shipment) {
             return NextResponse.json(
                 { error: "Envío no encontrado" },
                 { status: 404 }
@@ -42,25 +33,25 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
         }
 
         // Nivel 1: ruta completa almacenada — 0 llamadas ORS
-        if (envio.route_geometry) {
+        if (shipment.route_geometry) {
             return NextResponse.json({
-                geometry: envio.route_geometry,
+                geometry: shipment.route_geometry,
                 summary: {
-                    distance: envio.route_distance,
-                    duration: envio.route_duration,
+                    distance: shipment.route_distance,
+                    duration: shipment.route_duration,
                 },
                 waypoints: makeWaypoints(
-                    [envio.pickup_lng!, envio.pickup_lat!],
-                    [envio.delivery_lng!, envio.delivery_lat!]
+                    [shipment.pickup_lng!, shipment.pickup_lat!],
+                    [shipment.delivery_lng!, shipment.delivery_lat!]
                 ),
             });
         }
 
         // Nivel 2: solo coordenadas almacenadas — 1 llamada ORS (routing)
-        if (envio.pickup_lat != null && envio.pickup_lng != null &&
-            envio.delivery_lat != null && envio.delivery_lng != null) {
-            const origin: [number, number] = [envio.pickup_lng, envio.pickup_lat];
-            const dest: [number, number] = [envio.delivery_lng, envio.delivery_lat];
+        if (shipment.pickup_lat != null && shipment.pickup_lng != null &&
+            shipment.delivery_lat != null && shipment.delivery_lng != null) {
+            const origin: [number, number] = [shipment.pickup_lng, shipment.pickup_lat];
+            const dest: [number, number] = [shipment.delivery_lng, shipment.delivery_lat];
 
             const route = await getRoute(origin, dest);
 
@@ -72,8 +63,8 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
         }
 
         // Nivel 3: legacy — geocoding + routing (3 llamadas ORS)
-        const pickupAddr = envio.pickup_address as AddressWithCity;
-        const deliveryAddr = envio.delivery_address as AddressWithCity;
+        const pickupAddr = shipment.pickup_address as AddressWithCity;
+        const deliveryAddr = shipment.delivery_address as AddressWithCity;
 
         const [originCoords, destCoords] = await Promise.all([
             getCoordinatesFromAddress(pickupAddr),
@@ -83,16 +74,16 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
         if (!originCoords || !destCoords) {
             return NextResponse.json(
                 { error: "No se pudieron geocodificar las direcciones" },
-                { status: 422 }
+                { status: 400 }
             );
         }
 
-        const route = await getRoute(originCoords, destCoords);
+        const route = await getRoute(originCoords.coordinates, destCoords.coordinates);
 
         return NextResponse.json({
             geometry: route.geometry,
             summary: route.summary,
-            waypoints: makeWaypoints(originCoords, destCoords),
+            waypoints: makeWaypoints(originCoords.coordinates, destCoords.coordinates),
         });
 
     } catch (error) {

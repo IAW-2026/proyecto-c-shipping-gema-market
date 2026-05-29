@@ -1,22 +1,20 @@
-// app/(operator)/dashboard/_components/dashboard-header.tsx
 import Link from "next/link";
 import { Plus } from "lucide-react";
 import { Header } from "../../_components/page-layout";
-import { auth, clerkClient } from "@clerk/nextjs/server";
+import { getAuthenticatedUserId } from "@/lib/auth/get-authenticated-user";
+
+export function DashboardHeaderSkeleton() {
+    return (
+        <div className="px-4 lgx:px-7 py-5 border-b border-line animate-pulse">
+            <div className="h-6 bg-bone rounded w-48 mb-2" />
+            <div className="h-4 bg-bone rounded w-32" />
+        </div>
+    );
+}
 
 export async function DashboardHeader() {
-    const { userId } = await auth();
-    let firstName = "Operador";
-
-    if (userId) {
-        try {
-            const client = await clerkClient();
-            const user = await client.users.getUser(userId);
-            firstName = user.firstName || "Operador";
-        } catch {
-            // Fallback si Clerk aún no propagó el usuario
-        }
-    }
+    const user = await getAuthenticatedUserId();
+    const firstName = user?.full_name?.split(" ")[0] || "Operador";
 
     const takeShipmentButton = (
         <Link

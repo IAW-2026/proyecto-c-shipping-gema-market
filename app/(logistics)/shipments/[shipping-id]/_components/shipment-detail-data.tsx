@@ -1,7 +1,8 @@
-import { getShipmentDetails } from "@/lib/db/queries/shipment";
+import { getShipmentDetails } from "@/lib/db/queries/logistics/shipments";
 import { notFound } from "next/navigation";
 import { Content } from "../../../_components/page-layout";
 import { ShipmentDetailsHeader } from "./shipment-details-header";
+import { TakeShipmentAction } from "./take-shipment-action";
 import { ShipmentMap } from "./shipment-map";
 import { RouteInfo } from "./route-info";
 import { PaymentInfo } from "./payment-info";
@@ -10,10 +11,12 @@ import { PackageInfo } from "./package-info";
 
 
 interface ShipmentDetailDataProps {
-    shippingId: string;
+    params: Promise<{ "shipping-id": string }>;
 }
 
-export async function ShipmentDetailData({ shippingId }: ShipmentDetailDataProps) {
+export async function ShipmentDetailData({ params }: ShipmentDetailDataProps) {
+    const resolvedParams = await params;
+    const shippingId = resolvedParams["shipping-id"];
     const shipment = await getShipmentDetails(shippingId);
 
     if (!shipment) {
@@ -24,7 +27,12 @@ export async function ShipmentDetailData({ shippingId }: ShipmentDetailDataProps
         <>
             <ShipmentDetailsHeader
                 shippingId={shipment.shippingId}
-                orderId={shipment.orderId}
+                trackingCode={shipment.trackingCode}
+                action={
+                    shipment.status === "waiting_for_courier"
+                        ? <TakeShipmentAction shippingId={shipment.shippingId} />
+                        : undefined
+                }
             />
             <Content className="px-4 lgx:px-7 pb-8">
                 <div className="grid gap-4 grid-cols-1 min-[901px]:grid-cols-[minmax(0,2fr)_minmax(280px,1fr)] h-full">

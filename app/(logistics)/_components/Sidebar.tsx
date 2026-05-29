@@ -5,7 +5,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Truck, ArrowLeft } from "lucide-react";
 import { UserButton, useUser } from "@clerk/nextjs";
-import { OPERATOR_NAV } from "@/config/logistics-nav";
+import { OPERATOR_NAV } from "@/lib/config/logistics-nav";
 
 export function OperatorSidebar() {
     const pathname = usePathname();

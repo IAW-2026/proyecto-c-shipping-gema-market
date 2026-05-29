@@ -1,40 +1,92 @@
-// middleware.ts
 import { clerkMiddleware, createRouteMatcher } from "@clerk/nextjs/server";
 import { NextResponse } from "next/server";
 
-// Rutas que no requieren autenticación (ej: tracking público)
-const isPublicRoute = createRouteMatcher(['/tracking(.*)']);
+// Rutas públicas (no requieren autenticación)
+const isPublicRoute = createRouteMatcher([
+    '/track(.*)',
+    '/api(.*)',
+    '/_next(.*)',
+    '/favicon.ico',
+]);
 
-// Rutas exclusivas para usuarios NO autenticados (Login/Registro)
-const isAuthRoute = createRouteMatcher(['/login(.*)', '/register(.*)']);
+// Rutas de autenticación (solo para no autenticados)
+const isAuthRoute = createRouteMatcher(['/sign-in(.*)', '/sign-up(.*)']);
+
+// Rutas de logística
+const isLogisticsRoute = createRouteMatcher([
+    '/dashboard',
+    '/courier',
+    '/available',
+    '/history',
+    '/settlements',
+    '/shipments(.*)',
+]);
+
+// Rutas de admin
+const isAdminRoute = createRouteMatcher([
+    '/admin(.*)',
+]);
 
 export default clerkMiddleware(async (auth, req) => {
-  const { userId } = await auth();
-  const { pathname } = req.nextUrl;
+    const { userId, sessionClaims } = await auth();
+    const { pathname } = req.nextUrl;
 
-  // 1. Lógica para usuarios autenticados intentando entrar a Login o Registro
-  if (userId && isAuthRoute(req)) {
-    // Redirigimos al dashboard porque el usuario ya tiene una sesión válida
-    return NextResponse.redirect(new URL('/dashboard', req.url));
-  }
+    const role = (sessionClaims as any)?.metadata?.role as string | undefined;
 
-  // 2. Lógica para usuarios NO autenticados intentando entrar a rutas protegidas
-  if (!userId && !isPublicRoute(req) && !isAuthRoute(req)) {
-    // Si no está logueado y la ruta no es pública ni de auth, va a login
-    const loginUrl = new URL('/login', req.url);
-    return NextResponse.redirect(loginUrl);
-  }
+    const response = NextResponse.next();
 
-  // 3. Redirección de la raíz / al contexto correspondiente
-  if (pathname === '/') {
-    const target = userId ? '/dashboard' : '/login';
-    return NextResponse.redirect(new URL(target, req.url));
-  }
+    // 1. Rutas públicas: permitir sin importar auth
+    if (isPublicRoute(req)) {
+        return response;
+    }
+
+    // 2. Usuario no autenticado
+    if (!userId) {
+        // Si intenta acceder a ruta de auth, permitir
+        if (isAuthRoute(req)) {
+            return response;
+        }
+        // Cualquier otra ruta protegida → login
+        return NextResponse.redirect(new URL("/sign-in", req.url));
+    }
+
+    // 3. Usuario autenticado sin rol definido
+    if (!role) {
+        return NextResponse.redirect(new URL("/unauthorized", req.url));
+    }
+
+    // 4. Usuario autenticado en ruta de auth → redirigir a su dashboard
+    if (isAuthRoute(req)) {
+        const target = role === "admin_logistics" ? "/admin/dashboard" : "/dashboard";
+        return NextResponse.redirect(new URL(target, req.url));
+    }
+
+    // 5. Usuario logistics en ruta de admin
+    if (role === "logistics" && isAdminRoute(req)) {
+        return NextResponse.redirect(new URL("/dashboard", req.url));
+    }
+
+    // 6. Usuario logistics en unauthorized
+    if (role === "logistics" && pathname === "/unauthorized") {
+        return NextResponse.redirect(new URL("/dashboard", req.url));
+    }
+
+    // 7. Usuario admin_logistics en rutas de logística
+    if (role === "admin_logistics" && isLogisticsRoute(req)) {
+        return NextResponse.redirect(new URL("/admin/dashboard", req.url));
+    }
+
+    // 8. Usuario admin_logistics en unauthorized
+    if (role === "admin_logistics" && pathname === "/unauthorized") {
+        return NextResponse.redirect(new URL("/admin/dashboard", req.url));
+    }
+
+    return response;
 });
 
 export const config = {
-  matcher: [
-    '/((?!_next|[^?]*\\.(?:html?|css|js(?!on)|jpe?g|webp|png|gif|svg|ttf|woff2?|ico|csv|docx?|xlsx?|zip|webmanifest)).*)',
-    '/(api|trpc)(.*)',
-  ],
+    matcher: [
+        "/((?!_next|[^?]*\\.(?:html?|css|js(?!on)|jpe?g|webp|png|gif|svg|ttf|woff2?|ico|csv|docx?|xlsx?|zip|webmanifest)).*)",
+        "/(api|trpc)(.*)",
+    ],
 };

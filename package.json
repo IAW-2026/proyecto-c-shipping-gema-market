@@ -9,6 +9,12 @@
     "start": "next start",
     "lint": "eslint"
   },
+  "browserslist": [
+    "last 2 Chrome versions",
+    "last 2 Firefox versions",
+    "last 2 Safari versions",
+    "last 2 Edge versions"
+  ],
   "dependencies": {
     "@clerk/nextjs": "^7.2.9",
     "@prisma/adapter-pg": "^7.8.0",
@@ -23,7 +29,7 @@
     "pg": "^8.20.0",
     "react": "19.2.4",
     "react-dom": "19.2.4",
-    "react-leaflet": "^5.0.0",
+    "recharts": "^3.8.1",
     "svix": "^1.93.0",
     "tailwind-merge": "^3.5.0",
     "ulid": "^3.0.2",

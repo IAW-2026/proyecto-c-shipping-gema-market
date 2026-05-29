@@ -4,7 +4,7 @@ import {
 import { ShipmentStatusBadge } from "../../_components/shipment-status-badge"
 import { ChevronRight } from "lucide-react"
 import Link from "next/link"
-import { ShipmentSummary } from "@/lib/definitions/shipment"
+import { ShipmentSummary } from "@/lib/schemas/domain"
 
 export function HistoryTable({ shipments }: { shipments: ShipmentSummary[] }) {
     return (

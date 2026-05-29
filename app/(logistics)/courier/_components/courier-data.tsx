@@ -1,15 +1,18 @@
 "use client";
 
-import { useState, useCallback, ReactNode } from "react";
-import { createPortal } from "react-dom";
+import { useState, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { Tag, Home } from "lucide-react";
-import type { ShipmentSummary } from "@/lib/definitions/shipment";
-import { transitionShipmentAction } from "@/lib/actions/shipment.actions";
+import type { ShipmentSummary } from "@/lib/schemas/domain";
+import { transitionShipmentAction } from "@/lib/features/shipment";
+import { useConfirmAction } from "@/lib/hooks/use-confirm-action";
+import { ConfirmDialog } from "@/components/ui/confirm-dialog";
+import { COURIER_ACTION_MAP } from "@/lib/constants/shipment";
+import { formatAddress } from "@/lib/utils/address-utils";
 import { CourierHeader } from "./courier-header";
 import { CourierMap } from "./courier-map";
-import { ChangeStateButton } from "./courier-actions";
-import { CancelDialog } from "./cancel-dialog";
+import { ChangeStateButton } from "./change-state-button";
+import { GoogleMapsLink } from "./google-maps-link";
 
 interface CourierDataProps {
     shipment: ShipmentSummary;
@@ -19,10 +22,12 @@ interface CourierDataProps {
 
 export function CourierData({ shipment, shipments, selectedTracking }: CourierDataProps) {
     const router = useRouter();
-    const [showCancel, setShowCancel] = useState(false);
     const [hasPendingAction, setHasPendingAction] = useState(false);
 
-    const handleAction = useCallback(async (shippingId: string, transition: "pickup" | "deliver") => {
+    const { isOpen: showCancel, isPending: isCancelPending, open: openCancel, close: closeCancel, handleConfirm: handleCancel }
+        = useConfirmAction(useCallback(() => transitionShipmentAction(shipment.shippingId, "cancel"), [shipment.shippingId]));
+
+    const handleAction = useCallback(async (shippingId: string, transition: "pickup" | "transit" | "deliver") => {
         setHasPendingAction(true);
         try {
             const result = await transitionShipmentAction(shippingId, transition);
@@ -35,47 +40,22 @@ export function CourierData({ shipment, shipments, selectedTracking }: CourierDa
         }
     }, [router]);
 
-    const handleCancel = useCallback(async (shippingId: string) => {
-        setHasPendingAction(true);
-        try {
-            const result = await transitionShipmentAction(shippingId, "cancel");
-            if (!result.success) console.error(result.error);
-        } catch (error) {
-            console.error("Error al cancelar:", error);
-        } finally {
-            router.refresh();
-            setHasPendingAction(false);
-        }
-    }, [router]);
-
-    const formatGmaps = (address: ShipmentSummary["pickupAddress"]) =>
-        `${address.street}${address.number ? ` ${address.number}` : ""}, Bahía Blanca, Argentina`;
-
-    const formatAddress = (address: ShipmentSummary["pickupAddress"]) => {
-        let base = address.street;
-        if (address.number) base += ` ${address.number}`;
-        if (address.floor) base += `, Piso ${address.floor}`;
-        if (address.apartment) base += `, Depto ${address.apartment}`;
-        return base;
-    };
-
-    const isPickup = shipment.status === "pending_pickup";
-    const mainActionLabel = isPickup ? "Recoger paquete" : "Marcar entregado";
-    const mainActionTransition: "pickup" | "deliver" = isPickup ? "pickup" : "deliver";
+    const actionConfig = COURIER_ACTION_MAP[shipment.status];
 
     return (
         <>
             <CourierHeader
                 shipments={shipments}
                 selectedTracking={selectedTracking}
-                onCancelClick={() => setShowCancel(true)}
-                hasPendingAction={hasPendingAction}
+                onCancelClick={openCancel}
+                hasPendingAction={hasPendingAction || isCancelPending}
+                canCancel={!!actionConfig?.canCancel}
             />
 
             <section className="flex flex-col flex-1 px-4 lgx:px-0">
-                <CourierMapArea>
+                <div className="flex-1 relative min-h-0">
                     <CourierMap shipment={shipment} hasPendingAction={hasPendingAction} />
-                </CourierMapArea>
+                </div>
 
                 <div className="px-4 py-2 bg-paper border-t border-line">
                     <div className="flex items-center gap-3">
@@ -94,8 +74,8 @@ export function CourierData({ shipment, shipments, selectedTracking }: CourierDa
                         </div>
 
                         <GoogleMapsLink
-                            origin={formatGmaps(shipment.pickupAddress)}
-                            destination={formatGmaps(shipment.deliveryAddress)}
+                            origin={shipment.pickupAddress}
+                            destination={shipment.deliveryAddress}
                         />
                     </div>
 
@@ -108,49 +88,27 @@ export function CourierData({ shipment, shipments, selectedTracking }: CourierDa
                     </div>
                 </div>
 
-                <div className="border-t border-line px-0 pt-4 pb-6 bg-paper">
-                    <ChangeStateButton
-                        isPending={hasPendingAction}
-                        label={mainActionLabel}
-                        onClick={() => handleAction(shipment.shippingId, mainActionTransition)}
-                    />
-                </div>
+                {actionConfig && (
+                    <div className="border-t border-line px-0 pt-4 pb-6 bg-paper">
+                        <ChangeStateButton
+                            isPending={hasPendingAction}
+                            label={actionConfig.label}
+                            onClick={() => handleAction(shipment.shippingId, actionConfig.transition)}
+                        />
+                    </div>
+                )}
             </section>
 
-            {typeof window !== "undefined" && createPortal(
-                <CancelDialog
-                    open={showCancel}
-                    hasPendingAction={hasPendingAction}
-                    onConfirm={() => handleCancel(shipment.shippingId)}
-                    onCancel={() => setShowCancel(false)}
-                />,
-                document.body
-            )}
+            <ConfirmDialog
+                open={showCancel}
+                isPending={isCancelPending}
+                onConfirm={handleCancel}
+                onCancel={closeCancel}
+                title="Cancelar misión"
+                description="El envío volverá a estar disponible para que otro repartidor lo tome. Esta acción no se puede deshacer."
+                confirmLabel="Sí, cancelar"
+                variant="danger"
+            />
         </>
     );
 }
-
-// --- Layout helpers ---
-
-function CourierMapArea({ children }: { children: ReactNode }) {
-    return <div className="flex-1 relative min-h-0">{children}</div>;
-}
-
-function GoogleMapsLink({ origin, destination }: { origin: string; destination: string }) {
-    const handleClick = () => {
-        const url = `https://www.google.com/maps/dir/?api=1&origin=${encodeURIComponent(origin)}&destination=${encodeURIComponent(destination)}&travelmode=driving`;
-        window.open(url, "_blank", "noopener,noreferrer");
-    };
-
-    return (
-        <button
-            onClick={handleClick}
-            className="w-10 h-10 rounded-full bg-white hover:bg-gray-100 flex items-center justify-center shrink-0 transition-colors shadow-sm"
-            title="Abrir en Google Maps"
-        >
-            <img src="/images/google_maps_icon.png" alt="Google Maps" className="w-5 h-5" />
-        </button>
-    );
-}
-
-

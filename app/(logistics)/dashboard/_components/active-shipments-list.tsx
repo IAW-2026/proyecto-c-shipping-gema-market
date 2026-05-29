@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { Package, ArrowRight } from "lucide-react";
-import { ShipmentSummary } from "@/lib/definitions/shipment";
+import { ShipmentSummary } from "@/lib/schemas/domain";
 import { ShipmentStatusBadge } from "../../_components/shipment-status-badge";
 interface ActiveShipmentsListProps {
   shipments: ShipmentSummary[];
