@@ -1,5 +1,5 @@
 import { getAllRates } from "@/lib/db/queries/admin/rates";
-import { updateRateAction } from "@/lib/actions/admin.actions";
+import { updateRateAction } from "@/lib/features/admin/actions";
 import { DeleteRateButton } from "./delete-rate-button";
 import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from "@/components/ui/table";
 import { Pagination } from "@/components/ui/pagination";

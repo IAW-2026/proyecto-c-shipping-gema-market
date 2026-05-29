@@ -1,5 +1,5 @@
 import prisma from "@/lib/db/prisma";
-import type { AdminDashboardMetrics } from "@/lib/definitions/admin-dashboard-metrics";
+import type { AdminDashboardMetrics } from "@/lib/types/admin-dashboard-metrics";
 import { cacheLife } from "next/cache";
 
 function startOfToday(): Date {

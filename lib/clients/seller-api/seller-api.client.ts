@@ -1,6 +1,6 @@
 import { ApiResult } from "../types";
 import { OriginAddressResponse, SellerNotificationResponse, SellerStatusUpdate } from "./seller-api.types";
-import type { ApiTrace } from "@/lib/shared/api-trace";
+import type { ApiTrace } from "@/lib/utils/api-trace";
 import { hashApiKey } from "@/lib/auth/api-key";
 
 const SELLER_API_URL = process.env.SELLER_API_URL;

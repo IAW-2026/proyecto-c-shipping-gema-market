@@ -2,9 +2,9 @@ import prisma from "@/lib/db/prisma";
 import { Prisma } from "@/lib/generated/prisma/client";
 import {
     Shipment, ShipmentSummary, ShipmentOffer,
-    ShipmentFilterParams,
     ShippingStatusSchema, AddressSchema, DimensionsSchema,
-} from "@/lib/definitions/shipments";
+} from "@/lib/schemas/domain";
+import type { ShipmentFilterParams } from "@/lib/types/shipments/filters";
 import { cacheLife } from "next/cache";
 
 export const summarySelect = {

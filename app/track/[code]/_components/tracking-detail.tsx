@@ -1,10 +1,10 @@
 import { getShipmentByTrackingCode } from "@/lib/db/queries/public/tracking";
 import { notFound } from "next/navigation";
-import { formatDateTime } from "@/lib/shared/date-utils";
+import { formatDateTime } from "@/lib/utils/date-utils";
 import { TrackingTimeline } from "./tracking-timeline";
 import { MapWrapper } from "./map-wrapper";
-import type { Shipment } from "@/lib/definitions/shipments";
-import { SHIPMENT_STATUS_LABELS } from "@/lib/shared/shipment-constants";
+import type { Shipment } from "@/lib/schemas/domain";
+import { SHIPMENT_STATUS_LABELS } from "@/lib/constants/shipment";
 
 function InfoCard({ shipment }: { shipment: Shipment }) {
     return (

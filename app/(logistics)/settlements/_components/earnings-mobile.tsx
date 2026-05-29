@@ -1,9 +1,9 @@
 import { ChevronRight } from "lucide-react";
-import { cn } from "@/lib/shared/classnames";
+import { cn } from "@/lib/utils/classnames";
 import { Card } from "@/components/ui/card";
 import { formatDateKey, formatDateTime } from "./earnings-list-utils";
 import type { EarningsViewProps } from "./earnings-list";
-import type { DailyEarnings, DayOrder } from "@/lib/definitions/shipments";
+import type { DailyEarnings, DayOrder } from "@/lib/types/shipments";
 
 function DayOrdersMobile({ orders }: { orders: DayOrder[] }) {
     return (

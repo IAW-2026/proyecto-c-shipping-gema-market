@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { validateApiKey } from "@/lib/auth/api-key";
 import prisma from "@/lib/db/prisma";
-import { getCoordinatesFromAddress, getRoute } from "@/lib/services/map-services";
+import { getCoordinatesFromAddress, getRoute } from "@/lib/clients/maps";
 
 interface RouteParams {
     params: Promise<{ shipmentId: string }>;

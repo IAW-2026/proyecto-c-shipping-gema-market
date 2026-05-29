@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback } from "react";
-import { deleteRateAction } from "@/lib/actions/admin.actions";
+import { deleteRateAction } from "@/lib/features/admin/actions";
 import { useConfirmAction } from "@/lib/hooks/use-confirm-action";
 import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 

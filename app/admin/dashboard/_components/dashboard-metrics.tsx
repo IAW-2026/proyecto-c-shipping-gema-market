@@ -2,7 +2,7 @@ import { getAdminDashboardMetrics } from "@/lib/db/queries/admin/dashboard";
 import { Truck, Package, TrendingUp, ClipboardList, DollarSign } from "lucide-react";
 import { MetricCard } from "@/components/ui/metric-card";
 import { Card } from "@/components/ui/card";
-import { ADMIN_SHIPMENT_STATUS_LABELS } from "@/lib/shared/shipment-constants";
+import { ADMIN_SHIPMENT_STATUS_LABELS } from "@/lib/constants/shipment";
 
 export async function AdminDashboardMetrics() {
     const metrics = await getAdminDashboardMetrics();

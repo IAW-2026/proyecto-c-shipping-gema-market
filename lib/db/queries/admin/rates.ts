@@ -1,6 +1,6 @@
 import prisma from "@/lib/db/prisma";
-import type { AdminRate } from "@/lib/definitions/admin-dashboard-metrics";
-import type { PaginatedResult } from "@/lib/definitions/shipments/filters";
+import type { AdminRate } from "@/lib/types/admin-dashboard-metrics";
+import type { PaginatedResult } from "@/lib/types/shipments/filters";
 import { cacheLife } from "next/cache";
 
 export async function getAllRates(

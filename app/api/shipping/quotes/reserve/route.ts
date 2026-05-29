@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { validateApiKey } from "@/lib/auth/api-key";
-import { reserveQuoteSchema } from "@/lib/validations/api-schemas";
-import { reserveQuote } from "@/lib/services/quote";
+import { reserveQuoteSchema } from "@/lib/schemas/api/quote";
+import { reserveQuote } from "@/lib/features/quote";
 
 /**
  * POST /api/shipping/quotes/reserve

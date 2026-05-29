@@ -1,10 +1,10 @@
 "use server";
 
 import { requireRole } from "@/lib/auth/rbac";
-import { ROLES } from "@/lib/definitions/auth";
+import { ROLES } from "@/lib/types/auth";
 import { revalidatePath } from "next/cache";
 import prisma from "@/lib/db/prisma";
-import { isNextDynamicServerError } from "@/lib/shared/server-utils";
+import { isNextDynamicServerError } from "@/lib/utils/server-utils";
 import { invalidateUserCache } from "@/lib/auth/user-cache";
 import { deleteDriver, toggleBan } from "@/lib/db/mutations/admin/drivers";
 import { updateShipmentPrice, unassignDriver, deleteShipment } from "@/lib/db/mutations/admin/shipments";

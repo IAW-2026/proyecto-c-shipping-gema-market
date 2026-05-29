@@ -1,6 +1,6 @@
 import prisma from "@/lib/db/prisma";
 import { Prisma } from "@/lib/generated/prisma/client";
-import { generatePrefixedId } from "@/lib/shared/server-utils";
+import { generatePrefixedId } from "@/lib/utils/server-utils";
 
 export async function createRate(
     weightMin: number,

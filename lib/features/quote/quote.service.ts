@@ -1,11 +1,11 @@
 /** Orquestador del flujo de cotización: coordina API externa, geocoding, pricing y persistencia. */
 import { sellerApiClient } from "@/lib/clients/seller-api/seller-api.client";
-import { getCoordinatesFromAddress, getMatrixDistance } from "@/lib/services/map-services";
-import type { ApiTrace } from "@/lib/shared/api-trace";
+import { getCoordinatesFromAddress, getMatrixDistance } from "@/lib/clients/maps";
+import type { ApiTrace } from "@/lib/utils/api-trace";
 import type { z } from "zod";
-import type { quoteRequestSchema } from "@/lib/validations/api-schemas";
+import type { quoteRequestSchema } from "@/lib/schemas/api/quote";
 import { calculateVolume, calculateVolumetricWeight, calculateBillableWeight, calculatePrice, calculateEstimatedDays, getDefaultPricePerKm, CURRENCY, DEFAULT_DISTANCE_KM } from "./price-and-time-calculator";
-import { getUsdToArsRate } from "@/lib/services/exchange-rate";
+import { getUsdToArsRate } from "@/lib/clients/exchange-rate";
 import { validateQuoteForReservation, validateQuoteForRelease } from "./state-validations";
 import { findMatchingRate, findQuoteById, findQuoteForRelease, type CreateQuoteData } from "@/lib/db/queries/quote";
 import { createQuoteRecord, reserveQuoteInDb, releaseQuoteInDb } from "@/lib/db/mutations/quote";

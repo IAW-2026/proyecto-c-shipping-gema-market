@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { generatePrefixedId } from "@/lib/shared/server-utils";
+import { generatePrefixedId } from "@/lib/utils/server-utils";
 import { DEFAULT_CONFIG, ENDPOINTS, INTERNAL_CALLS } from "./constants";
 import type { PlaygroundConfig, EndpointDef, RequestState, FlowStatus, LogEntry, LogInternalCall } from "./types";
 

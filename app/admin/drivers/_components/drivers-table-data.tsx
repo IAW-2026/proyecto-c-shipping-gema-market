@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { getAllDrivers } from "@/lib/db/queries/admin/drivers";
-import { formatDate } from "@/lib/shared/date-utils";
+import { formatDate } from "@/lib/utils/date-utils";
 import { ToggleBanButton } from "./toggle-ban-button";
 import { DeleteDriverButton } from "./delete-driver-button";
 import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from "@/components/ui/table";

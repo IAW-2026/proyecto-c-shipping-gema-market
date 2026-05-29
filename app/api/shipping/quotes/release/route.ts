@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { validateApiKey } from "@/lib/auth/api-key";
-import { releaseQuoteSchema } from "@/lib/validations/api-schemas";
-import { releaseQuote } from "@/lib/services/quote";
+import { releaseQuoteSchema } from "@/lib/schemas/api/quote";
+import { releaseQuote } from "@/lib/features/quote";
 
 /**
  * POST /api/shipping/quotes/release

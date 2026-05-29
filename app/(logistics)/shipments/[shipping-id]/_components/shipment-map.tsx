@@ -1,4 +1,4 @@
-import type { ShipmentStatus } from "@/lib/shared/shipment-constants";
+import type { ShipmentStatus } from "@/lib/constants/shipment";
 import { MapIframe } from "@/components/ui/map-iframe";
 import { ShipmentStatusBadge } from "@/app/(logistics)/_components/shipment-status-badge";
 import { Card } from "@/components/ui/card";

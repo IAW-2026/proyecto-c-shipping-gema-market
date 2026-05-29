@@ -1,8 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { validateApiKey } from "@/lib/auth/api-key";
-import { quoteRequestSchema } from "@/lib/validations/api-schemas";
-import { calculateQuote } from "@/lib/services/quote";
-import { createTraceIfDebug, withTrace } from "@/lib/shared/api-handler";
+import { quoteRequestSchema } from "@/lib/schemas/api/quote";
+import { calculateQuote } from "@/lib/features/quote";
+import { createTraceIfDebug, withTrace } from "@/lib/utils/api-handler";
 
 /**
  * POST /api/shipping/quotes

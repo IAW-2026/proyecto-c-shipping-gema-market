@@ -1,8 +1,8 @@
 import { getAvailableShipments } from "@/lib/db/queries/logistics/available";
-import type { ShipmentFilterParams } from "@/lib/definitions/shipments";
+import type { ShipmentFilterParams } from "@/lib/types/shipments/filters";
 import { AvailableShipmentCard } from "./shipment-card";
 import { getAuthenticatedUserId } from "@/lib/auth/get-authenticated-user";
-import { AvailableSearchParamsSchema } from "@/lib/validations/shipment";
+import { AvailableSearchParamsSchema } from "@/lib/schemas/api/filters";
 import { Pagination } from "@/components/ui/pagination";
 
 interface AvailableDataProps {

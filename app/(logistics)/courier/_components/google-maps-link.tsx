@@ -1,8 +1,8 @@
 "use client";
 
 import Image from "next/image";
-import { formatGmapsUrl } from "@/lib/shared/address-utils";
-import type { Address } from "@/lib/definitions/shipments";
+import { formatGmapsUrl } from "@/lib/utils/address-utils";
+import type { Address } from "@/lib/schemas/domain";
 
 interface GoogleMapsLinkProps {
     origin: Address;

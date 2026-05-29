@@ -1,6 +1,6 @@
 import { getAllShipments } from "@/lib/db/queries/admin/shipments";
-import { formatDate } from "@/lib/shared/date-utils";
-import { updateShipmentPriceAction } from "@/lib/actions/admin.actions";
+import { formatDate } from "@/lib/utils/date-utils";
+import { updateShipmentPriceAction } from "@/lib/features/admin/actions";
 import { DeleteShipmentButton } from "./delete-shipment-button";
 import { UnassignShipmentButton } from "./unassign-shipment-button";
 import { SortableHeader } from "./sortable-header";

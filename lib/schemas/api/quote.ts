@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { ShippingStatusSchema } from "../definitions/shipments";
+import { ShippingStatusSchema } from "@/lib/schemas/domain";
 
 // --- Esquemas de dirección ---
 
@@ -9,23 +9,6 @@ export const DestinationAddressSchema = z.object({
     zip: z.string().min(1, "El código postal es obligatorio"),
     floor: z.string().optional(),
     apartment: z.string().optional(),
-});
-
-// --- Validación: POST /api/shipping/shipments ---
-
-export const createShipmentSchema = z.object({
-    order_id: z.string().min(1),
-    seller_id: z.string().min(1),
-    buyer_id: z.string().min(1),
-    receiver_name: z.string().optional(),
-    receiver_phone: z.string().optional(),
-});
-
-// --- Validación: actualizaciones de estado internas ---
-
-export const updateStatusSchema = z.object({
-    status: ShippingStatusSchema,
-    notes: z.string().optional(),
 });
 
 // --- Validación: POST /api/shipping/quotes ---

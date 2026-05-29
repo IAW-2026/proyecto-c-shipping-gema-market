@@ -1,4 +1,4 @@
-import type { ShipmentSummary } from "@/lib/definitions/shipments";
+import type { ShipmentSummary } from "@/lib/schemas/domain";
 import { MapIframe } from "@/components/ui/map-iframe";
 import { ShipmentStatusBadge } from "@/app/(logistics)/_components/shipment-status-badge";
 

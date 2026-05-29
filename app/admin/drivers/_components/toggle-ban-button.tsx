@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback } from "react";
-import { toggleBanAction } from "@/lib/actions/admin.actions";
+import { toggleBanAction } from "@/lib/features/admin/actions";
 import { useConfirmAction } from "@/lib/hooks/use-confirm-action";
 import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 

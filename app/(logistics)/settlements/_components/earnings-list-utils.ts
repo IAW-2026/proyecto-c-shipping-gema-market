@@ -1,5 +1,5 @@
-import { toDate } from "@/lib/shared/date-utils";
-import type { SettlementPeriod } from "@/lib/definitions/shipments";
+import { toDate } from "@/lib/utils/date-utils";
+import type { SettlementPeriod } from "@/lib/types/shipments";
 
 export function formatDateKey(date: Date): string {
     return new Date(date).toISOString().split("T")[0];

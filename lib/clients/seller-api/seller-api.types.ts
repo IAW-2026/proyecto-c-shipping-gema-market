@@ -1,4 +1,4 @@
-import type { ShipmentStatus } from "@/lib/shared/shipment-constants";
+import type { ShipmentStatus } from "@/lib/constants/shipment";
 
 export interface SellerStatusUpdate {
     order_id: string;

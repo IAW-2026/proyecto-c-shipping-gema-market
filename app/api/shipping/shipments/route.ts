@@ -1,8 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { validateApiKey } from "@/lib/auth/api-key";
-import { createShipmentSchema } from "@/lib/validations/api-schemas";
-import { createShipment } from "@/lib/services/shipment";
-import { fetchAndPersistRouteGeometry } from "@/lib/services/map-services";
+import { createShipmentSchema } from "@/lib/schemas/api/shipment";
+import { createShipment } from "@/lib/features/shipment/shipment.service";
+import { fetchAndPersistRouteGeometry } from "@/lib/clients/maps";
 
 /**
  * POST /api/shipping/shipments

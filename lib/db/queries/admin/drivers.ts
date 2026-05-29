@@ -1,7 +1,7 @@
 import prisma from "@/lib/db/prisma";
 import { Prisma } from "@/lib/generated/prisma/client";
-import type { AdminDriver, AdminDriverDetail, DriverShipment } from "@/lib/definitions/admin-dashboard-metrics";
-import type { PaginatedResult } from "@/lib/definitions/shipments/filters";
+import type { AdminDriver, AdminDriverDetail, DriverShipment } from "@/lib/types/admin-dashboard-metrics";
+import type { PaginatedResult } from "@/lib/types/shipments/filters";
 import { cacheLife } from "next/cache";
 
 export async function getAllDrivers(

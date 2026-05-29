@@ -3,12 +3,12 @@
 import { useState, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { Tag, Home } from "lucide-react";
-import type { ShipmentSummary } from "@/lib/definitions/shipments";
-import { transitionShipmentAction } from "@/lib/actions/shipment.actions";
+import type { ShipmentSummary } from "@/lib/schemas/domain";
+import { transitionShipmentAction } from "@/lib/features/shipment";
 import { useConfirmAction } from "@/lib/hooks/use-confirm-action";
 import { ConfirmDialog } from "@/components/ui/confirm-dialog";
-import { COURIER_ACTION_MAP } from "@/lib/shared/shipment-constants";
-import { formatAddress } from "@/lib/shared/address-utils";
+import { COURIER_ACTION_MAP } from "@/lib/constants/shipment";
+import { formatAddress } from "@/lib/utils/address-utils";
 import { CourierHeader } from "./courier-header";
 import { CourierMap } from "./courier-map";
 import { ChangeStateButton } from "./change-state-button";

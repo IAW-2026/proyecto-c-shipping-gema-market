@@ -3,7 +3,7 @@
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { Check, Loader2 } from "lucide-react";
-import { takeShipmentAction } from "@/lib/actions/shipment.actions";
+import { takeShipmentAction } from "@/lib/features/shipment";
 
 export function TakeShipmentAction({ shippingId }: { shippingId: string }) {
     const router = useRouter();

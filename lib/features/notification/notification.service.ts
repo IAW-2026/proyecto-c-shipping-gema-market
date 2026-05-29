@@ -1,4 +1,4 @@
-import type { ShipmentStatus } from "@/lib/shared/shipment-constants";
+import type { ShipmentStatus } from "@/lib/constants/shipment";
 import { sellerApiClient } from "@/lib/clients/seller-api/seller-api.client";
 import { buyerApiClient } from "@/lib/clients/buyer-api/buyer-api.client";
 import type { SellerStatusUpdate } from "@/lib/clients/seller-api/seller-api.types";

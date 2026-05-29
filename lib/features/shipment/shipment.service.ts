@@ -1,8 +1,8 @@
 /** Servicio de creación de envíos: valida datos del comprador, busca cotización reservada y persiste el envío. */
-import { generatePrefixedId } from "@/lib/shared/server-utils";
+import { generatePrefixedId } from "@/lib/utils/server-utils";
 import { buyerApiClient } from "@/lib/clients/buyer-api/buyer-api.client";
 import type { z } from "zod";
-import type { createShipmentSchema } from "@/lib/validations/api-schemas";
+import type { createShipmentSchema } from "@/lib/schemas/api/shipment";
 import { createShipmentRecord, generateTrackingCode } from "@/lib/db/mutations/shared";
 import { findReservedQuote } from "@/lib/db/queries/quote";
 import { confirmQuote } from "@/lib/db/mutations/quote";

@@ -1,7 +1,8 @@
 import { auth, currentUser } from "@clerk/nextjs/server";
-import { ROLES, UserRole } from "../definitions/auth";
+import { ROLES } from "@/lib/types/auth";
+import type { UserRole } from "@/lib/types/auth";
 import { redirect } from "next/navigation";
-import { isNextDynamicServerError } from "@/lib/shared/server-utils";
+import { isNextDynamicServerError } from "@/lib/utils/server-utils";
 import prisma from "@/lib/db/prisma";
 import getCurrentUserId from "./get-current-user-id";
 import { getUserFromCache, setUserInCache } from "./user-cache";

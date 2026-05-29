@@ -1,5 +1,6 @@
 import prisma from "@/lib/db/prisma";
-import { ShipmentSummary, PaginatedResult, ShipmentFilterParams } from "@/lib/definitions/shipments";
+import { ShipmentSummary } from "@/lib/schemas/domain";
+import type { PaginatedResult, ShipmentFilterParams } from "@/lib/types/shipments/filters";
 import { summarySelect, toShipmentSummary, buildWhere, buildOrderBy } from "@/lib/db/queries/shared";
 import { cacheLife } from "next/cache";
 

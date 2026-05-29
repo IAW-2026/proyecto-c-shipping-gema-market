@@ -1,7 +1,7 @@
 import { notFound } from "next/navigation";
 import { getDriverById, getDriverShipments } from "@/lib/db/queries/admin/drivers";
 import { getShipmentCountsByStatus } from "@/lib/db/queries/shared";
-import { formatDate } from "@/lib/shared/date-utils";
+import { formatDate } from "@/lib/utils/date-utils";
 import { Package, CheckCircle, Clock } from "lucide-react";
 import { Header, Content, PageWrapper } from "../../../_components";
 import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from "@/components/ui/table";

@@ -1,12 +1,12 @@
 "use server";
 
 import { requireRole } from "@/lib/auth/rbac";
-import { ROLES } from "@/lib/definitions/auth";
-import { TakeShipmentSchema } from "@/lib/validations/shipment";
+import { ROLES } from "@/lib/types/auth";
+import { TakeShipmentSchema } from "@/lib/schemas/api/shipment";
 import { revalidatePath } from "next/cache";
 import prisma from "@/lib/db/prisma";
-import { isNextDynamicServerError } from "@/lib/shared/server-utils";
-import { notifyTransition } from "@/lib/services/notification/notification.service";
+import { isNextDynamicServerError } from "@/lib/utils/server-utils";
+import { notifyTransition } from "@/lib/features/notification/notification.service";
 import { assignShipmentToDriver, transitionShipmentStatus } from "@/lib/db/mutations/logistics/shipments";
 
 export async function takeShipmentAction(shipmentId: string) {
@@ -116,8 +116,8 @@ export async function transitionShipmentAction(
             orderId: shipment.order_id,
             shippingId: shipmentId,
             trackingCode: shipment.tracking_code,
-            oldStatus: shipment.status as import("@/lib/shared/shipment-constants").ShipmentStatus,
-            newStatus: newStatus as import("@/lib/shared/shipment-constants").ShipmentStatus,
+            oldStatus: shipment.status as import("@/lib/constants/shipment").ShipmentStatus,
+            newStatus: newStatus as import("@/lib/constants/shipment").ShipmentStatus,
         });
 
         revalidatePath("/courier");

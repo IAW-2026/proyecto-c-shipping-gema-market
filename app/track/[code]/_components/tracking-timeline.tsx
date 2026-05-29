@@ -1,8 +1,8 @@
 "use client";
 
 import { Check, Package, MapPin, Truck, Navigation, Home } from "lucide-react";
-import { toDate } from "@/lib/shared/date-utils";
-import type { ShipmentStatus } from "@/lib/shared/shipment-constants";
+import { toDate } from "@/lib/utils/date-utils";
+import type { ShipmentStatus } from "@/lib/constants/shipment";
 
 interface TrackingTimelineProps {
     status: ShipmentStatus;

@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback } from "react";
-import { unassignDriverAction } from "@/lib/actions/admin.actions";
+import { unassignDriverAction } from "@/lib/features/admin/actions";
 import { useConfirmAction } from "@/lib/hooks/use-confirm-action";
 import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 import { UserX } from "lucide-react";

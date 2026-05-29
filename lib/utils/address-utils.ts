@@ -1,4 +1,4 @@
-import type { Address } from "@/lib/definitions/shipments";
+import type { Address } from "@/lib/schemas/domain";
 
 export function formatAddress(address: Address): string {
     let base = address.street;

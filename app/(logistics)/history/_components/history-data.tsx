@@ -1,8 +1,8 @@
 import { getFilteredShipments } from "@/lib/db/queries/logistics/history";
 import { getShipmentCountsByStatus } from "@/lib/db/queries/shared";
-import type { ShipmentFilterParams } from "@/lib/definitions/shipments";
-import type { ShipmentStatus } from "@/lib/shared/shipment-constants";
-import { HistorySearchParamsSchema } from "@/lib/validations/shipment";
+import type { ShipmentFilterParams } from "@/lib/types/shipments/filters";
+import type { ShipmentStatus } from "@/lib/constants/shipment";
+import { HistorySearchParamsSchema } from "@/lib/schemas/api/filters";
 import { getAuthenticatedUserId } from "@/lib/auth/get-authenticated-user";
 import { HistoryTabs } from "./history-tabs";
 import { HistoryTable } from "./history-table";

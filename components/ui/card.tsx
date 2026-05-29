@@ -1,5 +1,5 @@
 // components/ui/card.tsx
-import { cn } from "@/lib/shared/classnames"; // Utilidad estándar para combinar clases
+import { cn } from "@/lib/utils/classnames"; // Utilidad estándar para combinar clases
 
 interface CardProps {
     children: React.ReactNode;

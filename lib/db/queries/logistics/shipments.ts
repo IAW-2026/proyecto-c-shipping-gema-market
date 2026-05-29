@@ -1,5 +1,5 @@
 import prisma from "@/lib/db/prisma";
-import { Shipment } from "@/lib/definitions/shipments";
+import { Shipment } from "@/lib/schemas/domain";
 import { detailSelect, toShipmentDetail } from "@/lib/db/queries/shared";
 import { cacheLife } from "next/cache";
 

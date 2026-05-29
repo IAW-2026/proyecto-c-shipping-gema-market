@@ -1,8 +1,8 @@
 import prisma from "@/lib/db/prisma";
 import { Prisma } from "@/lib/generated/prisma/client";
-import { ShipmentOffer, PaginatedResult } from "@/lib/definitions/shipments";
+import { ShipmentOffer } from "@/lib/schemas/domain";
+import type { PaginatedResult, ShipmentFilterParams } from "@/lib/types/shipments/filters";
 import { offerSelect, toShipmentOffer, buildOrderBy } from "@/lib/db/queries/shared";
-import type { ShipmentFilterParams } from "@/lib/definitions/shipments";
 import { cacheLife } from "next/cache";
 
 export async function getAvailableShipments(params?: ShipmentFilterParams): Promise<PaginatedResult<ShipmentOffer>> {

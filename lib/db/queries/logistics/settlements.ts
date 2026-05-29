@@ -1,5 +1,5 @@
 import prisma from "@/lib/db/prisma";
-import type { SettlementPeriod, DailyEarnings, DayOrder } from "@/lib/definitions/shipments";
+import type { SettlementPeriod, DailyEarnings, DayOrder } from "@/lib/types/shipments";
 import { cacheLife } from "next/cache";
 
 interface WeeklySettlementRaw {

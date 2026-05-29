@@ -1,4 +1,4 @@
-import { ShipmentSummary } from "./shipments";
+import type { ShipmentSummary } from "@/lib/schemas/domain";
 
 export interface DashboardMetrics {
     shipmentToday: number;

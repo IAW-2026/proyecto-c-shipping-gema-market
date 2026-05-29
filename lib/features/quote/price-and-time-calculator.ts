@@ -5,7 +5,7 @@ export { DEFAULT_DISTANCE_KM };
 const DEFAULT_PRICE_PER_KM = 200;
 export const CURRENCY = "ARS";
 
-import { ADMIN_DAYS, SECONDS_PER_TRANSIT_DAY, MAX_TRANSIT_DAYS } from "@/lib/shared/shipment-constants";
+import { ADMIN_DAYS, SECONDS_PER_TRANSIT_DAY, MAX_TRANSIT_DAYS } from "@/lib/constants/shipment";
 
 export function calculateVolume(height_cm: number, width_cm: number, depth_cm: number): number {
     return height_cm * width_cm * depth_cm / 1_000_000;

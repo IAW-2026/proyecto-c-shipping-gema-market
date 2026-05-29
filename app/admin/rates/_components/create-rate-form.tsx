@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { createRateAction } from "@/lib/actions/admin.actions";
+import { createRateAction } from "@/lib/features/admin/actions";
 import { Plus } from "lucide-react";
 
 export function CreateRateForm() {

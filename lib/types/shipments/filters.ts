@@ -1,4 +1,4 @@
-import type { ShipmentStatus } from "@/lib/shared/shipment-constants";
+import type { ShipmentStatus } from "@/lib/constants/shipment";
 
 export interface ShipmentFilterParams {
     logisticsId?: string;

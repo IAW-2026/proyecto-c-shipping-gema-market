@@ -1,6 +1,6 @@
 import prisma from "@/lib/db/prisma";
-import type { DashboardMetrics, PerformanceData, WeekData } from "@/lib/definitions/dashboard-metrics";
-import type { ShipmentSummary } from "@/lib/definitions/shipments";
+import type { DashboardMetrics, PerformanceData, WeekData } from "@/lib/types/dashboard-metrics";
+import type { ShipmentSummary } from "@/lib/schemas/domain";
 import { getSettlements } from "@/lib/db/queries/logistics/settlements";
 import { summarySelect, toShipmentSummary } from "@/lib/db/queries/shared";
 import { cacheLife } from "next/cache";

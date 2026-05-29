@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { validateApiKey } from "@/lib/auth/api-key";
 import { z } from "zod";
-import { getCoordinatesFromAddress } from "@/lib/services/map-services";
+import { getCoordinatesFromAddress } from "@/lib/clients/maps";
 
 const verifySchema = z.object({
     product_id: z.string().min(1),

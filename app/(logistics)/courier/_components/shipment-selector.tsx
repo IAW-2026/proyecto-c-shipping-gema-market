@@ -2,7 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { ChevronDown } from "lucide-react";
-import type { ShipmentSummary } from "@/lib/definitions/shipments";
+import type { ShipmentSummary } from "@/lib/schemas/domain";
 
 interface ShipmentSelectorProps {
     shipments: ShipmentSummary[];

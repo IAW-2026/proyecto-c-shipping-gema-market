@@ -3,7 +3,7 @@
 import { useState, useCallback } from "react";
 import { EarningsDesktop } from "./earnings-desktop";
 import { EarningsMobile } from "./earnings-mobile";
-import type { SettlementPeriod, DailyEarnings, DayOrder } from "@/lib/definitions/shipments";
+import type { SettlementPeriod, DailyEarnings, DayOrder } from "@/lib/types/shipments";
 
 export interface EarningsViewProps {
     settlements: SettlementPeriod[];

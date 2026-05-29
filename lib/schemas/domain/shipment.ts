@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { SHIPMENT_STATUSES } from "@/lib/shared/shipment-constants";
+import { SHIPMENT_STATUSES } from "@/lib/constants/shipment";
 
 export const ShippingStatusSchema = z.enum(SHIPMENT_STATUSES);
 
