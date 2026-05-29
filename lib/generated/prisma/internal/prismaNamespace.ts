@@ -387,7 +387,8 @@ export const ModelName = {
   User: 'User',
   Quote: 'Quote',
   Shipment: 'Shipment',
-  Rate: 'Rate'
+  Rate: 'Rate',
+  TrackingSequence: 'TrackingSequence'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -403,7 +404,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "user" | "quote" | "shipment" | "rate"
+    modelProps: "user" | "quote" | "shipment" | "rate" | "trackingSequence"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -703,6 +704,80 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
+    TrackingSequence: {
+      payload: Prisma.$TrackingSequencePayload<ExtArgs>
+      fields: Prisma.TrackingSequenceFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.TrackingSequenceFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TrackingSequencePayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.TrackingSequenceFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TrackingSequencePayload>
+        }
+        findFirst: {
+          args: Prisma.TrackingSequenceFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TrackingSequencePayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.TrackingSequenceFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TrackingSequencePayload>
+        }
+        findMany: {
+          args: Prisma.TrackingSequenceFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TrackingSequencePayload>[]
+        }
+        create: {
+          args: Prisma.TrackingSequenceCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TrackingSequencePayload>
+        }
+        createMany: {
+          args: Prisma.TrackingSequenceCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.TrackingSequenceCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TrackingSequencePayload>[]
+        }
+        delete: {
+          args: Prisma.TrackingSequenceDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TrackingSequencePayload>
+        }
+        update: {
+          args: Prisma.TrackingSequenceUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TrackingSequencePayload>
+        }
+        deleteMany: {
+          args: Prisma.TrackingSequenceDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.TrackingSequenceUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.TrackingSequenceUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TrackingSequencePayload>[]
+        }
+        upsert: {
+          args: Prisma.TrackingSequenceUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TrackingSequencePayload>
+        }
+        aggregate: {
+          args: Prisma.TrackingSequenceAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateTrackingSequence>
+        }
+        groupBy: {
+          args: Prisma.TrackingSequenceGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.TrackingSequenceGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.TrackingSequenceCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.TrackingSequenceCountAggregateOutputType> | number
+        }
+      }
+    }
   }
 } & {
   other: {
@@ -817,6 +892,14 @@ export const RateScalarFieldEnum = {
 } as const
 
 export type RateScalarFieldEnum = (typeof RateScalarFieldEnum)[keyof typeof RateScalarFieldEnum]
+
+
+export const TrackingSequenceScalarFieldEnum = {
+  year: 'year',
+  last_number: 'last_number'
+} as const
+
+export type TrackingSequenceScalarFieldEnum = (typeof TrackingSequenceScalarFieldEnum)[keyof typeof TrackingSequenceScalarFieldEnum]
 
 
 export const SortOrder = {
@@ -1077,6 +1160,7 @@ export type GlobalOmitConfig = {
   quote?: Prisma.QuoteOmit
   shipment?: Prisma.ShipmentOmit
   rate?: Prisma.RateOmit
+  trackingSequence?: Prisma.TrackingSequenceOmit
 }
 
 /* Types for Logging */

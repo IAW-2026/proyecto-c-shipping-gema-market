@@ -88,3 +88,9 @@ model Rate {
   weight_range Json // Ejemplo: { "min": 0, "max": 30 }
   price_per_km Decimal @db.Decimal(10, 2) // USD por km
 }
+
+// 5. TrackingSequence: Secuencia atómica para tracking codes por año
+model TrackingSequence {
+  year        Int @id
+  last_number Int
+}

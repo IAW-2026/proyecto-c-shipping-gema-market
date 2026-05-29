@@ -61,3 +61,8 @@ export type Shipment = Prisma.ShipmentModel
  * 
  */
 export type Rate = Prisma.RateModel
+/**
+ * Model TrackingSequence
+ * 
+ */
+export type TrackingSequence = Prisma.TrackingSequenceModel

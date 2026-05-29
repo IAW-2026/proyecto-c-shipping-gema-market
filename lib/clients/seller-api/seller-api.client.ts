@@ -25,6 +25,14 @@ export const sellerApiClient = {
             };
         }
 
+        if (process.env.MOCK_EXTERNAL_APIS === "true") {
+            console.log(`[SELLER CLIENT MOCK] GET /api/seller/productos/${productId}/direccion-origen`);
+            return {
+                data: { origin_address: { street: "Calle Mock", number: "123", zip: "1406" } },
+                status: 200,
+            };
+        }
+
         try {
             const res = await fetch(`${SELLER_API_URL}/api/seller/productos/${productId}/direccion-origen`, {
                 headers: { "x-api-key-hash": API_KEY_HASH },
@@ -41,6 +49,11 @@ export const sellerApiClient = {
     },
 
     notifyStatusChange: async (orderId: string, payload: SellerStatusUpdate): ApiResult<SellerNotificationResponse> => {
+        if (process.env.MOCK_EXTERNAL_APIS === "true") {
+            console.log(`[SELLER CLIENT MOCK] POST /api/seller/ventas/${orderId}/estado-envio`, payload);
+            return { data: { success: true }, status: 200 };
+        }
+
         try {
             const res = await fetch(`${SELLER_API_URL}/api/seller/ventas/${orderId}/estado-envio`, {
                 method: "POST",

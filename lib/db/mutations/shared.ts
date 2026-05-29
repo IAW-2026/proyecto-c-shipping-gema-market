@@ -51,6 +51,20 @@ export async function createShipmentRecord(data: CreateShipmentData, client: Pri
     });
 }
 
+export async function generateTrackingCode(
+    client: Prisma.TransactionClient | typeof prisma = prisma
+): Promise<string> {
+    const year = new Date().getFullYear();
+    const result = await client.$queryRaw<[{ last_number: number }]>`
+        INSERT INTO "TrackingSequence" ("year", "last_number")
+        VALUES (${year}, 1)
+        ON CONFLICT ("year") DO UPDATE SET "last_number" = "TrackingSequence"."last_number" + 1
+        RETURNING "last_number"
+    `;
+    const number = result[0].last_number;
+    return `BB-${String(number).padStart(6, '0')}-${year}`;
+}
+
 export async function persistRouteGeometry(
     shipmentId: string,
     routeGeometry: Prisma.InputJsonValue

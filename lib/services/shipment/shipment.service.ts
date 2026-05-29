@@ -3,17 +3,11 @@ import { generatePrefixedId } from "@/lib/shared/server-utils";
 import { buyerApiClient } from "@/lib/clients/buyer-api/buyer-api.client";
 import type { z } from "zod";
 import type { createShipmentSchema } from "@/lib/validations/api-schemas";
-import { createShipmentRecord, type CreateShipmentData } from "@/lib/db/mutations/shared";
+import { createShipmentRecord, generateTrackingCode } from "@/lib/db/mutations/shared";
 import { findReservedQuote } from "@/lib/db/queries/quote";
 import { confirmQuote } from "@/lib/db/mutations/quote";
 import prisma from "@/lib/db/prisma";
 type CreateShipmentRequest = z.infer<typeof createShipmentSchema>;
-
-function generateTrackingCode(): string {
-    const year = new Date().getFullYear();
-    const number = Math.floor(1000 + Math.random() * 9000);
-    return `BB-${number}-${year}`;
-}
 
 export interface CreateShipmentResult {
     shipping_id: string;
@@ -25,7 +19,8 @@ export async function createShipment(
     data: CreateShipmentRequest,
     req?: Request
 ): Promise<CreateShipmentResult> {
-    let { order_id, seller_id, buyer_id, receiver_name, receiver_phone } = data;
+    const { order_id, seller_id, buyer_id } = data;
+    let { receiver_name, receiver_phone } = data;
 
     if (!receiver_name || !receiver_phone) {
         try {
@@ -54,7 +49,6 @@ export async function createShipment(
         );
     }
 
-    const tracking_code = generateTrackingCode();
     const packageDetails = cotizacion.package_details as {
         weight: number;
         width: number;
@@ -63,6 +57,8 @@ export async function createShipment(
     };
 
     const [shipment] = await prisma.$transaction(async (tx) => {
+        const tracking_code = await generateTrackingCode(tx);
+
         const e = await createShipmentRecord({
             id: generatePrefixedId("shp"),
             order_id,

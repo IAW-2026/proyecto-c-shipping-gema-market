@@ -54,7 +54,8 @@ export const ModelName = {
   User: 'User',
   Quote: 'Quote',
   Shipment: 'Shipment',
-  Rate: 'Rate'
+  Rate: 'Rate',
+  TrackingSequence: 'TrackingSequence'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -148,6 +149,14 @@ export const RateScalarFieldEnum = {
 } as const
 
 export type RateScalarFieldEnum = (typeof RateScalarFieldEnum)[keyof typeof RateScalarFieldEnum]
+
+
+export const TrackingSequenceScalarFieldEnum = {
+  year: 'year',
+  last_number: 'last_number'
+} as const
+
+export type TrackingSequenceScalarFieldEnum = (typeof TrackingSequenceScalarFieldEnum)[keyof typeof TrackingSequenceScalarFieldEnum]
 
 
 export const SortOrder = {
