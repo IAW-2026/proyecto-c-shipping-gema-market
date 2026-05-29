@@ -1,4 +1,4 @@
-import { LayoutDashboard, Users, Truck, Package, DollarSign } from "lucide-react";
+import { LayoutDashboard, Truck, Package, DollarSign } from "lucide-react";
 
 export const ADMIN_NAV = [
     { id: "dashboard", label: "Dashboard", icon: LayoutDashboard, route: "/admin/dashboard" },

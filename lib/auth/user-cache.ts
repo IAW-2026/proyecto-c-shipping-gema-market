@@ -29,6 +29,3 @@ export function invalidateUserCache(clerkUserId: string): void {
   store.delete(clerkUserId);
 }
 
-export function clearUserCache(): void {
-  store.clear();
-}

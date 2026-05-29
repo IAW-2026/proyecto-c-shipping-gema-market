@@ -1,5 +1,4 @@
 import { z } from "zod";
-import { ShippingStatusSchema } from "@/lib/schemas/domain";
 
 // --- Esquemas de dirección ---
 

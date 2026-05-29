@@ -2,7 +2,6 @@ import { NextRequest, NextResponse } from "next/server";
 import { validateApiKey } from "@/lib/auth/api-key";
 import { getCoordinatesFromAddress, getRoute } from "@/lib/clients/maps";
 import { getShipmentRouteData } from "@/lib/db/queries/public/shipment-route";
-import type { ShipmentRouteData } from "@/lib/db/queries/public/shipment-route";
 
 interface RouteParams {
     params: Promise<{ shipmentId: string }>;
