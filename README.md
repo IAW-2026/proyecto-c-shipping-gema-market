@@ -1,45 +1,84 @@
-[![Review Assignment Due Date](https://classroom.github.com/assets/deadline-readme-button-22041afd0340ce965d47ae6ef1cefeee28c7c493a6346c4f15d667ab976d596c.svg)](https://classroom.github.com/a/mVV06Hfm)
-# shipping
+# UniHousing — Shipping App
 
-Aplicación **Shipping** del [Proyecto IAW 2026](https://iaw-2026.github.io/proyecto/) — comisión `<!-- completar -->`.
+Aplicación de logística y envíos del **Tipo C (Marketplace)** del [Proyecto IAW 2026](https://iaw-2026.github.io/proyecto/).
 
-Esta app corresponde al módulo de envíos y logística en el proyecto de tipo **C (Marketplace)**.
+**Marca:** UniHousing — marketplace estudiantil para equipar departamentos en Bahía Blanca.
 
-## Estimación de días de entrega
+**Responsable:** Emiliano Sensini
 
-Siempre sumamos 1 día por procesamiento administrativo. Después, por cada 8 horas de viaje sumamos 1 día de tránsito (máximo 5). Para rutas urbanas esto da unos 2 días; si en el futuro se manejan rutas más largas, la cuenta escala sola.
+## Deploy
+
+[https://proyecto-c-shipping-gema-market.vercel.app](https://proyecto-c-shipping-gema-market.vercel.app)
+
+## Credenciales de prueba
+
+| Rol | Email | Contraseña |
+|-----|-------|------------|
+| Operador logístico (`logistics`) | `logistics@unihousing.com` | — |
+| Administrador (`admin_logistics`) | `admin@unihousing.com` | — |
+
+> Las contraseñas se gestionan a través de Clerk. Para acceder, registrarse con esos emails o usar los que defina el equipo en Clerk Dashboard.
+
+## Descripción
+
+La Shipping App es la interfaz para **operadores logísticos (fleteros)** y **administradores de logística**. Permite:
+
+- **Operadores:** ver envíos disponibles, tomar pedidos, actualizar estados (retiro, tránsito, entrega), historial de entregas y liquidaciones.
+- **Administradores:** panel con métricas, gestión de repartidores (alta/baja/suspensión), gestión de tarifas, supervisión de todos los envíos.
+
+### Flujo de estados de un envío
+
+```
+waiting_for_courier → pending_pickup → picked_up → in_transit → delivered
+```
+
+## Stack tecnológico
+
+| Capa | Tecnología |
+|------|-----------|
+| Full-stack | Next.js 16 (App Router) |
+| Base de datos | PostgreSQL (Supabase) |
+| ORM | Prisma |
+| Autenticación | Clerk v7 |
+| Mapas | Leaflet + OpenRouteService |
+| Gráficos | Recharts |
+| Estilos | Tailwind CSS 4 |
+
+## API propia
+
+Endpoints expuestos para el ecosistema inter-servicios:
+
+| Endpoint | Consumidor |
+|----------|-----------|
+| `POST /api/shipping/cotizaciones` | Buyer App |
+| `POST /api/shipping/cotizaciones/reservar` | Payments App |
+| `POST /api/shipping/cotizaciones/liberar-reserva` | Payments App |
+| `POST /api/shipping/envios` | Seller App |
+| `GET /api/shipping/envios/:order_id` | Buyer App, Seller App, Control Plane |
+| `POST /api/shipping/sellers/verificar-origen` | Seller App |
+
+## Variables de entorno
+
+Copiar `.env.example` a `.env.local` y completar los valores.
 
 ---
 
-## Rendimiento
+## Notas técnicas
 
-### Caché de aplicación
+### Estimación de días de entrega
 
-**Sesión:** el `userId` interno se cachea en memoria con TTL de 30s para evitar llamar a `currentUser()` (Clerk API) en cada navegación. El dólar (USD/ARS) se cachea con TTL de 5 min. Ver `lib/services/exchange-rate/`.
+Siempre sumamos 1 día por procesamiento administrativo. Después, por cada 8 horas de viaje sumamos 1 día de tránsito (máximo 5). Para rutas urbanas esto da unos 2 días; si en el futuro se manejan rutas más largas, la cuenta escala sola.
 
-### Caché de queries
+### Caché
 
-Las queries de Prisma se cachean con `'use cache'` y `cacheLife()` (Next.js 16) con TTLs graduados según volatilidad:
+- **Sesión:** el `userId` interno se cachea en memoria con TTL de 30s. El dólar (USD/ARS) se cachea con TTL de 5 min.
+- **Queries:** las queries de Prisma se cachean con `'use cache'` y `cacheLife()` con TTLs graduados según volatilidad.
+- **Middleware-first Auth:** autenticación y autorización por rol en el middleware antes del renderizado.
+- **PPR:** `cacheComponents: true` — shell estático desde edge, contenido dinámico en streaming.
 
-| Función | TTL |
-|---------|-----|
-| `getAvailableShipments` | 30s |
-| `getDashboardMetrics`, `getActiveShipments`, `getAllShipments` | 1 min |
-| `getPerformanceData`, `getSettlements`, `getAdminDashboardMetrics`, `getAllDrivers`, `getAllRates`, `getDriverById` | 5 min |
+### Bundle
 
-### Middleware-first Auth
-
-La autenticación y autorización por rol se ejecutan en el middleware de Next.js **antes** del renderizado. Esto permite que layouts y páginas sean estáticos y cacheables. Los data components leen la identidad del usuario desde headers inyectados y resuelven el `userId` interno de Prisma dentro de `<Suspense>` boundaries.
-
-**Redirecciones:** el middleware enruta automáticamente según el rol — `logistics` a `/dashboard`, `admin_logistics` a `/admin/dashboard`, usuarios sin rol a `/unauthorized`.
-
-### Partial Prerendering (PPR)
-
-Habilitamos `cacheComponents: true` en `next.config.ts`. El shell estático (layouts, sidebars, navegación) se sirve instantáneamente desde el edge de Vercel, mientras que el contenido dinámico hace streaming progresivamente dentro de los `Suspense` boundaries.
-
-### Reducción de bundle
-
-- **Leaflet** y **Recharts** se cargan bajo demanda con `next/dynamic` para minimizar Total Blocking Time (TBT) en mobile.
+Leaflet y Recharts se cargan bajo demanda con `next/dynamic`.
 
 ---
 
