@@ -14,8 +14,10 @@ Aplicación de logística y envíos del **Tipo C (Marketplace)** del [Proyecto I
 
 | Rol | Email | Contraseña |
 |-----|-------|------------|
-| Operador logístico (`logistics`) | `logistics@unihousing.com` | — |
-| Administrador (`admin_logistics`) | `admin@unihousing.com` | — |
+| Operador logístico (`logistics`) | `logisitcsoperator+clerk_test@unihousing.com` | Operator@4321 |
+| Administrador (`admin_logistics`) | `logisitcsadmin+clerk_test@unihousing.com` | AdminL@4321 |
+
+El código de verificacion por mail siempre es: 424242
 
 > Las contraseñas se gestionan a través de Clerk. Para acceder, registrarse con esos emails o usar los que defina el equipo en Clerk Dashboard.
 

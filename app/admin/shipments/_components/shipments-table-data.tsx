@@ -1,3 +1,5 @@
+import { requireRole } from "@/lib/auth/rbac";
+import { ROLES } from "@/lib/types/auth";
 import { getAllShipments } from "@/lib/db/queries/admin/shipments";
 import { formatDate } from "@/lib/utils/date-utils";
 import { updateShipmentPriceAction } from "@/lib/features/admin/actions";
@@ -14,6 +16,7 @@ interface AdminShipmentsTableDataProps {
 }
 
 export async function AdminShipmentsTableData({ searchParams }: AdminShipmentsTableDataProps) {
+    await requireRole([ROLES.ADMIN_LOGISTICS]);
     const raw = await searchParams;
     const page = parseInt(raw.page || "1", 10) || 1;
     const result = await getAllShipments(raw.status, raw.sortBy, raw.sortOrder, page);

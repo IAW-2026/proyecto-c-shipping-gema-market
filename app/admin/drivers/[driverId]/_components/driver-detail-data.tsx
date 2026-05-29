@@ -1,4 +1,6 @@
 import { notFound } from "next/navigation";
+import { requireRole } from "@/lib/auth/rbac";
+import { ROLES } from "@/lib/types/auth";
 import { getDriverById, getDriverShipments } from "@/lib/db/queries/admin/drivers";
 import { getShipmentCountsByStatus } from "@/lib/db/queries/shared";
 import { formatDate } from "@/lib/utils/date-utils";
@@ -10,6 +12,7 @@ import { MetricCard } from "@/components/ui/metric-card";
 import { AdminShipmentStatusBadge } from "../../../_components/admin-shipment-status-badge";
 
 export async function DriverDetailData({ params, searchParams }: { params: Promise<{ driverId: string }>; searchParams: Promise<{ [key: string]: string | undefined }> }) {
+    await requireRole([ROLES.ADMIN_LOGISTICS]);
     const { driverId } = await params;
     const raw = await searchParams;
     const page = parseInt(raw.page || "1", 10) || 1;
