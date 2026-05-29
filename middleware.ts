@@ -1,5 +1,6 @@
 import { clerkMiddleware, createRouteMatcher } from "@clerk/nextjs/server";
 import { NextResponse } from "next/server";
+import { ROLES } from "@/lib/types/auth";
 
 // Rutas públicas (no requieren autenticación)
 const isPublicRoute = createRouteMatcher([
@@ -43,16 +44,20 @@ export default clerkMiddleware(async (auth, req) => {
 
     // 2. Usuario no autenticado
     if (!userId) {
-        // Si intenta acceder a ruta de auth, permitir
         if (isAuthRoute(req)) {
             return response;
         }
-        // Cualquier otra ruta protegida → login
         return NextResponse.redirect(new URL("/sign-in", req.url));
     }
 
     // 3. Usuario autenticado sin rol definido
     if (!role) {
+        return NextResponse.redirect(new URL("/unauthorized", req.url));
+    }
+
+    // 3b. Usuario con rol ajeno al dominio de la app
+    if (role !== ROLES.LOGISTICS && role !== ROLES.ADMIN_LOGISTICS) {
+        if (pathname === "/unauthorized") return response;
         return NextResponse.redirect(new URL("/unauthorized", req.url));
     }
 
