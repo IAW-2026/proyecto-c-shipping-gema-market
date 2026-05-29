@@ -1,3 +1,5 @@
+import { requireRole } from "@/lib/auth/rbac";
+import { ROLES } from "@/lib/types/auth";
 import { getAdminDashboardMetrics } from "@/lib/db/queries/admin/dashboard";
 import { Truck, Package, TrendingUp, ClipboardList, DollarSign } from "lucide-react";
 import { MetricCard } from "@/components/ui/metric-card";
@@ -5,6 +7,7 @@ import { Card } from "@/components/ui/card";
 import { ADMIN_SHIPMENT_STATUS_LABELS } from "@/lib/constants/shipment";
 
 export async function AdminDashboardMetrics() {
+    await requireRole([ROLES.ADMIN_LOGISTICS]);
     const metrics = await getAdminDashboardMetrics();
 
     return (

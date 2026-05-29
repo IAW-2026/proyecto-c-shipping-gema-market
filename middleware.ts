@@ -52,6 +52,7 @@ export default clerkMiddleware(async (auth, req) => {
 
     // 3. Usuario autenticado sin rol definido
     if (!role) {
+        if (pathname === "/unauthorized") return response;
         return NextResponse.redirect(new URL("/unauthorized", req.url));
     }
 
