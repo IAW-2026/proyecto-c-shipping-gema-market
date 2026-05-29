@@ -114,14 +114,12 @@ function createApiClient(baseUrl: string, name: string) {
 
 ---
 
-### 6. [KISS] Post-procesamiento excesivo en liquidaciones
+### 6. [KISS] Post-procesamiento excesivo en liquidaciones *(CORREGIDO)*
 
 **Ubicación:** `lib/db/queries/logistics/settlements.ts:44-151`  
 **Principio:** Keep It Simple, Stupid  
 
-**Impacto:** La función `getSettlementsDetail()` ejecuta una query SQL que trae envíos planos y luego construye en JavaScript (107 líneas) una estructura de maps anidados (semana → día → órdenes) con loops y ordenamientos manuales. La lógica de agrupación por semana ISO (cálculo de lunes, domingo, keys de map) es propensa a bugs de timezone y difícil de mantener.
-
-**Refactor sugerido:** Mover la agrupación a SQL con `date_trunc('week', delivered_at)` y `date_trunc('day', delivered_at)` en una sola query, retornando los datos ya estructurados. El post-procesamiento se reduciría a un solo loop de transformación.
+**Estado:** ✅ Corregido el 29/05/2026. La agrupación por semana y día se movió a SQL con `date_trunc` + `JSON_AGG`. El post-procesamiento en JS pasó de 107 líneas (~4 loops anidados) a ~25 líneas (1 loop simple).
 
 ---
 

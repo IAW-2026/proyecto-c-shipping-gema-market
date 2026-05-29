@@ -41,6 +41,23 @@ export async function getSettlements(
     }));
 }
 
+interface SettlementsDetailRaw {
+    week_start: Date;
+    week_end: Date;
+    day: Date;
+    trips: bigint;
+    amount: string;
+    orders: unknown;
+}
+
+interface OrderRaw {
+    id: string;
+    order_id: string;
+    price: string;
+    picked_up_at: string | null;
+    delivered_at: string | null;
+}
+
 export async function getSettlementsDetail(
     logisticsId: string,
     dateFrom: Date,
@@ -52,99 +69,74 @@ export async function getSettlementsDetail(
 }> {
     "use cache";
     cacheLife("minutes");
-    const rows = await prisma.$queryRaw<Array<{
-        id: string;
-        order_id: string;
-        price: unknown;
-        picked_up_at: Date | null;
-        delivered_at: Date | null;
-        created_at: Date;
-    }>>`
-        SELECT id, order_id, price, picked_up_at, delivered_at, created_at
+
+    const rows = await prisma.$queryRaw<SettlementsDetailRaw[]>`
+        SELECT
+            date_trunc('week', delivered_at)::date AS week_start,
+            (date_trunc('week', delivered_at) + interval '6 days')::date AS week_end,
+            date_trunc('day', delivered_at)::date AS day,
+            COUNT(*)::bigint AS trips,
+            SUM(price)::text AS amount,
+            JSON_AGG(
+                JSON_BUILD_OBJECT(
+                    'id', id,
+                    'order_id', order_id,
+                    'price', price,
+                    'picked_up_at', picked_up_at,
+                    'delivered_at', delivered_at
+                )
+            ) AS orders
         FROM "Shipment"
         WHERE logistics_id = ${logisticsId}
           AND delivered_at >= ${dateFrom}
           AND delivered_at <= ${dateTo}
           AND status = 'delivered'
-        ORDER BY delivered_at DESC
+        GROUP BY date_trunc('week', delivered_at), date_trunc('day', delivered_at)
+        ORDER BY week_start DESC, day DESC
     `;
-
-    const weekMap = new Map<string, {
-        shipments: typeof rows;
-        weekStart: Date;
-        weekEnd: Date;
-    }>();
-
-    for (const s of rows) {
-        const d = new Date(s.delivered_at!);
-        const day = d.getDay();
-        const diff = day === 0 ? -6 : 1 - day;
-        const monday = new Date(d);
-        monday.setDate(d.getDate() + diff);
-        monday.setHours(0, 0, 0, 0);
-        const sunday = new Date(monday);
-        sunday.setDate(monday.getDate() + 6);
-
-        const key = monday.toISOString().split('T')[0];
-        if (!weekMap.has(key)) {
-            weekMap.set(key, { shipments: [], weekStart: monday, weekEnd: sunday });
-        }
-        weekMap.get(key)!.shipments.push(s);
-    }
 
     const settlements: SettlementPeriod[] = [];
     const dailyByWeek: Record<string, DailyEarnings[]> = {};
     const ordersByDay: Record<string, DayOrder[]> = {};
 
-    const weekKeysSorted = Array.from(weekMap.keys()).sort((a, b) => b.localeCompare(a));
+    for (const row of rows) {
+        const weekKey = row.week_start.toISOString().split('T')[0];
+        const dayKey = row.day.toISOString().split('T')[0];
 
-    for (const weekKey of weekKeysSorted) {
-        const weekData = weekMap.get(weekKey)!;
-        const trips = weekData.shipments.length;
-        const amount = Number(weekData.shipments.reduce((sum, s) => sum + Number(s.price), 0).toFixed(2));
+        const trips = Number(row.trips);
+        const amount = Number(row.amount);
 
-        settlements.push({
-            period: formatWeekPeriod(weekData.weekStart, weekData.weekEnd),
-            weekStart: weekData.weekStart,
-            weekEnd: weekData.weekEnd,
+        if (!dailyByWeek[weekKey]) {
+            settlements.push({
+                period: formatWeekPeriod(row.week_start, row.week_end),
+                weekStart: row.week_start,
+                weekEnd: row.week_end,
+                trips: 0,
+                amount: 0,
+            });
+            dailyByWeek[weekKey] = [];
+        }
+
+        const settlement = settlements.find(s => s.weekStart.getTime() === row.week_start.getTime())!;
+        settlement.trips += trips;
+        settlement.amount = Number((settlement.amount + amount).toFixed(2));
+
+        const dayLabel = row.day.toLocaleDateString('es-AR', { weekday: 'short', day: 'numeric' });
+
+        dailyByWeek[weekKey].push({
+            date: row.day,
+            dayLabel,
             trips,
             amount,
         });
 
-        const dayMap = new Map<string, typeof weekData.shipments>();
-        for (const s of weekData.shipments) {
-            const dayKey = s.delivered_at!.toISOString().split('T')[0];
-            if (!dayMap.has(dayKey)) {
-                dayMap.set(dayKey, []);
-            }
-            dayMap.get(dayKey)!.push(s);
-        }
-
-        const dayKeysSorted = Array.from(dayMap.keys()).sort((a, b) => b.localeCompare(a));
-        const dailyEarnings: DailyEarnings[] = [];
-
-        for (const dayKey of dayKeysSorted) {
-            const dayShipments = dayMap.get(dayKey)!;
-            const dayDate = new Date(dayKey + 'T12:00:00');
-            const dayLabel = dayDate.toLocaleDateString('es-AR', { weekday: 'short', day: 'numeric' });
-            const dayAmount = Number(dayShipments.reduce((sum, s) => sum + Number(s.price), 0).toFixed(2));
-
-            dailyEarnings.push({
-                date: dayDate,
-                dayLabel,
-                trips: dayShipments.length,
-                amount: dayAmount,
-            });
-
-            ordersByDay[dayKey] = dayShipments.map(s => ({
-                orderId: s.order_id,
-                price: Number(s.price),
-                pickedUpAt: s.picked_up_at,
-                deliveredAt: s.delivered_at,
-            }));
-        }
-
-        dailyByWeek[weekKey] = dailyEarnings;
+        const rawOrders = row.orders as OrderRaw[];
+        ordersByDay[dayKey] = rawOrders.map(o => ({
+            orderId: o.order_id,
+            price: Number(o.price),
+            pickedUpAt: o.picked_up_at ? new Date(o.picked_up_at) : null,
+            deliveredAt: o.delivered_at ? new Date(o.delivered_at) : null,
+        }));
     }
 
     return { settlements, dailyByWeek, ordersByDay };
