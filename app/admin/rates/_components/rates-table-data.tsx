@@ -1,3 +1,5 @@
+import { requireRole } from "@/lib/auth/rbac";
+import { ROLES } from "@/lib/types/auth";
 import { getAllRates } from "@/lib/db/queries/admin/rates";
 import { updateRateAction } from "@/lib/features/admin/actions";
 import { DeleteRateButton } from "./delete-rate-button";
@@ -5,6 +7,7 @@ import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from "@
 import { Pagination } from "@/components/ui/pagination";
 
 export async function AdminRatesTableData({ searchParams }: { searchParams: Promise<{ [key: string]: string | undefined }> }) {
+    await requireRole([ROLES.ADMIN_LOGISTICS]);
     const raw = await searchParams;
     const page = parseInt(raw.page || "1", 10) || 1;
     const result = await getAllRates(page);

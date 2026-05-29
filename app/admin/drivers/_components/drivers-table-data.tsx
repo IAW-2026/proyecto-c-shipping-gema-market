@@ -1,4 +1,6 @@
 import Link from "next/link";
+import { requireRole } from "@/lib/auth/rbac";
+import { ROLES } from "@/lib/types/auth";
 import { getAllDrivers } from "@/lib/db/queries/admin/drivers";
 import { formatDate } from "@/lib/utils/date-utils";
 import { ToggleBanButton } from "./toggle-ban-button";
@@ -12,6 +14,7 @@ interface AdminDriversTableDataProps {
 }
 
 export async function AdminDriversTableData({ searchParams }: AdminDriversTableDataProps) {
+    await requireRole([ROLES.ADMIN_LOGISTICS]);
     const raw = await searchParams;
     const page = parseInt(raw.page || "1", 10) || 1;
     const result = await getAllDrivers(raw.search, raw.banned as "all" | "banned" | "active" | undefined, page);
