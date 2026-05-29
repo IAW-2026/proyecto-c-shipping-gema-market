@@ -1,17 +1,17 @@
 "use client";
 
-import { useState, useCallback, useEffect } from "react";
-import { createPortal } from "react-dom";
+import { useState, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { Tag, Home } from "lucide-react";
 import type { ShipmentSummary } from "@/lib/definitions/shipments";
 import { transitionShipmentAction } from "@/lib/actions/shipment.actions";
+import { useConfirmAction } from "@/lib/hooks/use-confirm-action";
+import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 import { COURIER_ACTION_MAP } from "@/lib/shared/shipment-constants";
 import { formatAddress } from "@/lib/shared/address-utils";
 import { CourierHeader } from "./courier-header";
 import { CourierMap } from "./courier-map";
 import { ChangeStateButton } from "./change-state-button";
-import { CancelDialog } from "./cancel-dialog";
 import { GoogleMapsLink } from "./google-maps-link";
 
 interface CourierDataProps {
@@ -22,11 +22,10 @@ interface CourierDataProps {
 
 export function CourierData({ shipment, shipments, selectedTracking }: CourierDataProps) {
     const router = useRouter();
-    const [mounted, setMounted] = useState(false);
-    const [showCancel, setShowCancel] = useState(false);
     const [hasPendingAction, setHasPendingAction] = useState(false);
 
-    useEffect(() => { setMounted(true); }, []);
+    const { isOpen: showCancel, isPending: isCancelPending, open: openCancel, close: closeCancel, handleConfirm: handleCancel }
+        = useConfirmAction(useCallback(() => transitionShipmentAction(shipment.shippingId, "cancel"), [shipment.shippingId]));
 
     const handleAction = useCallback(async (shippingId: string, transition: "pickup" | "transit" | "deliver") => {
         setHasPendingAction(true);
@@ -41,20 +40,6 @@ export function CourierData({ shipment, shipments, selectedTracking }: CourierDa
         }
     }, [router]);
 
-    const handleCancel = useCallback(async (shippingId: string) => {
-        setHasPendingAction(true);
-        try {
-            const result = await transitionShipmentAction(shippingId, "cancel");
-            if (!result.success) console.error(result.error);
-        } catch (error) {
-            console.error("Error al cancelar:", error);
-        } finally {
-            router.refresh();
-            setHasPendingAction(false);
-            setShowCancel(false);
-        }
-    }, [router]);
-
     const actionConfig = COURIER_ACTION_MAP[shipment.status];
 
     return (
@@ -62,8 +47,8 @@ export function CourierData({ shipment, shipments, selectedTracking }: CourierDa
             <CourierHeader
                 shipments={shipments}
                 selectedTracking={selectedTracking}
-                onCancelClick={() => setShowCancel(true)}
-                hasPendingAction={hasPendingAction}
+                onCancelClick={openCancel}
+                hasPendingAction={hasPendingAction || isCancelPending}
                 canCancel={!!actionConfig?.canCancel}
             />
 
@@ -114,15 +99,16 @@ export function CourierData({ shipment, shipments, selectedTracking }: CourierDa
                 )}
             </section>
 
-            {mounted && createPortal(
-                <CancelDialog
-                    open={showCancel}
-                    hasPendingAction={hasPendingAction}
-                    onConfirm={() => handleCancel(shipment.shippingId)}
-                    onCancel={() => setShowCancel(false)}
-                />,
-                document.body
-            )}
+            <ConfirmDialog
+                open={showCancel}
+                isPending={isCancelPending}
+                onConfirm={handleCancel}
+                onCancel={closeCancel}
+                title="Cancelar misión"
+                description="El envío volverá a estar disponible para que otro repartidor lo tome. Esta acción no se puede deshacer."
+                confirmLabel="Sí, cancelar"
+                variant="danger"
+            />
         </>
     );
 }

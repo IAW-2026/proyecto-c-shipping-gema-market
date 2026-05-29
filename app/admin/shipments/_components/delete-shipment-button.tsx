@@ -1,34 +1,20 @@
 "use client";
 
-import { useRouter } from "next/navigation";
-import { useState, useCallback } from "react";
+import { useCallback } from "react";
 import { deleteShipmentAction } from "@/lib/actions/admin.actions";
-import { ConfirmDialog } from "../../_components/confirm-dialog";
+import { useConfirmAction } from "@/lib/hooks/use-confirm-action";
+import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 
 export function DeleteShipmentButton({ id, tracking }: { id: string; tracking: string }) {
-    const router = useRouter();
-    const [isOpen, setIsOpen] = useState(false);
-    const [isPending, setIsPending] = useState(false);
-
-    const handleConfirm = useCallback(async () => {
-        setIsPending(true);
-        try {
-            const result = await deleteShipmentAction(id);
-            if (!result.success) console.error(result.error);
-            router.refresh();
-        } catch (error) {
-            console.error(error);
-        } finally {
-            setIsPending(false);
-            setIsOpen(false);
-        }
-    }, [id, router]);
+    const { isOpen, isPending, open, close, handleConfirm } = useConfirmAction(
+        useCallback(() => deleteShipmentAction(id), [id])
+    );
 
     return (
         <>
             <button
                 type="button"
-                onClick={() => setIsOpen(true)}
+                onClick={open}
                 className="inline-flex items-center gap-1 text-xs text-red-600 hover:text-red-800 font-medium px-2 py-1 rounded-lg hover:bg-red-50 transition-colors"
             >
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -41,7 +27,7 @@ export function DeleteShipmentButton({ id, tracking }: { id: string; tracking: s
                 open={isOpen}
                 isPending={isPending}
                 onConfirm={handleConfirm}
-                onCancel={() => setIsOpen(false)}
+                onCancel={close}
                 title="Eliminar envío"
                 description={`Se eliminará el envío ${tracking} del sistema. Esta acción no se puede deshacer.`}
                 confirmLabel="Sí, eliminar"

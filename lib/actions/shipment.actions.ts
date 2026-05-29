@@ -40,6 +40,7 @@ export async function takeShipmentAction(shipmentId: string) {
         revalidatePath("/dashboard");
         revalidatePath("/history");
         revalidatePath("/courier");
+        revalidatePath(`/shipments/${shipmentId}`);
 
         return {
             success: true,
@@ -106,6 +107,7 @@ export async function transitionShipmentAction(
             updateData.logistics_id = null;
             updateData.picked_up_at = null;
             updateData.delivered_at = null;
+            revalidatePath(`/shipments/${shipmentId}`);
         }
 
         await transitionShipmentStatus(shipmentId, updateData);

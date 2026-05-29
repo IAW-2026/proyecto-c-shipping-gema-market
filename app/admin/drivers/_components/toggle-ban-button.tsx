@@ -1,34 +1,20 @@
 "use client";
 
-import { useRouter } from "next/navigation";
-import { useState, useCallback } from "react";
+import { useCallback } from "react";
 import { toggleBanAction } from "@/lib/actions/admin.actions";
-import { ConfirmDialog } from "../../_components/confirm-dialog";
+import { useConfirmAction } from "@/lib/hooks/use-confirm-action";
+import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 
 export function ToggleBanButton({ id, banned, fullName }: { id: string; banned: boolean; fullName: string }) {
-    const router = useRouter();
-    const [isOpen, setIsOpen] = useState(false);
-    const [isPending, setIsPending] = useState(false);
-
-    const handleConfirm = useCallback(async () => {
-        setIsPending(true);
-        try {
-            const result = await toggleBanAction(id, !banned);
-            if (!result.success) console.error(result.error);
-            router.refresh();
-        } catch (error) {
-            console.error(error);
-        } finally {
-            setIsPending(false);
-            setIsOpen(false);
-        }
-    }, [id, banned, router]);
+    const { isOpen, isPending, open, close, handleConfirm } = useConfirmAction(
+        useCallback(() => toggleBanAction(id, !banned), [id, banned])
+    );
 
     return (
         <>
             <button
                 type="button"
-                onClick={() => setIsOpen(true)}
+                onClick={open}
                 className={`text-xs font-medium px-2 py-1 rounded-lg transition-colors ${
                     banned
                         ? "text-green-600 hover:bg-green-50"
@@ -42,7 +28,7 @@ export function ToggleBanButton({ id, banned, fullName }: { id: string; banned: 
                 open={isOpen}
                 isPending={isPending}
                 onConfirm={handleConfirm}
-                onCancel={() => setIsOpen(false)}
+                onCancel={close}
                 title={banned ? "Desbanear repartidor" : "Banear repartidor"}
                 description={
                     banned
