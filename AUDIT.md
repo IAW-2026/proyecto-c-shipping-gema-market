@@ -41,17 +41,15 @@ Los siguientes hallazgos críticos del audit previo (27/05/2026) **ya fueron cor
 
 ---
 
-### 3. [SOLID/SRP] Prisma directo en Route Handlers de API
+### 3. [SOLID/SRP] Prisma directo en Route Handlers de API *(CORREGIDO)*
 
 **Ubicación:**  
-- `app/api/shipping/envios/[order_id]/route.ts:16-28`  
-- `app/api/shipping/shipments/[shipmentId]/route/route.ts:26-39`  
+- `app/api/shipping/envios/[order_id]/route.ts:16-28` → usa `getShipmentByOrderId()`  
+- `app/api/shipping/shipments/[shipmentId]/route/route.ts:26-39` → usa `getShipmentRouteData()`  
 
 **Principio:** Single Responsibility / Separation of concerns  
 
-**Impacto:** Estos route handlers acceden directamente a `prisma.shipment.findUnique()` en lugar de delegar a la capa de queries/services. Esto rompe la arquitectura en 3 capas que el resto del proyecto sigue consistentemente (Route → Service → Query). Si la lógica de consulta cambia, hay que modificar el route handler. Además, no se benefician del sistema de caché (`"use cache"` + `cacheLife()`) que sí usan las queries del directorio `lib/db/queries/`.
-
-**Refactor sugerido:** Extraer a funciones en `lib/db/queries/` (ej: `getShipmentByOrderId`, `getShipmentRouteData`) y llamarlas desde el route handler, como hace el resto de la API.
+**Estado:** ✅ Corregido el 29/05/2026. Se extrajeron las consultas a `lib/db/queries/public/shipment-by-order.ts` y `lib/db/queries/public/shipment-route.ts` con `"use cache"` + `cacheLife()`. Los route handlers ahora solo formatean la respuesta.
 
 ---
 

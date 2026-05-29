@@ -1,7 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { validateApiKey } from "@/lib/auth/api-key";
-import prisma from "@/lib/db/prisma";
 import { getCoordinatesFromAddress, getRoute } from "@/lib/clients/maps";
+import { getShipmentRouteData } from "@/lib/db/queries/public/shipment-route";
+import type { ShipmentRouteData } from "@/lib/db/queries/public/shipment-route";
 
 interface RouteParams {
     params: Promise<{ shipmentId: string }>;
@@ -23,20 +24,7 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
     try {
         const { shipmentId } = await params;
 
-        const shipment = await prisma.shipment.findUnique({
-            where: { id: shipmentId },
-            select: {
-                pickup_address: true,
-                delivery_address: true,
-                pickup_lat: true,
-                pickup_lng: true,
-                delivery_lat: true,
-                delivery_lng: true,
-                route_geometry: true,
-                route_distance: true,
-                route_duration: true,
-            },
-        });
+        const shipment = await getShipmentRouteData(shipmentId);
 
         if (!shipment) {
             return NextResponse.json(

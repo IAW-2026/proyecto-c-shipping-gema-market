@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { validateApiKey } from "@/lib/auth/api-key";
-import prisma from "@/lib/db/prisma";
+import { getShipmentByOrderId } from "@/lib/db/queries/public/shipment-by-order";
 
 interface RouteParams {
     params: Promise<{ order_id: string }>;
@@ -13,20 +13,7 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
     try {
         const { order_id } = await params;
 
-        const shipment = await prisma.shipment.findUnique({
-            where: { order_id },
-            select: {
-                id: true,
-                order_id: true,
-                status: true,
-                tracking_code: true,
-                pickup_address: true,
-                delivery_address: true,
-                price: true,
-                picked_up_at: true,
-                delivered_at: true,
-            },
-        });
+        const shipment = await getShipmentByOrderId(order_id);
 
         if (!shipment) {
             return NextResponse.json(
@@ -45,7 +32,7 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
             tracking_url: `${origin}/track/${shipment.tracking_code}`,
             pickup_address: shipment.pickup_address,
             delivery_address: shipment.delivery_address,
-            price: Number(shipment.price),
+            price: shipment.price,
             picked_up_at: shipment.picked_up_at?.toISOString() ?? null,
             delivered_at: shipment.delivered_at?.toISOString() ?? null,
         });
