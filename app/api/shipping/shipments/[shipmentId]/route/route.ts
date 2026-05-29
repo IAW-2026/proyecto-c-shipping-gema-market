@@ -87,7 +87,7 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
         if (!originCoords || !destCoords) {
             return NextResponse.json(
                 { error: "No se pudieron geocodificar las direcciones" },
-                { status: 422 }
+                { status: 400 }
             );
         }
 

@@ -1,3 +1,5 @@
+import { EXCHANGE_RATE_FALLBACK } from "@/lib/config/exchange-rate";
+
 let cachedRate: { value: number; timestamp: number } | null = null;
 const CACHE_TTL_MS = 5 * 60 * 1000;
 
@@ -14,10 +16,8 @@ export async function getUsdToArsRate(): Promise<number> {
     cachedRate = { value: rate, timestamp: Date.now() };
     return rate;
   } catch {
-    const fallback = process.env.DEFAULT_USD_RATE
-      ? Number.parseFloat(process.env.DEFAULT_USD_RATE)
-      : 1200;
-    cachedRate = { value: fallback, timestamp: Date.now() };
-    return fallback;
+    console.warn(`[Exchange Rate] API falló, usando fallback: ${EXCHANGE_RATE_FALLBACK}`);
+    cachedRate = { value: EXCHANGE_RATE_FALLBACK, timestamp: Date.now() };
+    return EXCHANGE_RATE_FALLBACK;
   }
 }

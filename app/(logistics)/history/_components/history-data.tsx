@@ -3,7 +3,7 @@ import { getShipmentCountsByStatus } from "@/lib/db/queries/shared";
 import type { ShipmentFilterParams } from "@/lib/types/shipments/filters";
 import type { ShipmentStatus } from "@/lib/constants/shipment";
 import { HistorySearchParamsSchema } from "@/lib/schemas/api/filters";
-import { getAuthenticatedUserId } from "@/lib/auth/get-authenticated-user";
+import { requireAuthenticatedUser } from "@/lib/auth/get-authenticated-user";
 import { HistoryTabs } from "./history-tabs";
 import { HistoryTable } from "./history-table";
 import { Pagination } from "@/components/ui/pagination";
@@ -22,11 +22,14 @@ interface HistoryDataProps {
 }
 
 export async function HistoryData({ searchParams }: HistoryDataProps) {
-    const user = await getAuthenticatedUserId();
-    if (!user) return null;
+    const user = await requireAuthenticatedUser();
 
     const raw = await searchParams;
-    const params = HistorySearchParamsSchema.parse(raw);
+    const parsed = HistorySearchParamsSchema.safeParse(raw);
+    if (!parsed.success) {
+        return <p className="col-span-full text-center text-ink-3 py-12">Filtros inválidos</p>;
+    }
+    const params = parsed.data;
     const currentStatus = params.status;
     const searchQuery = params.search;
 

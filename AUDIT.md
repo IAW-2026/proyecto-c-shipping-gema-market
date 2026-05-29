@@ -186,7 +186,7 @@ El proyecto usa **Route Groups de Next.js** (`(logistics)`, `admin`) como organi
 #### [CONSISTENCY] Status code de validacion inconsistente
 
 - **Problema:** `/api/shipping/shipments` retorna 400 para errores Zod. `/api/shipping/sellers/verificar-origen` retorna 422. No hay convencion.
-- **Solucion:** Definir convencion (422 es mas semantico para validacion) y aplicar consistentemente.
+- **Solucion:** Convencion: 400 para errores de validacion (segun contrato). Cambiar verificar-origen y shipments route a 400.
 
 #### [CONSISTENCY] Naming mixto espaniol/ingles
 

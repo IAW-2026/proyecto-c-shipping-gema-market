@@ -1,7 +1,7 @@
 import { getAvailableShipments } from "@/lib/db/queries/logistics/available";
 import type { ShipmentFilterParams } from "@/lib/types/shipments/filters";
 import { AvailableShipmentCard } from "./shipment-card";
-import { getAuthenticatedUserId } from "@/lib/auth/get-authenticated-user";
+import { requireAuthenticatedUser } from "@/lib/auth/get-authenticated-user";
 import { AvailableSearchParamsSchema } from "@/lib/schemas/api/filters";
 import { Pagination } from "@/components/ui/pagination";
 
@@ -10,8 +10,7 @@ interface AvailableDataProps {
 }
 
 export async function AvailableData({ searchParams }: AvailableDataProps) {
-    const user = await getAuthenticatedUserId();
-    if (!user) return null;
+    const user = await requireAuthenticatedUser();
 
     if (user.banned) {
         return (
@@ -27,7 +26,11 @@ export async function AvailableData({ searchParams }: AvailableDataProps) {
     }
 
     const raw = await searchParams;
-    const params = AvailableSearchParamsSchema.parse(raw);
+    const parsed = AvailableSearchParamsSchema.safeParse(raw);
+    if (!parsed.success) {
+        return <p className="col-span-full text-center text-ink-3 py-12">Filtros inválidos</p>;
+    }
+    const params = parsed.data;
 
     const filterParams: ShipmentFilterParams = {
         sortBy: params.sortBy as ShipmentFilterParams["sortBy"],
