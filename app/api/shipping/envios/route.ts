@@ -5,7 +5,7 @@ import { createShipment } from "@/lib/features/shipment/shipment.service";
 import { fetchAndPersistRouteGeometry } from "@/lib/clients/maps";
 
 /**
- * POST /api/shipping/shipments
+ * POST /api/shipping/envios
  * Consumido por: Seller App (tras pago confirmado)
  * Solicita la creación y gestión logística de un envío para una orden específica.
  */

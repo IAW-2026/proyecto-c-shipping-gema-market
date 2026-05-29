@@ -4,7 +4,7 @@ import { releaseQuoteSchema } from "@/lib/schemas/api/quote";
 import { releaseQuote } from "@/lib/features/quote";
 
 /**
- * POST /api/shipping/quotes/release
+ * POST /api/shipping/cotizaciones/liberar-reserva
  * Consumido por: Payments App
  * Libera la reserva de una cotización, dejándola disponible nuevamente.
  */

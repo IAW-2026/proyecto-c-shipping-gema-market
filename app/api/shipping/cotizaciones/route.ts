@@ -1,12 +1,13 @@
 import { NextRequest, NextResponse } from "next/server";
 import { validateApiKey } from "@/lib/auth/api-key";
-import { reserveQuoteSchema } from "@/lib/schemas/api/quote";
-import { reserveQuote } from "@/lib/features/quote";
+import { quoteRequestSchema } from "@/lib/schemas/api/quote";
+import { calculateQuote } from "@/lib/features/quote";
+import { createTraceIfDebug, withTrace } from "@/lib/utils/api-handler";
 
 /**
- * POST /api/shipping/quotes/reserve
- * Consumido por: Payments App
- * Reserva una cotización para una orden, evitando que sea utilizada por otra.
+ * POST /api/shipping/cotizaciones
+ * Consumido por: Buyer App
+ * Calcula el costo y tiempo estimado de envío logístico entre dos domicilios.
  */
 export async function POST(request: NextRequest) {
     if (!validateApiKey(request)) {
@@ -14,23 +15,23 @@ export async function POST(request: NextRequest) {
     }
     try {
         const body = await request.json();
-        const parsed = reserveQuoteSchema.safeParse(body);
+        const parsed = quoteRequestSchema.safeParse(body);
 
         if (!parsed.success) {
             return NextResponse.json(
-                { error: "Datos inválidos", details: parsed.error.flatten() },
+                { error: "Datos de cotización inválidos", details: parsed.error.flatten() },
                 { status: 400 }
             );
         }
 
-        const { quote_id, order_id } = parsed.data;
-        const result = await reserveQuote(quote_id, order_id);
+        const trace = createTraceIfDebug(request);
+        const result = await calculateQuote(parsed.data, trace, request);
 
-        return NextResponse.json({ ok: true, reserved_until: result.reserved_until }, { status: 200 });
+        return NextResponse.json(withTrace(result, trace), { status: 200 });
 
     } catch (error) {
         const err = error as Error & { statusCode?: number; code?: string };
-        console.error("[RESERVAR] Error:", err.message);
+        console.error("[COTIZACIONES] Error:", err.message);
 
         if (err.statusCode) {
             return NextResponse.json({ error: err.message }, { status: err.statusCode });
