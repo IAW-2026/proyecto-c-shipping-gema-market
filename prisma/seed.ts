@@ -9,10 +9,10 @@ const prisma = new PrismaClient({ adapter });
 async function main() {
     console.log("Vaciando base de datos...");
 
-    await prisma.envio.deleteMany();
-    await prisma.cotizacion.deleteMany();
-    await prisma.tarifa.deleteMany();
-    await prisma.usuario.deleteMany();
+    await prisma.shipment.deleteMany();
+    await prisma.quote.deleteMany();
+    await prisma.rate.deleteMany();
+    await prisma.user.deleteMany();
 
     console.log("Poblando tarifas...");
 
@@ -45,7 +45,7 @@ async function main() {
     ];
 
     for (const t of tarifas) {
-        await prisma.tarifa.create({ data: t });
+        await prisma.rate.create({ data: t });
         console.log(`  ✔ ${t.id} — ${t.weight_range.min}-${t.weight_range.max} kg → $${t.price_per_km}/km`);
     }
 

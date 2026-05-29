@@ -1,0 +1,1 @@
+export const EXCHANGE_RATE_FALLBACK = 1200;

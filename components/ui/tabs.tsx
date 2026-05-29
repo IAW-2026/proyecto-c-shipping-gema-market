@@ -1,4 +1,4 @@
-import { cn } from "@/lib/shared/utils";
+import { cn } from "@/lib/utils/classnames";
 
 interface TabItem {
     id: string;

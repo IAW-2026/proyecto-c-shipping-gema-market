@@ -24,6 +24,21 @@ export const buyerApiClient = {
             };
         }
 
+        if (process.env.MOCK_EXTERNAL_APIS === "true") {
+            console.log(`[BUYER CLIENT MOCK] POST /api/buyer/${buyerId}`);
+            return {
+                data: {
+                    id: buyerId,
+                    full_name: "Mock User",
+                    phone_number: "1234567890",
+                    email: "mock@email.com",
+                    address: { street: "", number: "", zip: "" },
+                    created_at: new Date().toISOString(),
+                },
+                status: 200,
+            };
+        }
+
         try {
             const res = await fetch(`${BUYER_API_URL}/api/buyer/${buyerId}`, {
                 method: "POST",
@@ -41,6 +56,11 @@ export const buyerApiClient = {
     },
 
     notifyStatusChange: async (orderId: string, payload: BuyerStatusUpdate): ApiResult<BuyerNotificationResponse> => {
+        if (process.env.MOCK_EXTERNAL_APIS === "true") {
+            console.log(`[BUYER CLIENT MOCK] POST /api/buyer/ordenes/${orderId}/estado-envio`, payload);
+            return { data: { received: true, order_id: orderId }, status: 200 };
+        }
+
         try {
             const res = await fetch(`${BUYER_API_URL}/api/buyer/ordenes/${orderId}/estado-envio`, {
                 method: "POST",

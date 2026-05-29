@@ -2,7 +2,7 @@
 
 import { TrendingUp, TrendingDown, DollarSign, Truck } from "lucide-react";
 import { BarChart, Bar, XAxis, Tooltip, ResponsiveContainer } from "recharts";
-import type { PerformanceData } from "@/lib/definitions/dashboard-metrics";
+import type { PerformanceData } from "@/lib/types/dashboard-metrics";
 
 interface Props {
     data: PerformanceData;

@@ -4,7 +4,7 @@ import { useRouter } from "next/navigation";
 import { Filter, RefreshCcw, ArrowRight, Check, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
-import { takeShipmentAction } from "@/lib/actions/shipment.actions";
+import { takeShipmentAction } from "@/lib/features/shipment";
 import { useFilterDialog } from "./filter-dialog-context";
 import { useState } from "react";
 

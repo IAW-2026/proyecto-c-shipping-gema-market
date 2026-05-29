@@ -1,7 +1,6 @@
 import prisma from "@/lib/db/prisma";
-import { generatePrefixedId } from "@/lib/shared/utils";
 
-export interface TarifaRecord {
+export interface RateRecord {
     id: string;
     price_per_km: number;
 }
@@ -23,8 +22,8 @@ export interface CreateQuoteData {
     route_duration: number | null;
 }
 
-export async function findMatchingTarifa(billableWeightKg: number): Promise<TarifaRecord | null> {
-    const tarifa = await prisma.tarifa.findFirst({
+export async function findMatchingRate(billableWeightKg: number): Promise<RateRecord | null> {
+    const rate = await prisma.rate.findFirst({
         where: {
             AND: [
                 { weight_range: { path: ["min"], lte: billableWeightKg } },
@@ -32,69 +31,21 @@ export async function findMatchingTarifa(billableWeightKg: number): Promise<Tari
             ],
         },
     });
-    return tarifa ? { id: tarifa.id, price_per_km: Number(tarifa.price_per_km) } : null;
+    return rate ? { id: rate.id, price_per_km: Number(rate.price_per_km) } : null;
 }
 
 export async function findQuoteById(quoteId: string) {
-    return prisma.cotizacion.findUnique({ where: { id: quoteId } });
+    return prisma.quote.findUnique({ where: { id: quoteId } });
 }
 
 export async function findQuoteForRelease(quoteId: string, orderId: string) {
-    return prisma.cotizacion.findFirst({
+    return prisma.quote.findFirst({
         where: { id: quoteId, reserved_for_order_id: orderId },
     });
 }
 
-export async function createQuoteRecord(data: CreateQuoteData) {
-    return prisma.cotizacion.create({
-        data: {
-            id: generatePrefixedId("qte"),
-            product_id: data.product_id,
-            status: "available",
-            package_details: data.package_details,
-            origin_address: data.origin_address,
-            destination_address: data.destination_address,
-            price: data.price,
-            currency: data.currency,
-            estimated_days: data.estimated_days,
-            valid_until: data.valid_until,
-            pickup_lat: data.pickup_lat,
-            pickup_lng: data.pickup_lng,
-            delivery_lat: data.delivery_lat,
-            delivery_lng: data.delivery_lng,
-            route_distance: data.route_distance,
-            route_duration: data.route_duration,
-        },
-    });
-}
-
-export async function reserveQuoteInDb(quoteId: string, orderId: string) {
-    return prisma.cotizacion.update({
-        where: { id: quoteId },
-        data: { status: "reserved", reserved_for_order_id: orderId },
-    });
-}
-
-export async function releaseQuoteInDb(quoteId: string, orderId: string) {
-    await prisma.cotizacion.update({
-        where: { id: quoteId },
-        data: {
-            status: "available",
-            reserved_for_order_id: null,
-            valid_until: new Date(Date.now() + 1 * 60 * 60 * 1000),
-        },
-    });
-}
-
-export async function findReservedCotizacion(orderId: string) {
-    return prisma.cotizacion.findFirst({
+export async function findReservedQuote(orderId: string) {
+    return prisma.quote.findFirst({
         where: { reserved_for_order_id: orderId, status: "reserved" },
-    });
-}
-
-export async function confirmCotizacion(quoteId: string) {
-    return prisma.cotizacion.update({
-        where: { id: quoteId },
-        data: { status: "confirmed" },
     });
 }

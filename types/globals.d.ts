@@ -1,4 +1,4 @@
-import { UserRole } from "@/lib/definitions/auth";
+import { UserRole } from "@/lib/types/auth";
 
 declare global {
   interface CustomJwtSessionClaims {

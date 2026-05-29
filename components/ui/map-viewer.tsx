@@ -1,7 +1,6 @@
 "use client";
 
-import { useEffect, useState, useMemo } from "react";
-import { MapContainer, TileLayer, Polyline, Marker, useMap } from "react-leaflet";
+import { useEffect, useState, useRef, useMemo } from "react";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 
@@ -33,17 +32,9 @@ function markerIcon(svg: string): L.DivIcon {
     });
 }
 
-function FitBounds({ coords }: { coords: [number, number][] }) {
-    const map = useMap();
-    useEffect(() => {
-        if (coords.length > 0) {
-            map.fitBounds(coords, { padding: [40, 40] });
-        }
-    }, [map, coords]);
-    return null;
-}
-
 export default function MapViewer({ shippingId, className }: MapViewerProps) {
+    const containerRef = useRef<HTMLDivElement>(null);
+    const mapRef = useRef<L.Map | null>(null);
     const [route, setRoute] = useState<RouteData | null>(null);
     const [error, setError] = useState<string | null>(null);
 
@@ -76,6 +67,75 @@ export default function MapViewer({ shippingId, className }: MapViewerProps) {
         return () => controller.abort();
     }, [shippingId]);
 
+    useEffect(() => {
+        if (!route || !containerRef.current) return;
+
+        const container = containerRef.current;
+
+        if ("_leaflet_id" in container) {
+            delete (container as Record<string, unknown>)._leaflet_id;
+        }
+
+        const positions: [number, number][] = route.geometry.coordinates.map(
+            ([lng, lat]) => [lat, lng]
+        );
+
+        const map = L.map(container, {
+            center: positions[0] ?? [-38.719, -62.272],
+            zoom: 13,
+            zoomControl: false,
+        });
+
+        mapRef.current = map;
+
+        L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+            attribution:
+                '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
+        }).addTo(map);
+
+        L.polyline(positions, {
+            color: "#3e0ee0",
+            weight: 7,
+            opacity: 0.8,
+        }).addTo(map);
+
+        L.polyline(positions, {
+            color: "#4710fb",
+            weight: 4,
+            opacity: 0.8,
+        }).addTo(map);
+
+        if (route.waypoints) {
+            L.marker(
+                [route.waypoints.origin.lat, route.waypoints.origin.lng],
+                { icon: originIcon }
+            ).addTo(map);
+            L.marker(
+                [
+                    route.waypoints.destination.lat,
+                    route.waypoints.destination.lng,
+                ],
+                { icon: destIcon }
+            ).addTo(map);
+        }
+
+        if (positions.length > 0) {
+            map.fitBounds(positions, { padding: [40, 40] });
+        }
+
+        return () => {
+            if ("_leaflet_id" in container) {
+                delete (container as Record<string, unknown>)._leaflet_id;
+            }
+            try {
+                map.remove();
+            } catch {
+                // ignore
+            }
+            mapRef.current = null;
+        };
+    }, [route, originIcon, destIcon]);
+
     if (error) {
         return (
             <div className="h-full w-full flex items-center justify-center bg-gradient-to-b from-slate-200 to-slate-100">
@@ -92,40 +152,5 @@ export default function MapViewer({ shippingId, className }: MapViewerProps) {
         );
     }
 
-    const positions: [number, number][] = route.geometry.coordinates.map(
-        ([lng, lat]) => [lat, lng]
-    );
-
-    return (
-        <MapContainer
-            center={positions[0] ?? [-38.719, -62.272]}
-            zoom={13}
-            className={className ?? "h-full w-full"}
-            zoomControl={false}
-        >
-            <TileLayer
-                attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
-                url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-            />
-            <Polyline
-                positions={positions}
-                pathOptions={{ color: "#3e0ee0", weight: 7, opacity: 0.8 }}
-            />
-            <Polyline
-                positions={positions}
-                pathOptions={{
-                    color: "#4710fb",
-                    weight: 4,
-                    opacity: 0.8,
-                }}
-            />
-            {route.waypoints && (
-                <>
-                    <Marker position={[route.waypoints.origin.lat, route.waypoints.origin.lng]} icon={originIcon} />
-                    <Marker position={[route.waypoints.destination.lat, route.waypoints.destination.lng]} icon={destIcon} />
-                </>
-            )}
-            <FitBounds coords={positions} />
-        </MapContainer>
-    );
+    return <div ref={containerRef} className={className ?? "h-full w-full"} />;
 }

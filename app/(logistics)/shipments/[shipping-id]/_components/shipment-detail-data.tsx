@@ -1,4 +1,4 @@
-import { getShipmentDetails } from "@/lib/db/queries/shipment";
+import { getShipmentDetails } from "@/lib/db/queries/logistics/shipments";
 import { notFound } from "next/navigation";
 import { Content } from "../../../_components/page-layout";
 import { ShipmentDetailsHeader } from "./shipment-details-header";
@@ -11,10 +11,12 @@ import { PackageInfo } from "./package-info";
 
 
 interface ShipmentDetailDataProps {
-    shippingId: string;
+    params: Promise<{ "shipping-id": string }>;
 }
 
-export async function ShipmentDetailData({ shippingId }: ShipmentDetailDataProps) {
+export async function ShipmentDetailData({ params }: ShipmentDetailDataProps) {
+    const resolvedParams = await params;
+    const shippingId = resolvedParams["shipping-id"];
     const shipment = await getShipmentDetails(shippingId);
 
     if (!shipment) {

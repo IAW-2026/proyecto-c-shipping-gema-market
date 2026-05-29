@@ -3,7 +3,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { OPERATOR_NAV } from "@/config/logistics-nav";
+import { OPERATOR_NAV } from "@/lib/config/logistics-nav";
 
 export function MobileNav() {
     const pathname = usePathname();

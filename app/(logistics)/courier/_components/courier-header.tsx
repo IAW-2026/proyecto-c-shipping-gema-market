@@ -1,7 +1,8 @@
 "use client";
 
-import { ShipmentSelector, CancelButton } from "./courier-actions";
-import type { ShipmentSummary } from "@/lib/definitions/shipments";
+import { ShipmentSelector } from "./shipment-selector";
+import { CancelButton } from "./cancel-button";
+import type { ShipmentSummary } from "@/lib/schemas/domain";
 
 interface CourierHeaderProps {
     shipments: ShipmentSummary[];

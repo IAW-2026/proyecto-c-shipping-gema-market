@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { validateApiKey } from "@/lib/auth/api-key";
 import { z } from "zod";
-import { getCoordinatesFromAddress } from "@/lib/services/map-services";
+import { getCoordinatesFromAddress } from "@/lib/clients/maps";
 
 const verifySchema = z.object({
     product_id: z.string().min(1),
@@ -21,7 +21,7 @@ export async function POST(request: NextRequest) {
         if (!parsed.success) {
             return NextResponse.json(
                 { valid: false, error: "Datos inválidos", code: "INVALID_INPUT" },
-                { status: 422 }
+                { status: 400 }
             );
         }
 
@@ -32,14 +32,14 @@ export async function POST(request: NextRequest) {
         if (!result) {
             return NextResponse.json(
                 { valid: false, error: "La dirección no existe", code: "INVALID_ADDRESS" },
-                { status: 422 }
+                { status: 400 }
             );
         }
 
         if (!result.displayName.includes("Bahía Blanca")) {
             return NextResponse.json(
                 { valid: false, error: "La dirección está fuera de Bahía Blanca", code: "OUTSIDE_COVERAGE" },
-                { status: 422 }
+                { status: 400 }
             );
         }
 

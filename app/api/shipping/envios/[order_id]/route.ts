@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { validateApiKey } from "@/lib/auth/api-key";
-import prisma from "@/lib/db/prisma";
+import { getShipmentByOrderId } from "@/lib/db/queries/public/shipment-by-order";
 
 interface RouteParams {
     params: Promise<{ order_id: string }>;
@@ -13,22 +13,9 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
     try {
         const { order_id } = await params;
 
-        const envio = await prisma.envio.findUnique({
-            where: { order_id },
-            select: {
-                id: true,
-                order_id: true,
-                status: true,
-                tracking_code: true,
-                pickup_address: true,
-                delivery_address: true,
-                price: true,
-                picked_up_at: true,
-                delivered_at: true,
-            },
-        });
+        const shipment = await getShipmentByOrderId(order_id);
 
-        if (!envio) {
+        if (!shipment) {
             return NextResponse.json(
                 { error: "Envío no encontrado" },
                 { status: 404 }
@@ -38,16 +25,16 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
         const origin = new URL(request.url).origin;
 
         return NextResponse.json({
-            shipping_id: envio.id,
-            order_id: envio.order_id,
-            status: envio.status,
-            tracking_code: envio.tracking_code,
-            tracking_url: `${origin}/track/${envio.tracking_code}`,
-            pickup_address: envio.pickup_address,
-            delivery_address: envio.delivery_address,
-            price: Number(envio.price),
-            picked_up_at: envio.picked_up_at?.toISOString() ?? null,
-            delivered_at: envio.delivered_at?.toISOString() ?? null,
+            shipping_id: shipment.id,
+            order_id: shipment.order_id,
+            status: shipment.status,
+            tracking_code: shipment.tracking_code,
+            tracking_url: `${origin}/track/${shipment.tracking_code}`,
+            pickup_address: shipment.pickup_address,
+            delivery_address: shipment.delivery_address,
+            price: shipment.price,
+            picked_up_at: shipment.picked_up_at?.toISOString() ?? null,
+            delivered_at: shipment.delivered_at?.toISOString() ?? null,
         });
     } catch (error) {
         console.error("[ENVIOS_API] Error:", error);

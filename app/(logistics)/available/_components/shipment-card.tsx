@@ -1,8 +1,7 @@
-import React from "react";
 import { Card } from "@/components/ui/card";
 import { MapPin } from "lucide-react";
 import { WeightTag, TimeTag, DistanceTag } from "./available-shipment-tags";
-import { ShipmentOffer } from "@/lib/definitions/shipments";
+import { ShipmentOffer } from "@/lib/schemas/domain";
 import { ViewDetailsButton, TakeShipmentButton } from "./available-actions";
 
 interface ShipmentCardProps {

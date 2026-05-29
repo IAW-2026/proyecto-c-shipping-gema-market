@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { ADMIN_NAV } from "@/config/admin-nav";
+import { ADMIN_NAV } from "@/lib/config/admin-nav";
 
 export function AdminMobileNav() {
     const pathname = usePathname();

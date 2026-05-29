@@ -1,4 +1,5 @@
 import { Suspense } from "react";
+import { preconnect, prefetchDNS } from "react-dom";
 import { Metadata } from "next";
 import { TrackingDetail } from "./_components/tracking-detail";
 
@@ -6,10 +7,11 @@ export const metadata: Metadata = {
     title: "Seguimiento de envio | UniHousing Shipping",
 };
 
-export default async function TrackingPage(props: {
+export default function TrackingPage(props: {
     params: Promise<{ code: string }>
 }) {
-    const { code } = await props.params;
+    preconnect("https://tile.openstreetmap.org");
+    prefetchDNS("https://tile.openstreetmap.org");
 
     return (
         <main className="min-h-screen bg-cream p-4 md:p-8 flex items-start justify-center pt-12">
@@ -29,7 +31,7 @@ export default async function TrackingPage(props: {
                     </div>
                 }
             >
-                <TrackingDetail trackingCode={code} />
+                <TrackingDetail params={props.params} />
             </Suspense>
         </main>
     );

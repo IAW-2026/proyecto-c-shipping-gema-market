@@ -1,30 +1,21 @@
-// app/(operator)/layout.tsx
-import { ReactNode } from "react";
-import { redirect } from "next/navigation";
-import { ROLES } from "@/lib/definitions/auth";
-import { requireRole } from "@/lib/auth/rbac";
+import { ReactNode, Suspense } from "react";
 import { OperatorSidebar } from "./_components/Sidebar";
 import { MobileNav } from "./_components/MobileNav";
 
-
-export default async function OperatorLayout({ children }: { children: ReactNode }) {
-    const result = await requireRole([ROLES.LOGISTICS]);
-
-    if (!result) {
-        redirect("/sign-in");
-    }
-
-    // 2. Estructura Persistente
+export default function OperatorLayout({ children }: { children: ReactNode }) {
     return (
         <div className="flex min-h-screen bg-cream">
-            <OperatorSidebar />
+            <Suspense fallback={<aside className="hidden lgx:flex lgx:flex-col lgx:fixed lgx:left-0 lgx:top-0 lgx:bottom-0 lgx:z-[60] w-[240px] bg-paper border-r border-line" />}>
+                <OperatorSidebar />
+            </Suspense>
 
             <main className="flex-1 min-w-0 flex flex-col lgx:ml-[240px] lgx:w-[calc(100%-240px)] pb-[72px] lgx:pb-0">
-                {/* El contenido dinámico de cada página (page.tsx) se inyecta aquí */}
                 {children}
             </main>
 
-            <MobileNav />
+            <Suspense fallback={<nav className="flex lgx:hidden fixed bottom-0 left-0 right-0 bg-paper/95 backdrop-blur-[12px] border-t border-line justify-around px-1 pt-2 pb-3 z-40 h-[72px]" />}>
+                <MobileNav />
+            </Suspense>
         </div>
     );
 }

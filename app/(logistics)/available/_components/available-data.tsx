@@ -1,39 +1,18 @@
-import { getAvailableShipments } from "@/lib/db/queries/shipment";
-import type { ShipmentFilterParams } from "@/lib/definitions/shipments";
+import { getAvailableShipments } from "@/lib/db/queries/logistics/available";
+import type { ShipmentFilterParams } from "@/lib/types/shipments/filters";
 import { AvailableShipmentCard } from "./shipment-card";
-import { requireRole } from "@/lib/auth/rbac";
-import { ROLES } from "@/lib/definitions/auth";
-import prisma from "@/lib/db/prisma";
+import { requireAuthenticatedUser } from "@/lib/auth/get-authenticated-user";
+import { AvailableSearchParamsSchema } from "@/lib/schemas/api/filters";
+import { Pagination } from "@/components/ui/pagination";
 
 interface AvailableDataProps {
-    sortBy?: string;
-    sortOrder?: "asc" | "desc";
-    weightMin?: number;
-    weightMax?: number;
-    priceMin?: number;
-    priceMax?: number;
-    distanceMin?: number;
-    distanceMax?: number;
+    searchParams: Promise<{ [key: string]: string | undefined }>;
 }
 
-export async function AvailableData({
-    sortBy,
-    sortOrder,
-    weightMin,
-    weightMax,
-    priceMin,
-    priceMax,
-    distanceMin,
-    distanceMax,
-}: AvailableDataProps) {
-    const { userId } = await requireRole([ROLES.LOGISTICS]);
+export async function AvailableData({ searchParams }: AvailableDataProps) {
+    const user = await requireAuthenticatedUser();
 
-    const user = await prisma.usuario.findUnique({
-        where: { id: userId },
-        select: { banned: true },
-    });
-
-    if (user?.banned) {
+    if (user.banned) {
         return (
             <div className="col-span-full text-center py-12">
                 <p className="text-red-600 font-semibold text-lg mb-2">
@@ -46,32 +25,44 @@ export async function AvailableData({
         );
     }
 
-    const params: ShipmentFilterParams = {
-        sortBy: sortBy as ShipmentFilterParams["sortBy"],
-        sortOrder,
-        weightMin,
-        weightMax,
-        priceMin,
-        priceMax,
-        distanceMin,
-        distanceMax,
+    const raw = await searchParams;
+    const parsed = AvailableSearchParamsSchema.safeParse(raw);
+    if (!parsed.success) {
+        return <p className="col-span-full text-center text-ink-3 py-12">Filtros inválidos</p>;
+    }
+    const params = parsed.data;
+
+    const filterParams: ShipmentFilterParams = {
+        sortBy: params.sortBy as ShipmentFilterParams["sortBy"],
+        sortOrder: params.sortOrder,
+        weightMin: params.weightMin,
+        weightMax: params.weightMax,
+        priceMin: params.priceMin,
+        priceMax: params.priceMax,
+        distanceMin: params.distanceMin,
+        distanceMax: params.distanceMax,
+        page: params.page,
+        pageSize: params.pageSize,
     };
 
-    const offers = await getAvailableShipments(params);
+    const result = await getAvailableShipments(filterParams);
     return (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {offers.length === 0 ? (
-                <p className="col-span-full text-center text-ink-3 py-12">
-                    No hay envíos disponibles para tomar en este momento.
-                </p>
-            ) : (
-                offers.map((offer) => (
-                    <AvailableShipmentCard
-                        key={offer.shippingId}
-                        offer={offer}
-                    />
-                ))
-            )}
-        </div>
+        <>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {result.data.length === 0 ? (
+                    <p className="col-span-full text-center text-ink-3 py-12">
+                        No hay envíos disponibles para tomar en este momento.
+                    </p>
+                ) : (
+                    result.data.map((offer) => (
+                        <AvailableShipmentCard
+                            key={offer.shippingId}
+                            offer={offer}
+                        />
+                    ))
+                )}
+            </div>
+            <Pagination currentPage={result.page} totalPages={result.totalPages} />
+        </>
     );
 }
