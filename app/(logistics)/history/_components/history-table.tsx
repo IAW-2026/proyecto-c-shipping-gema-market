@@ -27,7 +27,7 @@ export function HistoryTable({ shipments }: { shipments: ShipmentSummary[] }) {
                             <TableCell className="text-ink-3 font-mono font-medium">{s.shippingId}</TableCell>
                             <TableCell className="font-mono text-ink-3">{s.orderId}</TableCell>
                             <TableCell className="text-ink-2 text-sm whitespace-nowrap">
-                                {s.createdAt?.toLocaleDateString('es-AR', {
+                                {s.deliveredAt?.toLocaleDateString('es-AR', {
                                     day: '2-digit',
                                     month: '2-digit',
                                     year: 'numeric',
