@@ -43,8 +43,8 @@ export function DbExplorer() {
         if (col === "status") {
             const statusColor: Record<string, string> = {
                 delivered: "text-success",
-                in_transit: "text-warning",
-                picked_up: "text-warning",
+                in_transit: "text-cocoa",
+                picked_up: "text-cocoa",
                 pending_pickup: "text-ink-2",
                 waiting_for_courier: "text-ink-3",
             };

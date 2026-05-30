@@ -50,7 +50,7 @@ const SECTIONS: ChecklistSection[] = [
         items: [
             { id: "fdr-1", label: "Ver lista de todos los drivers" },
             { id: "fdr-2", label: "Ver detalle de un driver con su historial de envios" },
-            { id: "fdr-3", label: "Banear un driver (Carlos Mendez)" },
+            { id: "fdr-3", label: "Banear un driver (Logistics Operator)" },
             { id: "fdr-4", label: "Ver que el driver baneado no puede tomar envios" },
             { id: "fdr-5", label: "Desbanear un driver" },
             { id: "fdr-6", label: "Eliminar un driver (Ana Torres) con reasignacion de envios" },
