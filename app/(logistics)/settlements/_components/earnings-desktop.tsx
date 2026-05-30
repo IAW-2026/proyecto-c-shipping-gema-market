@@ -10,16 +10,16 @@ function DayOrdersDesktop({ orders }: { orders: DayOrder[] }) {
     return (
         <div className="border-t border-line bg-white">
             <div className="grid grid-cols-3 gap-4 px-6 py-1.5 pl-20 text-[11px] font-mono font-medium text-ink-3 uppercase tracking-wider">
-                <span>ID Pedido</span>
+                <span>ID Envío</span>
                 <span className="text-right">Precio</span>
                 <span className="text-right">Fecha de Retiro</span>
             </div>
             {orders.map((order) => (
                 <div
-                    key={order.orderId}
+                    key={order.shippingId}
                     className="grid grid-cols-3 gap-4 px-6 py-2 pl-20 text-sm text-ink border-t border-line/30"
                 >
-                    <span className="font-mono text-xs truncate">{order.orderId}</span>
+                    <span className="font-mono text-xs truncate">{order.shippingId}</span>
                     <span className="text-right font-medium">
                         ${order.price.toLocaleString("es-AR")}
                     </span>
