@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { Database, CheckCircle, AlertCircle, Loader2 } from "lucide-react";
+import { seedAction } from "./seed-action";
 
 type SeedState = "idle" | "loading" | "success" | "error";
 
@@ -14,21 +15,15 @@ export function SeedButton() {
         setState("loading");
         setMessage("");
 
-        try {
-            const res = await fetch("/api/dev/seed", { method: "POST" });
-            const data = await res.json();
+        const result = await seedAction();
 
-            if (res.ok) {
-                setState("success");
-                setMessage(data.message || "Seed completado correctamente");
-                setLastSeed(new Date().toLocaleString("es-AR"));
-            } else {
-                setState("error");
-                setMessage(data.error || "Error al seedear la base de datos");
-            }
-        } catch {
+        if (result.success) {
+            setState("success");
+            setMessage(result.message || "Seed completado correctamente");
+            setLastSeed(new Date().toLocaleString("es-AR"));
+        } else {
             setState("error");
-            setMessage("Error de conexion. Verifica que el servidor este corriendo.");
+            setMessage(result.error || "Error al seedear la base de datos");
         }
     };
 

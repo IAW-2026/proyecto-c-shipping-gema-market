@@ -26,9 +26,9 @@ const SEED_ITEMS = [
     { label: "Usuarios nuevos", detail: "2 (1 baneado + 1 eliminable)", icon: Users },
     { label: "Tarifas", detail: "5 rangos de peso", icon: BarChart3 },
     { label: "Entregas HOY (repartidor principal)", detail: "3 envios entregados", icon: Package },
-    { label: "Envios activos (repartidor principal)", detail: "4 (1 pending_pickup, 1 picked_up, 2 in_transit)", icon: Truck },
+    { label: "Envios activos (repartidor principal)", detail: "4 (1 pendiente de retiro, 1 retirado, 2 en viaje)", icon: Truck },
     { label: "Historicos (repartidor principal)", detail: "~23 distribuidos en 6 semanas", icon: History },
-    { label: "Sin asignar (waiting_for_courier)", detail: "~10 envios disponibles", icon: Clock },
+    { label: "Sin asignar (En espera)", detail: "~10 envíos disponibles", icon: Clock },
     { label: "Envios drivers secundarios", detail: "~9 entregas historicas", icon: Users },
 ];
 
