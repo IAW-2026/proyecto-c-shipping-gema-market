@@ -12,38 +12,45 @@ export interface NotificationEntry {
     transition?: string;
 }
 
+const STORAGE_KEY = "__opencode_notifications_registry";
 const MAX_ENTRIES = 500;
 
-class NotificationRegistry {
-    private entries: NotificationEntry[] = [];
-    private idCounter = 0;
+function getStore(): NotificationEntry[] {
+    const g = globalThis as { [STORAGE_KEY]?: NotificationEntry[] };
+    if (!g[STORAGE_KEY]) {
+        g[STORAGE_KEY] = [];
+    }
+    return g[STORAGE_KEY]!;
+}
 
+class NotificationRegistry {
     add(entry: Omit<NotificationEntry, "id" | "timestamp">): NotificationEntry {
+        const store = getStore();
         const newEntry: NotificationEntry = {
             ...entry,
-            id: `notif_${++this.idCounter}`,
+            id: `notif_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`,
             timestamp: new Date().toLocaleTimeString("es-AR", { hour12: false }),
         };
 
-        this.entries.unshift(newEntry);
+        store.unshift(newEntry);
 
-        if (this.entries.length > MAX_ENTRIES) {
-            this.entries = this.entries.slice(0, MAX_ENTRIES);
+        if (store.length > MAX_ENTRIES) {
+            store.length = MAX_ENTRIES;
         }
 
         return newEntry;
     }
 
     getAll(): NotificationEntry[] {
-        return [...this.entries];
+        return [...getStore()];
     }
 
     getByTarget(target: NotificationTarget): NotificationEntry[] {
-        return this.entries.filter((e) => e.target === target);
+        return getStore().filter((e) => e.target === target);
     }
 
     clear(): void {
-        this.entries = [];
+        getStore().length = 0;
     }
 }
 
