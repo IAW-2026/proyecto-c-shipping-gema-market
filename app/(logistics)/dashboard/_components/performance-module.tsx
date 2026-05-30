@@ -2,10 +2,21 @@
 
 import { TrendingUp, TrendingDown, DollarSign, Truck } from "lucide-react";
 import { BarChart, Bar, XAxis, Tooltip, ResponsiveContainer } from "recharts";
-import type { PerformanceData } from "@/lib/types/dashboard-metrics";
+import type { PerformanceData, WeekData } from "@/lib/types/dashboard-metrics";
 
 interface Props {
     data: PerformanceData;
+}
+
+function ChartTooltip({ active, payload }: { active?: boolean; payload?: { payload: WeekData }[] }) {
+    if (!active || !payload || payload.length === 0) return null;
+    const d = payload[0].payload;
+    return (
+        <div className="bg-paper border border-line rounded-r2 px-3 py-2 text-xs shadow-sm flex flex-col gap-1">
+            <span className="text-ink-2">Ganancia: <strong className="text-ink">${d.earnings.toLocaleString("es-AR")}</strong></span>
+            <span className="text-ink-2">Viajes: <strong className="text-ink">{d.trips}</strong></span>
+        </div>
+    );
 }
 
 function ChangeBadge({ value, suffix }: { value: number; suffix: string }) {
@@ -80,18 +91,7 @@ export function PerformanceModule({ data }: Props) {
                                 />
                                 <Tooltip
                                     cursor={{ fill: "#ede7d8" }}
-                                    contentStyle={{
-                                        backgroundColor: "#faf8f3",
-                                        border: "1px solid #e2dccc",
-                                        borderRadius: 12,
-                                        fontSize: 12,
-                                        boxShadow: "0 2px 8px rgba(0,0,0,0.06)",
-                                    }}
-                                    formatter={(value) => [
-                                        `$${Number(value).toLocaleString("es-AR")}` as React.ReactNode,
-                                        "Ganancia",
-                                    ]}
-                                    labelFormatter={(label) => `Semana del ${label}`}
+                                    content={<ChartTooltip />}
                                 />
                                 <Bar
                                     dataKey="earnings"
