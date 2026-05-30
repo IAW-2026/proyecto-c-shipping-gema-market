@@ -32,7 +32,7 @@ export function MobileNav() {
                 );
             })}
 
-            <div className="flex flex-col items-center gap-[3px] px-1 py-1.5 flex-1 min-w-0 text-ink-3">
+            <div suppressHydrationWarning className="flex flex-col items-center gap-[3px] px-1 py-1.5 flex-1 min-w-0 text-ink-3">
                 {isLoaded ? (
                     <UserButton />
                 ) : (

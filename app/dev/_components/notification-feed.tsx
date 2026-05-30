@@ -1,143 +1,11 @@
 "use client";
 
-import { useState, useRef } from "react";
-import { Trash2, Filter } from "lucide-react";
+import { useState, useEffect, useCallback } from "react";
+import { Trash2, Filter, RefreshCw, Radio } from "lucide-react";
+import { getNotificationsAction, clearNotificationsAction } from "./notification-feed-action";
+import type { NotificationTarget, NotificationEntry } from "@/lib/utils/notification-registry";
 
-type TargetType = "SELLER" | "BUYER" | "API";
-
-interface NotificationEntry {
-    id: string;
-    timestamp: string;
-    target: TargetType;
-    method: string;
-    url: string;
-    body?: Record<string, unknown>;
-    status: number;
-    response?: Record<string, unknown>;
-    transition?: string;
-}
-
-const MOCK_ENTRIES: NotificationEntry[] = [
-    {
-        id: "1",
-        timestamp: "14:32:15",
-        target: "SELLER",
-        method: "POST",
-        url: "/api/seller/ventas/ord_xxx1/estado-envio",
-        body: {
-            order_id: "ord_xxx1",
-            shipping_id: "shp_01K...",
-            status: "picked_up",
-            tracking_code: "BB-000001-2026",
-            updated_at: "2026-05-30T14:32:15.000Z",
-        },
-        status: 200,
-        response: { success: true },
-        transition: "pending_pickup -> picked_up",
-    },
-    {
-        id: "2",
-        timestamp: "14:32:15",
-        target: "BUYER",
-        method: "POST",
-        url: "/api/buyer/ordenes/ord_xxx1/estado-envio",
-        body: {
-            shipping_id: "shp_01K...",
-            status: "picked_up",
-            tracking_code: "BB-000001-2026",
-            updated_at: "2026-05-30T14:32:15.000Z",
-        },
-        status: 200,
-        response: { received: true, order_id: "ord_xxx1" },
-        transition: "pending_pickup -> picked_up",
-    },
-    {
-        id: "3",
-        timestamp: "14:30:00",
-        target: "API",
-        method: "GET",
-        url: "/api/seller/productos/prd_xxx1/direccion-origen",
-        status: 200,
-        response: { origin_address: { street: "Avenida Alem", number: "1250", zip: "8000" } },
-    },
-    {
-        id: "4",
-        timestamp: "14:29:58",
-        target: "API",
-        method: "POST",
-        url: "/api/buyer/usr_xxx",
-        status: 200,
-        response: { full_name: "Maria Garcia", phone_number: "2915550101", email: "maria.garcia@email.com" },
-    },
-    {
-        id: "5",
-        timestamp: "14:28:30",
-        target: "SELLER",
-        method: "POST",
-        url: "/api/seller/ventas/ord_xxx2/estado-envio",
-        body: {
-            order_id: "ord_xxx2",
-            shipping_id: "shp_01K...",
-            status: "in_transit",
-            tracking_code: "BB-000002-2026",
-            updated_at: "2026-05-30T14:28:30.000Z",
-        },
-        status: 200,
-        response: { success: true },
-        transition: "picked_up -> in_transit",
-    },
-    {
-        id: "6",
-        timestamp: "14:28:30",
-        target: "BUYER",
-        method: "POST",
-        url: "/api/buyer/ordenes/ord_xxx2/estado-envio",
-        body: {
-            shipping_id: "shp_01K...",
-            status: "in_transit",
-            tracking_code: "BB-000002-2026",
-            updated_at: "2026-05-30T14:28:30.000Z",
-        },
-        status: 200,
-        response: { received: true, order_id: "ord_xxx2" },
-        transition: "picked_up -> in_transit",
-    },
-    {
-        id: "7",
-        timestamp: "14:25:10",
-        target: "SELLER",
-        method: "POST",
-        url: "/api/seller/ventas/ord_xxx3/estado-envio",
-        body: {
-            order_id: "ord_xxx3",
-            shipping_id: "shp_01K...",
-            status: "delivered",
-            tracking_code: "BB-000003-2026",
-            updated_at: "2026-05-30T14:25:10.000Z",
-        },
-        status: 200,
-        response: { success: true },
-        transition: "in_transit -> delivered",
-    },
-    {
-        id: "8",
-        timestamp: "14:25:10",
-        target: "BUYER",
-        method: "POST",
-        url: "/api/buyer/ordenes/ord_xxx3/estado-envio",
-        body: {
-            shipping_id: "shp_01K...",
-            status: "delivered",
-            tracking_code: "BB-000003-2026",
-            updated_at: "2026-05-30T14:25:10.000Z",
-        },
-        status: 200,
-        response: { received: true, order_id: "ord_xxx3" },
-        transition: "in_transit -> delivered",
-    },
-];
-
-const TARGET_COLORS: Record<TargetType, string> = {
+const TARGET_COLORS: Record<NotificationTarget, string> = {
     SELLER: "text-yellow-400",
     BUYER: "text-cyan-400",
     API: "text-green-400",
@@ -215,15 +83,34 @@ function EntryCard({ entry }: { entry: NotificationEntry }) {
 }
 
 export function NotificationFeed() {
-    const [entries, setEntries] = useState<NotificationEntry[]>(MOCK_ENTRIES);
-    const [filter, setFilter] = useState<"ALL" | TargetType>("ALL");
-    const scrollRef = useRef<HTMLDivElement>(null);
+    const [entries, setEntries] = useState<NotificationEntry[]>([]);
+    const [filter, setFilter] = useState<"ALL" | NotificationTarget>("ALL");
+    const [loading, setLoading] = useState(false);
+    const [autoRefresh, setAutoRefresh] = useState(true);
 
-    const filtered = filter === "ALL" ? entries : entries.filter((e) => e.target === filter);
+    const fetchData = useCallback(async () => {
+        setLoading(true);
+        const data = await getNotificationsAction(filter === "ALL" ? undefined : filter);
+        setEntries(data);
+        setLoading(false);
+    }, [filter]);
 
-    const handleClear = () => {
+    useEffect(() => {
+        fetchData();
+    }, [fetchData]);
+
+    useEffect(() => {
+        if (!autoRefresh) return;
+        const interval = setInterval(fetchData, 5000);
+        return () => clearInterval(interval);
+    }, [autoRefresh, fetchData]);
+
+    const handleClear = async () => {
+        await clearNotificationsAction();
         setEntries([]);
     };
+
+    const filtered = filter === "ALL" ? entries : entries.filter((e) => e.target === filter);
 
     return (
         <div
@@ -235,7 +122,7 @@ export function NotificationFeed() {
                     <h3 className="text-sm font-semibold text-white font-mono">Consola de Notificaciones</h3>
                     <span className="flex items-center gap-1.5 text-[11px] text-green-400 font-mono">
                         <span className="w-1.5 h-1.5 rounded-full bg-green-400 animate-pulse" />
-                        Mock
+                        {autoRefresh ? "Live" : "Paused"}
                     </span>
                 </div>
 
@@ -254,6 +141,21 @@ export function NotificationFeed() {
                         </select>
                     </div>
                     <button
+                        onClick={fetchData}
+                        disabled={loading}
+                        className="flex items-center gap-1.5 text-[11px] text-gray-400 hover:text-white transition-colors font-mono disabled:opacity-50"
+                    >
+                        <RefreshCw size={12} className={loading ? "animate-spin" : ""} />
+                    </button>
+                    <button
+                        onClick={() => setAutoRefresh(!autoRefresh)}
+                        className={`flex items-center gap-1.5 text-[11px] font-mono transition-colors ${
+                            autoRefresh ? "text-green-400 hover:text-green-300" : "text-gray-500 hover:text-gray-300"
+                        }`}
+                    >
+                        <Radio size={12} />
+                    </button>
+                    <button
                         onClick={handleClear}
                         className="flex items-center gap-1.5 text-[11px] text-gray-400 hover:text-white transition-colors font-mono"
                     >
@@ -263,7 +165,7 @@ export function NotificationFeed() {
                 </div>
             </div>
 
-            <div ref={scrollRef} className="flex-1 overflow-y-auto">
+            <div className="flex-1 overflow-y-auto">
                 {filtered.length === 0 ? (
                     <div className="p-8 text-center text-gray-400 font-mono text-base">
                         No hay notificaciones. Realiza una accion para verlas aqui.
