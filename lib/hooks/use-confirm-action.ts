@@ -28,7 +28,6 @@ export function useConfirmAction(
     try {
       const result = await action();
       if (!result.success) {
-        console.error(result.error);
         optionsRef.current?.onError?.(result.error ?? "Error desconocido");
         return;
       }

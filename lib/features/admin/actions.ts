@@ -10,6 +10,8 @@ import { deleteDriver, toggleBan } from "@/lib/db/mutations/admin/drivers";
 import { updateShipmentPrice, unassignDriver, deleteShipment } from "@/lib/db/mutations/admin/shipments";
 import { createRate, updateRate, deleteRate } from "@/lib/db/mutations/admin/rates";
 
+const PROTECTED_OPERATOR_ID = "usr_01KSTWBKD7VFMD9JQ5FNXMPM5J";
+
 export async function deleteDriverAction(driverId: string) {
     try {
         const { userId } = await requireRole([ROLES.ADMIN_LOGISTICS]);
@@ -18,10 +20,18 @@ export async function deleteDriverAction(driverId: string) {
             return { success: false, error: "No puedes eliminarte a ti mismo" };
         }
 
+        if (driverId === PROTECTED_OPERATOR_ID) {
+            return { success: false, error: "No se puede eliminar al operador de testeo" };
+        }
+
         await deleteDriver(driverId);
 
         revalidatePath("/admin/drivers");
         revalidatePath("/admin/dashboard");
+        revalidatePath("/dashboard");
+        revalidatePath("/available");
+        revalidatePath("/courier");
+        revalidatePath("/history");
 
         return { success: true };
     } catch (error) {
@@ -49,6 +59,11 @@ export async function updateShipmentPriceAction(shipmentId: string, price: numbe
         await updateShipmentPrice(shipmentId, price);
 
         revalidatePath("/admin/shipments");
+        revalidatePath("/dashboard");
+        revalidatePath("/available");
+        revalidatePath("/courier");
+        revalidatePath("/history");
+        revalidatePath(`/shipments/${shipmentId}`);
         return { success: true };
     } catch (error) {
         if (isNextDynamicServerError(error)) throw error;
@@ -75,6 +90,11 @@ export async function unassignDriverAction(shipmentId: string) {
 
         revalidatePath("/admin/shipments");
         revalidatePath("/admin/drivers");
+        revalidatePath("/dashboard");
+        revalidatePath("/available");
+        revalidatePath("/courier");
+        revalidatePath("/history");
+        revalidatePath(`/shipments/${shipmentId}`);
         return { success: true };
     } catch (error) {
         if (isNextDynamicServerError(error)) throw error;
@@ -91,6 +111,11 @@ export async function deleteShipmentAction(shipmentId: string) {
 
         revalidatePath("/admin/shipments");
         revalidatePath("/admin/dashboard");
+        revalidatePath("/dashboard");
+        revalidatePath("/available");
+        revalidatePath("/courier");
+        revalidatePath("/history");
+        revalidatePath(`/shipments/${shipmentId}`);
         return { success: true };
     } catch (error) {
         if (isNextDynamicServerError(error)) throw error;
@@ -182,6 +207,10 @@ export async function toggleBanAction(driverId: string, banned: boolean) {
 
         revalidatePath("/admin/drivers");
         revalidatePath(`/admin/drivers/${driverId}`);
+        revalidatePath("/dashboard");
+        revalidatePath("/available");
+        revalidatePath("/courier");
+        revalidatePath("/history");
         return { success: true };
     } catch (error) {
         if (isNextDynamicServerError(error)) throw error;

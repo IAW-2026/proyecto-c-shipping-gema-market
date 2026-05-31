@@ -64,6 +64,7 @@ export const ShipmentSummarySchema = ShipmentSchema.pick({
     deliveryAddress: true,
     price: true,
     createdAt: true,
+    deliveredAt: true,
 });
 
 export type ShipmentSummary = z.infer<typeof ShipmentSummarySchema>;

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback } from "react";
+import { useCallback, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { Tag, Home } from "lucide-react";
 import type { ShipmentSummary } from "@/lib/schemas/domain";
@@ -22,22 +22,21 @@ interface CourierDataProps {
 
 export function CourierData({ shipment, shipments, selectedTracking }: CourierDataProps) {
     const router = useRouter();
-    const [hasPendingAction, setHasPendingAction] = useState(false);
+    const [isPending, startTransition] = useTransition();
 
     const { isOpen: showCancel, isPending: isCancelPending, open: openCancel, close: closeCancel, handleConfirm: handleCancel }
         = useConfirmAction(useCallback(() => transitionShipmentAction(shipment.shippingId, "cancel"), [shipment.shippingId]));
 
     const handleAction = useCallback(async (shippingId: string, transition: "pickup" | "transit" | "deliver") => {
-        setHasPendingAction(true);
-        try {
-            const result = await transitionShipmentAction(shippingId, transition);
-            if (!result.success) console.error(result.error);
-        } catch (error) {
-            console.error("Error al ejecutar acción:", error);
-        } finally {
+        startTransition(async () => {
+            try {
+                const result = await transitionShipmentAction(shippingId, transition);
+                if (!result.success) console.error(result.error);
+            } catch (error) {
+                console.error("Error al ejecutar acción:", error);
+            }
             router.refresh();
-            setHasPendingAction(false);
-        }
+        });
     }, [router]);
 
     const actionConfig = COURIER_ACTION_MAP[shipment.status];
@@ -48,13 +47,13 @@ export function CourierData({ shipment, shipments, selectedTracking }: CourierDa
                 shipments={shipments}
                 selectedTracking={selectedTracking}
                 onCancelClick={openCancel}
-                hasPendingAction={hasPendingAction || isCancelPending}
+                hasPendingAction={isPending || isCancelPending}
                 canCancel={!!actionConfig?.canCancel}
             />
 
             <section className="flex flex-col flex-1 px-4 lgx:px-0">
                 <div className="flex-1 relative min-h-0">
-                    <CourierMap shipment={shipment} hasPendingAction={hasPendingAction} />
+                    <CourierMap shipment={shipment} hasPendingAction={isPending} />
                 </div>
 
                 <div className="px-4 py-2 bg-paper border-t border-line">
@@ -91,7 +90,7 @@ export function CourierData({ shipment, shipments, selectedTracking }: CourierDa
                 {actionConfig && (
                     <div className="border-t border-line px-0 pt-4 pb-6 bg-paper">
                         <ChangeStateButton
-                            isPending={hasPendingAction}
+                            isPending={isPending}
                             label={actionConfig.label}
                             onClick={() => handleAction(shipment.shippingId, actionConfig.transition)}
                         />

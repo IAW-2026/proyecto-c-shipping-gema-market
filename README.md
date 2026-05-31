@@ -65,6 +65,38 @@ Copiar `.env.example` a `.env.local` y completar los valores.
 
 ---
 
+## Área de Desarrollo (Dev Center)
+
+El Dev Center es un conjunto de herramientas interactivas accesibles desde cualquier navegador sin necesidad de autenticación. Ideal para evaluadores y equipos de integración.
+
+**Acceso:** [`/dev`](https://proyecto-c-shipping-gema-market.vercel.app/dev)
+
+| Ruta | Herramienta | Qué permite |
+|------|-------------|-------------|
+| `/dev` | **Testing Checklist** | Checklist interactivo con todos los flujos a probar (ciclo de envío, dashboard, gestión de drivers, tracking público, API playground, consola). El progreso se guarda en localStorage. |
+| `/dev/seed` | **Seed + DB Explorer** | Botón "Seedear Base de Datos" que crea envíos, tarifas, drivers y usuarios con datos realistas de Bahía Blanca (fechas relativas al momento de ejecución). El explorador permite seleccionar cualquier tabla y ver su contenido. |
+| `/dev/playground` | **API Playground** | Simula el flujo completo de integración entre aplicaciones: configurar origen/destino, cotizar, reservar, crear envío. Muestra el tráfico HTTP entre servicios en un log lateral. |
+| `/dev/console` | **Consola de Notificaciones** | Muestra en tiempo real todas las notificaciones enviadas a Seller API, Buyer API y llamadas internas (mock). Permite filtrar por tipo y limpiar el historial. |
+
+### Script CLI
+
+```bash
+bash scripts/api-tests.sh http://localhost:3000
+```
+
+Simula desde terminal las mismas llamadas que el API Playground (cotización, reserva, liberación, creación de envío).
+
+### Flujo recomendado para evaluar
+
+1. Ir a `/dev/seed` y hacer clic en **Seedear Base de Datos**
+2. Ir a `/dev` y seguir la checklist de **Ciclo completo de un envío**
+3. Explorar el panel de operador en `/dashboard` y admin en `/admin/dashboard`
+4. Probar el tracking público en `/track/BB-000001-2026`
+5. Usar el API Playground en `/dev/playground` para simular integración
+6. Monitorear las notificaciones en `/dev/console`
+
+---
+
 ## Notas técnicas
 
 ### Estimación de días de entrega
@@ -187,7 +219,7 @@ lib/features/
 
 - **Liquidaciones con SQL nativo:** Las consultas de liquidaciones semanales usan `$queryRaw` de Prisma con `date_trunc` de PostgreSQL para agrupación eficiente por semana ISO, evitando post-procesamiento en JavaScript.
 
-- **API Playground para desarrollo:** Panel interactivo en `/dev/api-playground` que permite probar todos los endpoints de la API con payloads predefinidos, headers mock y modo debug, facilitando la integración con otros equipos del ecosistema.
+- **API Playground para desarrollo:** Panel interactivo en `/dev/playground` que permite probar todos los endpoints de la API con payloads predefinidos, headers mock y modo debug, facilitando la integración con otros equipos del ecosistema.
 
 - **Transacciones con aislamiento serializable:** La creación de tarifas usa `isolationLevel: "Serializable"` para prevenir condiciones de carrera al validar solapamiento de rangos de peso.
 

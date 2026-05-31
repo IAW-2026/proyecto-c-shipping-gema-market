@@ -9,9 +9,9 @@ function DayOrdersMobile({ orders }: { orders: DayOrder[] }) {
     return (
         <div className="ml-6 border-l-2 border-line pl-3 mt-1 mb-2 space-y-2">
             {orders.map((order) => (
-                <div key={order.orderId} className="text-xs">
+                <div key={order.shippingId} className="text-xs">
                     <div className="font-mono text-ink font-medium truncate">
-                        {order.orderId}
+                        {order.shippingId}
                     </div>
                     <div className="flex justify-between text-ink-2 mt-0.5">
                         <span>${order.price.toLocaleString("es-AR")}</span>

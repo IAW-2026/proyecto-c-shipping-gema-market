@@ -14,7 +14,7 @@ export interface DailyEarnings {
 }
 
 export interface DayOrder {
-    orderId: string;
+    shippingId: string;
     price: number;
     pickedUpAt: Date | null;
     deliveredAt: Date | null;

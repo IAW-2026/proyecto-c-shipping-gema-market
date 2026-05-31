@@ -10,7 +10,7 @@ export default function ApiPlaygroundPage() {
     const state = usePlaygroundState();
 
     return (
-        <div className="min-h-screen bg-cream p-6">
+        <div className="p-6">
             <div className="max-w-6xl mx-auto">
                 <div className="flex items-center gap-3 mb-1">
                     <h1 className="text-xl font-bold text-ink">API Playground</h1>

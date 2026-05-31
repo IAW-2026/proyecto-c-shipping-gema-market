@@ -7,6 +7,7 @@ import { createShipmentRecord, generateTrackingCode } from "@/lib/db/mutations/s
 import { findReservedQuote } from "@/lib/db/queries/quote";
 import { confirmQuote } from "@/lib/db/mutations/quote";
 import prisma from "@/lib/db/prisma";
+import { notificationRegistry } from "@/lib/utils/notification-registry";
 type CreateShipmentRequest = z.infer<typeof createShipmentSchema>;
 
 export interface CreateShipmentResult {
@@ -25,6 +26,15 @@ export async function createShipment(
     if (!receiver_name || !receiver_phone) {
         try {
             const buyerResult = await buyerApiClient.getBuyerData(buyer_id, req);
+
+            notificationRegistry.add({
+                target: "API",
+                method: "POST",
+                url: `/api/buyer/${buyer_id}`,
+                status: buyerResult.status,
+                response: (buyerResult.data ?? buyerResult.error) as unknown as Record<string, unknown>,
+            });
+
             if (buyerResult.data) {
                 receiver_name ??= buyerResult.data.full_name;
                 receiver_phone ??= buyerResult.data.phone_number;

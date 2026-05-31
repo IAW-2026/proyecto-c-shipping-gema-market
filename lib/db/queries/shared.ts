@@ -16,6 +16,7 @@ export const summarySelect = {
     delivery_address: true,
     price: true,
     created_at: true,
+    delivered_at: true,
 } as const;
 
 export const detailSelect = {
@@ -59,6 +60,7 @@ export function buildOrderBy(sortBy?: string, sortOrder?: 'asc' | 'desc'): Prism
         case 'weight': return { weight: dir };
         case 'tracking_code': return { tracking_code: dir };
         case 'status': return { status: dir };
+        case 'delivered_at': return { delivered_at: dir };
         default: return { created_at: dir };
     }
 }
@@ -102,6 +104,7 @@ export function toShipmentSummary(row: {
     delivery_address: unknown;
     price: unknown;
     created_at: Date;
+    delivered_at: Date | null;
 }): ShipmentSummary {
     return {
         shippingId: row.id,
@@ -112,6 +115,7 @@ export function toShipmentSummary(row: {
         deliveryAddress: AddressSchema.parse(row.delivery_address),
         price: Number(row.price),
         createdAt: row.created_at,
+        deliveredAt: row.delivered_at,
     };
 }
 
