@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import { ChevronDown, ChevronUp, Repeat, BarChart3, Users, Package, Globe, Gamepad2, Radio } from "lucide-react";
+import { ChevronDown, ChevronUp, Repeat, BarChart3, Users, Package, Globe, Gamepad2 } from "lucide-react";
 
 const STORAGE_KEY = "dev-testing-checklist";
 
@@ -31,7 +31,6 @@ const SECTIONS: ChecklistSection[] = [
             { id: "fc-4", label: "Ir a Modo repartidor - Click \"Marcar entregado\"" },
             { id: "fc-5", label: "Ver en Historial que el envío aparece" },
             { id: "fc-6", label: "Ver en Liquidaciones la liquidación semanal" },
-            { id: "fc-7", label: "Ir a Consola - Ver las notificaciones enviadas" },
         ],
     },
     {
@@ -90,18 +89,6 @@ const SECTIONS: ChecklistSection[] = [
             { id: "fp-3", label: "Reservar la cotizacion" },
             { id: "fp-4", label: "Crear el envio" },
             { id: "fp-5", label: "Ver el trafico en el log" },
-        ],
-    },
-    {
-        id: "flow-console",
-        title: "Consola de notificaciones",
-        icon: Radio,
-        items: [
-            { id: "fco-1", label: "Ver notificaciones enviadas a Seller" },
-            { id: "fco-2", label: "Ver notificaciones enviadas a Buyer" },
-            { id: "fco-3", label: "Ver llamadas API mock (origen vendedor, datos comprador)" },
-            { id: "fco-4", label: "Filtrar por tipo (Seller/Buyer/API)" },
-            { id: "fco-5", label: "Limpiar consola" },
         ],
     },
 ];

@@ -3,7 +3,6 @@ import { sellerApiClient } from "@/lib/clients/seller-api/seller-api.client";
 import { buyerApiClient } from "@/lib/clients/buyer-api/buyer-api.client";
 import type { SellerStatusUpdate } from "@/lib/clients/seller-api/seller-api.types";
 import type { BuyerStatusUpdate } from "@/lib/clients/buyer-api/buyer-api.types";
-import { notificationRegistry } from "@/lib/utils/notification-registry";
 
 interface NotificationPayload {
     orderId: string;
@@ -17,26 +16,9 @@ async function notifySeller(orderId: string, payload: SellerStatusUpdate, transi
     const url = `/api/seller/ventas/${orderId}/estado-envio`;
     try {
         const result = await sellerApiClient.notifyStatusChange(orderId, payload);
-        notificationRegistry.add({
-            target: "SELLER",
-            method: "POST",
-            url,
-            body: payload as unknown as Record<string, unknown>,
-            status: result.status,
-            response: result.data ? { success: true } : undefined,
-            transition,
-        });
+        console.log(`[NOTIFICATION] SELLER → ${result.status} ${result.data ? "OK" : "no data"} | ${transition || ""} | ${url}`);
     } catch (error) {
         console.error("[NOTIFICATION] Error notificando a Seller:", error);
-        notificationRegistry.add({
-            target: "SELLER",
-            method: "POST",
-            url,
-            body: payload as unknown as Record<string, unknown>,
-            status: 500,
-            response: { error: String(error) },
-            transition,
-        });
     }
 }
 
@@ -44,26 +26,9 @@ async function notifyBuyer(orderId: string, payload: BuyerStatusUpdate, transiti
     const url = `/api/buyer/ordenes/${orderId}/estado-envio`;
     try {
         const result = await buyerApiClient.notifyStatusChange(orderId, payload);
-        notificationRegistry.add({
-            target: "BUYER",
-            method: "POST",
-            url,
-            body: payload as unknown as Record<string, unknown>,
-            status: result.status,
-            response: result.data ? { received: true, order_id: orderId } : undefined,
-            transition,
-        });
+        console.log(`[NOTIFICATION] BUYER → ${result.status} ${result.data ? "OK" : "no data"} | ${transition || ""} | ${url}`);
     } catch (error) {
         console.error("[NOTIFICATION] Error notificando a Buyer:", error);
-        notificationRegistry.add({
-            target: "BUYER",
-            method: "POST",
-            url,
-            body: payload as unknown as Record<string, unknown>,
-            status: 500,
-            response: { error: String(error) },
-            transition,
-        });
     }
 }
 
