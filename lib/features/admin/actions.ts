@@ -28,6 +28,10 @@ export async function deleteDriverAction(driverId: string) {
 
         revalidatePath("/admin/drivers");
         revalidatePath("/admin/dashboard");
+        revalidatePath("/dashboard");
+        revalidatePath("/available");
+        revalidatePath("/courier");
+        revalidatePath("/history");
 
         return { success: true };
     } catch (error) {
@@ -55,6 +59,11 @@ export async function updateShipmentPriceAction(shipmentId: string, price: numbe
         await updateShipmentPrice(shipmentId, price);
 
         revalidatePath("/admin/shipments");
+        revalidatePath("/dashboard");
+        revalidatePath("/available");
+        revalidatePath("/courier");
+        revalidatePath("/history");
+        revalidatePath(`/shipments/${shipmentId}`);
         return { success: true };
     } catch (error) {
         if (isNextDynamicServerError(error)) throw error;
@@ -81,6 +90,11 @@ export async function unassignDriverAction(shipmentId: string) {
 
         revalidatePath("/admin/shipments");
         revalidatePath("/admin/drivers");
+        revalidatePath("/dashboard");
+        revalidatePath("/available");
+        revalidatePath("/courier");
+        revalidatePath("/history");
+        revalidatePath(`/shipments/${shipmentId}`);
         return { success: true };
     } catch (error) {
         if (isNextDynamicServerError(error)) throw error;
@@ -97,6 +111,11 @@ export async function deleteShipmentAction(shipmentId: string) {
 
         revalidatePath("/admin/shipments");
         revalidatePath("/admin/dashboard");
+        revalidatePath("/dashboard");
+        revalidatePath("/available");
+        revalidatePath("/courier");
+        revalidatePath("/history");
+        revalidatePath(`/shipments/${shipmentId}`);
         return { success: true };
     } catch (error) {
         if (isNextDynamicServerError(error)) throw error;
@@ -188,6 +207,10 @@ export async function toggleBanAction(driverId: string, banned: boolean) {
 
         revalidatePath("/admin/drivers");
         revalidatePath(`/admin/drivers/${driverId}`);
+        revalidatePath("/dashboard");
+        revalidatePath("/available");
+        revalidatePath("/courier");
+        revalidatePath("/history");
         return { success: true };
     } catch (error) {
         if (isNextDynamicServerError(error)) throw error;
