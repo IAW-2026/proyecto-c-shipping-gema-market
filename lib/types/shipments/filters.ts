@@ -8,7 +8,7 @@ export interface ShipmentFilterParams {
     dateTo?: Date;
     page?: number;
     pageSize?: number;
-    sortBy?: 'created_at' | 'price' | 'tracking_code' | 'status' | 'weight' | 'distance';
+    sortBy?: 'created_at' | 'price' | 'tracking_code' | 'status' | 'weight' | 'distance' | 'delivered_at';
     sortOrder?: 'asc' | 'desc';
     weightMin?: number;
     weightMax?: number;

@@ -10,7 +10,7 @@ interface ShipmentMapProps {
 }
 
 export function ShipmentMap({ shippingId, distance, status }: ShipmentMapProps) {
-    const formattedDistance = `${distance} km`;
+    const formattedDistance = `${distance.toFixed(2)} km`;
 
     return (
         <Card padding="none" className="overflow-hidden flex-1">

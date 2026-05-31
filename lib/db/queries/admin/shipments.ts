@@ -10,6 +10,7 @@ export async function getAllShipments(
     sortOrder?: string,
     page: number = 1,
     pageSize: number = 20,
+    query?: string,
 ): Promise<PaginatedResult<AdminShipment>> {
     "use cache";
     cacheLife("minutes");
@@ -17,6 +18,11 @@ export async function getAllShipments(
     const where: Prisma.ShipmentWhereInput = {};
     if (status && status !== "all") {
         where.status = status;
+    }
+    if (query) {
+        where.OR = [
+            { id: { contains: query, mode: "insensitive" } },
+        ];
     }
 
     const dir = sortOrder === "asc" ? "asc" : "desc";

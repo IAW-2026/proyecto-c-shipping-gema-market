@@ -8,7 +8,7 @@ export function WeightTag({ value }: { value: number | string }) {
 
 export function DistanceTag({ value }: { value: number | string | undefined }) {
     if (value === undefined) return null;
-    const displayValue = typeof value === 'number' ? `${value} km` : value;
+    const displayValue = typeof value === 'number' ? `${Number(value).toFixed(2)} km` : value;
     return <InfoTag label={displayValue} Icon={MapPin} />;
 }
 

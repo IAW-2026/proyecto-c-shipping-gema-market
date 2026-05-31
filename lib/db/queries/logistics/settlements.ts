@@ -132,7 +132,7 @@ export async function getSettlementsDetail(
 
         const rawOrders = row.orders as OrderRaw[];
         ordersByDay[dayKey] = rawOrders.map(o => ({
-            orderId: o.order_id,
+            shippingId: o.id,
             price: Number(o.price),
             pickedUpAt: o.picked_up_at ? new Date(o.picked_up_at) : null,
             deliveredAt: o.delivered_at ? new Date(o.delivered_at) : null,

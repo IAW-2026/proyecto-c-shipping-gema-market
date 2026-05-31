@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { TARGET_COLORS } from "./constants";
 import type { LogInternalCall, LogEntry } from "./types";
 
@@ -59,13 +59,11 @@ function InternalCallCard({ call }: { call: LogInternalCall }) {
     );
 }
 
-function LogEntryCard({ entry, isFirst }: { entry: LogEntry; isFirst: boolean }) {
-    const [open, setOpen] = useState(isFirst);
-
+function LogEntryCard({ entry, isOpen, onToggle }: { entry: LogEntry; isOpen: boolean; onToggle: () => void }) {
     return (
         <div className="border border-line rounded-r2 overflow-hidden bg-paper">
             <button
-                onClick={() => setOpen(!open)}
+                onClick={onToggle}
                 className="w-full flex items-center gap-3 px-4 py-2.5 hover:bg-cream/50 transition-colors text-left"
             >
                 <span className="text-[11px] font-mono text-ink-3 shrink-0 w-14">{entry.timestamp}</span>
@@ -73,10 +71,10 @@ function LogEntryCard({ entry, isFirst }: { entry: LogEntry; isFirst: boolean })
                 <MethodBadge method={entry.method} />
                 <span className="text-xs text-ink-2 font-mono truncate flex-1">{entry.url}</span>
                 <StatusBadge status={entry.responseStatus} />
-                <span className="text-[10px] text-ink-3 shrink-0">{open ? "▲" : "▼"}</span>
+                <span className="text-[10px] text-ink-3 shrink-0">{isOpen ? "▲" : "▼"}</span>
             </button>
 
-            {open && (
+            {isOpen && (
                 <div className="px-4 pb-3 pt-1 border-t border-line space-y-2">
                     {entry.requestBody && (
                         <CodeBlock label="Request" json={entry.requestBody} />
@@ -102,6 +100,16 @@ function LogEntryCard({ entry, isFirst }: { entry: LogEntry; isFirst: boolean })
 }
 
 export function TrafficLog({ entries, onClear }: TrafficLogProps) {
+    const [openEntryId, setOpenEntryId] = useState<string | null>(null);
+
+    useEffect(() => {
+        if (entries.length > 0) {
+            setOpenEntryId(entries[0].id);
+        } else {
+            setOpenEntryId(null);
+        }
+    }, [entries.length]);
+
     return (
         <div className="bg-paper border border-line rounded-r3 overflow-hidden">
             <div className="px-4 py-3 border-b border-line flex items-center justify-between bg-bone/30">
@@ -122,8 +130,15 @@ export function TrafficLog({ entries, onClear }: TrafficLogProps) {
                         Aun no hay trafico. Envia una request para verla aqui.
                     </div>
                 ) : (
-                    entries.map((entry, i) => (
-                        <LogEntryCard key={entry.id} entry={entry} isFirst={i === 0} />
+                    entries.map((entry) => (
+                        <LogEntryCard
+                            key={entry.id}
+                            entry={entry}
+                            isOpen={openEntryId === entry.id}
+                            onToggle={() =>
+                                setOpenEntryId(openEntryId === entry.id ? null : entry.id)
+                            }
+                        />
                     ))
                 )}
             </div>
