@@ -4,10 +4,9 @@ import { buyerApiClient } from "@/lib/clients/buyer-api/buyer-api.client";
 import type { z } from "zod";
 import type { createShipmentSchema } from "@/lib/schemas/api/shipment";
 import { createShipmentRecord, generateTrackingCode } from "@/lib/db/mutations/shared";
-import { findReservedQuote } from "@/lib/db/queries/quote";
 import { confirmQuote } from "@/lib/db/mutations/quote";
 import prisma from "@/lib/db/prisma";
-import { notificationRegistry } from "@/lib/utils/notification-registry";
+import { findReservedQuote } from "@/lib/db/queries/quote";
 type CreateShipmentRequest = z.infer<typeof createShipmentSchema>;
 
 export interface CreateShipmentResult {
@@ -26,14 +25,7 @@ export async function createShipment(
     if (!receiver_name || !receiver_phone) {
         try {
             const buyerResult = await buyerApiClient.getBuyerData(buyer_id, req);
-
-            notificationRegistry.add({
-                target: "API",
-                method: "POST",
-                url: `/api/buyer/${buyer_id}`,
-                status: buyerResult.status,
-                response: (buyerResult.data ?? buyerResult.error) as unknown as Record<string, unknown>,
-            });
+            console.log(`[API] BUYER DATA → ${buyerResult.status} | /api/buyer/${buyer_id}`);
 
             if (buyerResult.data) {
                 receiver_name ??= buyerResult.data.full_name;

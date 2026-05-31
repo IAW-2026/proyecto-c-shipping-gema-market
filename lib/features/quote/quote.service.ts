@@ -6,10 +6,9 @@ import type { z } from "zod";
 import type { quoteRequestSchema } from "@/lib/schemas/api/quote";
 import { calculateVolume, calculateVolumetricWeight, calculateBillableWeight, calculatePrice, calculateEstimatedDays, getDefaultPricePerKm, CURRENCY, DEFAULT_DISTANCE_KM } from "./price-and-time-calculator";
 import { getUsdToArsRate } from "@/lib/clients/exchange-rate";
-import { validateQuoteForReservation, validateQuoteForRelease } from "./state-validations";
-import { findMatchingRate, findQuoteById, findQuoteForRelease, type CreateQuoteData } from "@/lib/db/queries/quote";
 import { createQuoteRecord, reserveQuoteInDb, releaseQuoteInDb } from "@/lib/db/mutations/quote";
-import { notificationRegistry } from "@/lib/utils/notification-registry";
+import { findMatchingRate, findQuoteById, findQuoteForRelease, type CreateQuoteData } from "@/lib/db/queries/quote";
+import { validateQuoteForReservation, validateQuoteForRelease } from "./state-validations";
 
 const COVERAGE_CITY = "Bahía Blanca";
 
@@ -56,14 +55,7 @@ export async function calculateQuote(
     const { destination_address, product_id, weight_kg, height_cm, width_cm, depth_cm } = data;
 
     const originResult = await sellerApiClient.getOriginAddress(product_id, trace, req);
-
-    notificationRegistry.add({
-        target: "API",
-        method: "GET",
-        url: `/api/seller/productos/${product_id}/direccion-origen`,
-        status: originResult.status,
-        response: (originResult.data ?? originResult.error) as unknown as Record<string, unknown>,
-    });
+    console.log(`[API] SELLER ORIGIN → ${originResult.status} | /api/seller/productos/${product_id}/direccion-origen`);
 
     if (!originResult?.data) {
         throw Object.assign(

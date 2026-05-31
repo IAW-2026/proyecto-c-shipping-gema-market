@@ -44,7 +44,6 @@ Les dejo esta sección que hice con el fin de testear el sistema. El Dev Center 
 | `/dev` | **Testing Checklist** | Checklist interactivo con todos los flujos a probar (ciclo de envío, dashboard, gestión de drivers, tracking público, API playground, consola). El progreso se guarda en localStorage. |
 | `/dev/seed` | **Seed + DB Explorer** | Botón "Seedear Base de Datos" que crea envíos, tarifas, drivers y usuarios con datos realistas de Bahía Blanca (fechas relativas al momento de ejecución). El explorador permite seleccionar cualquier tabla y ver su contenido. |
 | `/dev/playground` | **API Playground** | Simula el flujo completo de integración con las aplicaciones de buyer y seller: configurar origen/destino, cotizar, reservar, crear envío. Muestra el tráfico HTTP entre servicios en un log lateral. |
-| `/dev/console` | **Consola de Notificaciones** | Muestra en tiempo real todas las notificaciones enviadas a Seller API, Buyer API y llamadas internas (mock). Permite filtrar por tipo y limpiar el historial. |
 
 A pesar de que el usuario de prueba ya tiene pedidos. Les recomiendo encarecidamente que seeden la base de datos, esto va hacer que los pedidos de muestra creados tengan como referencia la fecha actual. 
 
