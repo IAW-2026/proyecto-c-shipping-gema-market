@@ -10,12 +10,18 @@ import { deleteDriver, toggleBan } from "@/lib/db/mutations/admin/drivers";
 import { updateShipmentPrice, unassignDriver, deleteShipment } from "@/lib/db/mutations/admin/shipments";
 import { createRate, updateRate, deleteRate } from "@/lib/db/mutations/admin/rates";
 
+const PROTECTED_OPERATOR_ID = "usr_01KSTWBKD7VFMD9JQ5FNXMPM5J";
+
 export async function deleteDriverAction(driverId: string) {
     try {
         const { userId } = await requireRole([ROLES.ADMIN_LOGISTICS]);
 
         if (driverId === userId) {
             return { success: false, error: "No puedes eliminarte a ti mismo" };
+        }
+
+        if (driverId === PROTECTED_OPERATOR_ID) {
+            return { success: false, error: "No se puede eliminar al operador de testeo" };
         }
 
         await deleteDriver(driverId);
