@@ -37,7 +37,6 @@ export function AdminMobileNav() {
                 ) : (
                     <div className="w-7 h-7 animate-pulse bg-line/50 rounded-full" />
                 )}
-                <span className="text-[9px] font-medium">Perfil</span>
             </div>
         </nav>
     );
