@@ -1,3 +1,4 @@
+"use cache: false";
 "use server";
 
 import { getNotifications, clearNotifications } from "@/lib/db/queries/dev/notification-feed";
