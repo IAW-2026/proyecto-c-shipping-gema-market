@@ -54,7 +54,7 @@ const SECTIONS: ChecklistSection[] = [
             { id: "fdr-3", label: "Banear un driver (Logistics Operator)" },
             { id: "fdr-4", label: "Ver que el driver baneado no puede tomar envios" },
             { id: "fdr-5", label: "Desbanear un driver" },
-            { id: "fdr-6", label: "Eliminar un driver (Ana Torres) con reasignacion de envios" },
+            { id: "fdr-6", label: "Eliminar un driver (Ana Torres)" },
         ],
     },
     {
@@ -88,7 +88,6 @@ const SECTIONS: ChecklistSection[] = [
             { id: "fp-2", label: "Cotizar un envio" },
             { id: "fp-3", label: "Reservar la cotizacion" },
             { id: "fp-4", label: "Crear el envio" },
-            { id: "fp-5", label: "Ver el trafico en el log" },
         ],
     },
 ];
