@@ -21,14 +21,12 @@ export function RouteInfo({ pickupAddress, deliveryAddress }: RouteInfoProps) {
             addr: formatAddress(pickupAddress),
             icon: <Tag size={16} />,
             color: "#7f4f24",
-            time: "10:30" // Placeholder as in design
         },
         {
             label: "Destino",
             addr: formatAddress(deliveryAddress),
             icon: <Home size={16} />,
             color: "#414833",
-            time: "11:15 ETA" // Placeholder as in design
         },
     ];
 
@@ -46,7 +44,7 @@ export function RouteInfo({ pickupAddress, deliveryAddress }: RouteInfoProps) {
                             {p.icon}
                         </div>
                         <div className="flex-1 pt-1.5">
-                            <div className="text-[11px] text-slate-500 font-mono">{p.label.toUpperCase()} · {p.time}</div>
+                            <div className="text-[11px] text-slate-500 font-mono">{p.label.toUpperCase()}</div>
                             <div className="font-medium text-ink text-sm">{p.addr}</div>
                         </div>
                     </div>
