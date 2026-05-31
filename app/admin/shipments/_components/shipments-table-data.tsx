@@ -19,14 +19,14 @@ export async function AdminShipmentsTableData({ searchParams }: AdminShipmentsTa
     await requireRole([ROLES.ADMIN_LOGISTICS]);
     const raw = await searchParams;
     const page = parseInt(raw.page || "1", 10) || 1;
-    const result = await getAllShipments(raw.status, raw.sortBy, raw.sortOrder, page);
+    const result = await getAllShipments(raw.status, raw.sortBy, raw.sortOrder, page, 20, raw.search);
 
     return (
         <div className="bg-paper border border-line rounded-r2 overflow-hidden">
             <Table>
                 <TableHeader>
                     <TableRow>
-                        <TableHead><SortableHeader label="Tracking" sortKey="tracking_code" /></TableHead>
+                        <TableHead><SortableHeader label="ID" sortKey="id" /></TableHead>
                         <TableHead><SortableHeader label="Estado" sortKey="status" /></TableHead>
                         <TableHead><SortableHeader label="Precio" sortKey="price" /></TableHead>
                         <TableHead><SortableHeader label="Repartidor" sortKey="logistics_id" /></TableHead>
@@ -45,7 +45,7 @@ export async function AdminShipmentsTableData({ searchParams }: AdminShipmentsTa
                         result.data.map((s) => (
                             <TableRow key={s.id}>
                                 <TableCell className="text-ink-3 font-mono text-xs">
-                                    {s.tracking_code}
+                                    {s.id}
                                 </TableCell>
                                 <TableCell>
                                     <AdminShipmentStatusBadge status={s.status} />
