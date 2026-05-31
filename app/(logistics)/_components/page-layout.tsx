@@ -23,13 +23,13 @@ export function Header({ title, subtitle, action, className }: HeaderProps) {
                 "px-4 lgx:px-7 pt-8 pb-4 flex flex-wrap justify-between items-end gap-4 border-b border-line mb-6 bg-paper",
                 className
             )}>
-                <div>
+                <div className="min-w-0">
                     {subtitle && (
                         <div className="text-xs font-mono uppercase tracking-[0.1em] text-ink-3 mb-1">
                             {subtitle}
                         </div>
                     )}
-                    <h1 className="m-0 text-2xl font-sans font-bold tracking-[-0.02em] text-ink">
+                    <h1 className="m-0 text-xl lgx:text-2xl font-sans font-bold tracking-[-0.02em] text-ink break-words">
                         {title}
                     </h1>
                 </div>
