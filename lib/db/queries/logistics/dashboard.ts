@@ -76,7 +76,7 @@ function getLast6WeeksRange(): { dateFrom: Date; dateTo: Date } {
 }
 
 function formatShortLabel(date: Date): string {
-    const opts: Intl.DateTimeFormatOptions = { day: "numeric", month: "short" };
+    const opts: Intl.DateTimeFormatOptions = { day: "numeric", month: "short", timeZone: "America/Argentina/Buenos_Aires" };
     return date.toLocaleDateString("es-AR", opts);
 }
 

@@ -121,7 +121,7 @@ export async function getSettlementsDetail(
         settlement.trips += trips;
         settlement.amount = Number((settlement.amount + amount).toFixed(2));
 
-        const dayLabel = row.day.toLocaleDateString('es-AR', { weekday: 'short', day: 'numeric' });
+        const dayLabel = row.day.toLocaleDateString('es-AR', { weekday: 'short', day: 'numeric', timeZone: 'America/Argentina/Buenos_Aires' });
 
         dailyByWeek[weekKey].push({
             date: row.day,
@@ -145,7 +145,7 @@ export async function getSettlementsDetail(
 export type SettlementsDetail = Awaited<ReturnType<typeof getSettlementsDetail>>;
 
 function formatWeekPeriod(start: Date, end: Date): string {
-    const opts: Intl.DateTimeFormatOptions = { day: 'numeric', month: 'short' };
+    const opts: Intl.DateTimeFormatOptions = { day: 'numeric', month: 'short', timeZone: 'America/Argentina/Buenos_Aires' };
     const startStr = start.toLocaleDateString('es-AR', opts);
     const endStr = end.toLocaleDateString('es-AR', opts);
     return `${startStr} al ${endStr}`;

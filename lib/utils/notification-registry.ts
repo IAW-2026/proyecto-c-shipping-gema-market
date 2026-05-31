@@ -29,7 +29,7 @@ class NotificationRegistry {
         const newEntry: NotificationEntry = {
             ...entry,
             id: `notif_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`,
-            timestamp: new Date().toLocaleTimeString("es-AR", { hour12: false }),
+            timestamp: new Date().toLocaleTimeString("es-AR", { hour12: false, timeZone: "America/Argentina/Buenos_Aires" }),
         };
 
         store.unshift(newEntry);

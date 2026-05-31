@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import Link from "next/link";
 import { ChevronDown, ChevronUp, Repeat, BarChart3, Users, Package, Globe, Gamepad2, Radio } from "lucide-react";
 
 const STORAGE_KEY = "dev-testing-checklist";
@@ -8,6 +9,7 @@ const STORAGE_KEY = "dev-testing-checklist";
 interface ChecklistItem {
     id: string;
     label: string;
+    href?: string;
 }
 
 interface ChecklistSection {
@@ -72,9 +74,10 @@ const SECTIONS: ChecklistSection[] = [
         title: "Tracking publico",
         icon: Globe,
         items: [
-            { id: "ft-1", label: "Ir a /track/BB-000001-2026 - Ver entregado con ruta en mapa" },
-            { id: "ft-2", label: "Ir a /track/BB-000002-2026 - Ver en transito" },
-            { id: "ft-3", label: "Ir a /track/BB-000003-2026 - Ver pendiente de retiro" },
+            { id: "ft-1", label: "Ir a /track/BB-000041-2026 - Ver pendiente de retiro", href: "/track/BB-000041-2026" },
+            { id: "ft-2", label: "Ir a /track/BB-000042-2026 - Ver retirado", href: "/track/BB-000042-2026" },
+            { id: "ft-3", label: "Ir a /track/BB-000043-2026 - Ver en transito", href: "/track/BB-000043-2026" },
+            { id: "ft-4", label: "Ir a /track/BB-000044-2026 - Ver entregado con ruta en mapa", href: "/track/BB-000044-2026" },
         ],
     },
     {
@@ -161,7 +164,17 @@ function SectionAccordion({ section, checked, onToggle }: {
                                 checked.has(item.id) ? "text-ink-3 line-through" : "text-ink-2 group-hover:text-ink"
                             }`}>
                                 <span className="text-ink-3 mr-1.5 font-mono text-xs">{idx + 1}.</span>
-                                {item.label}
+                                {item.href ? (
+                                    <Link
+                                        href={item.href}
+                                        onClick={(e) => e.stopPropagation()}
+                                        className="text-blue-600 hover:text-blue-700 underline underline-offset-2"
+                                    >
+                                        {item.label}
+                                    </Link>
+                                ) : (
+                                    item.label
+                                )}
                             </span>
                         </label>
                     ))}
