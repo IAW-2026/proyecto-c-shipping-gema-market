@@ -10,7 +10,7 @@ import { deleteDriver, toggleBan } from "@/lib/db/mutations/admin/drivers";
 import { updateShipmentPrice, unassignDriver, deleteShipment } from "@/lib/db/mutations/admin/shipments";
 import { createRate, updateRate, deleteRate } from "@/lib/db/mutations/admin/rates";
 
-const PROTECTED_OPERATOR_ID = "usr_01KSTWBKD7VFMD9JQ5FNXMPM5J";
+const PROTECTED_OPERATOR_ID = "usr_01KT27KCG3MXET3RA9KCSKHWQ4";
 
 export async function deleteDriverAction(driverId: string) {
     try {

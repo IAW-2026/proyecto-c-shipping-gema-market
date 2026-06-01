@@ -193,7 +193,7 @@ const WEIGHT_TIERS: WeightTier[] = [
 
 // ─── User IDs ───
 
-const OPERATOR_ID = "usr_01KSTWBKD7VFMD9JQ5FNXMPM5J";
+const OPERATOR_ID = "usr_01KT27KCG3MXET3RA9KCSKHWQ4";
 const CARLOS_ID = "usr_carlos_mendez";
 const ANA_ID = "usr_ana_torres";
 

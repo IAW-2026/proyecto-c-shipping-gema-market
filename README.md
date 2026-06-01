@@ -14,8 +14,8 @@ Aplicación de logística y envíos del **Tipo C (Marketplace)** del [Proyecto I
 
 | Rol | Email | Contraseña |
 |-----|-------|------------|
-| Operador logístico (`logistics`) | `logisitcsoperator+clerk_test@unihousing.com` | Operator@4321 |
-| Administrador (`admin_logistics`) | `logisitcsadmin+clerk_test@unihousing.com` | AdminL@4321 |
+| Operador logístico (`logistics`) | `shipping.user+clerk_test@iaw.com` | iawuser# |
+| Administrador (`admin_logistics`) | `shipping.admin+clerk_test@iaw.com` | iawuser# |
 
 El código de verificacion por mail siempre es: 424242
 
