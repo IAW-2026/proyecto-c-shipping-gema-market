@@ -12,7 +12,7 @@ function DayOrdersDesktop({ orders }: { orders: DayOrder[] }) {
             <div className="grid grid-cols-3 gap-4 px-6 py-1.5 pl-20 text-[11px] font-mono font-medium text-ink-3 uppercase tracking-wider">
                 <span>ID Envío</span>
                 <span className="text-right">Precio</span>
-                <span className="text-right">Fecha de Retiro</span>
+                <span className="text-right">Fecha de Entrega</span>
             </div>
             {orders.map((order) => (
                 <div
@@ -24,7 +24,7 @@ function DayOrdersDesktop({ orders }: { orders: DayOrder[] }) {
                         ${order.price.toLocaleString("es-AR")}
                     </span>
                     <span className="text-right text-ink-2 text-xs">
-                        {formatDateTime(order.pickedUpAt)}
+                        {formatDateTime(order.deliveredAt)}
                     </span>
                 </div>
             ))}

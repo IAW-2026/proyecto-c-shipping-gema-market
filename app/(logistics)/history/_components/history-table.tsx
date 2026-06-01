@@ -5,6 +5,7 @@ import { ShipmentStatusBadge } from "../../_components/shipment-status-badge"
 import { ChevronRight } from "lucide-react"
 import Link from "next/link"
 import { ShipmentSummary } from "@/lib/schemas/domain"
+import { formatDateTimeFull } from "@/lib/utils/date-utils"
 
 export function HistoryTable({ shipments }: { shipments: ShipmentSummary[] }) {
     return (
@@ -14,7 +15,7 @@ export function HistoryTable({ shipments }: { shipments: ShipmentSummary[] }) {
                     <TableRow>
                         <TableHead>ID envío</TableHead>
                         <TableHead>Pedido</TableHead>
-                        <TableHead>Fecha</TableHead>
+                        <TableHead>Fecha de Entrega</TableHead>
                         <TableHead>Destino</TableHead>
                         <TableHead>Estado</TableHead>
                         <TableHead className="text-right">Pago</TableHead>
@@ -27,13 +28,7 @@ export function HistoryTable({ shipments }: { shipments: ShipmentSummary[] }) {
                             <TableCell className="text-ink-3 font-mono font-medium">{s.shippingId}</TableCell>
                             <TableCell className="font-mono text-ink-3">{s.orderId}</TableCell>
                             <TableCell className="text-ink-2 text-sm whitespace-nowrap">
-                                {s.deliveredAt?.toLocaleDateString('es-AR', {
-                                    day: '2-digit',
-                                    month: '2-digit',
-                                    year: 'numeric',
-                                    hour: '2-digit',
-                                    minute: '2-digit',
-                                })}
+                                {formatDateTimeFull(s.deliveredAt)}
                             </TableCell>
 
                             {/* Corrección 1: Acceder al objeto deliveryAddress */}

@@ -23,3 +23,18 @@ export function formatDateTime(
     const time = d.toLocaleTimeString("es-AR", { hour: "2-digit", minute: "2-digit", timeZone: TZ });
     return `${date} ${time}`;
 }
+
+export function formatDateTimeFull(
+    value: Date | string | null | undefined
+): string {
+    const d = toDate(value);
+    if (!d) return "-";
+    return d.toLocaleString("es-AR", {
+        day: "2-digit",
+        month: "2-digit",
+        year: "numeric",
+        hour: "2-digit",
+        minute: "2-digit",
+        timeZone: TZ,
+    });
+}

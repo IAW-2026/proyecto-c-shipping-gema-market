@@ -85,6 +85,7 @@ export async function getSettlementsDetail(
                     'picked_up_at', picked_up_at,
                     'delivered_at', delivered_at
                 )
+                ORDER BY delivered_at DESC
             ) AS orders
         FROM "Shipment"
         WHERE logistics_id = ${logisticsId}

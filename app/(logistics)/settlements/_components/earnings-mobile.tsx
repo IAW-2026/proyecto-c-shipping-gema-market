@@ -15,7 +15,7 @@ function DayOrdersMobile({ orders }: { orders: DayOrder[] }) {
                     </div>
                     <div className="flex justify-between text-ink-2 mt-0.5">
                         <span>${order.price.toLocaleString("es-AR")}</span>
-                        <span>Retiro: {formatDateTime(order.pickedUpAt)}</span>
+                        <span>Entrega: {formatDateTime(order.deliveredAt)}</span>
                     </div>
                 </div>
             ))}
