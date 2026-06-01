@@ -1,4 +1,4 @@
-import { toDate } from "@/lib/utils/date-utils";
+import { formatDateTimeFull } from "@/lib/utils/date-utils";
 import type { SettlementPeriod } from "@/lib/types/shipments";
 
 export function formatDateKey(date: Date): string {
@@ -6,22 +6,15 @@ export function formatDateKey(date: Date): string {
 }
 
 export function formatDateTime(date: Date | string | null): string {
-    if (!date) return "-";
-    const d = toDate(date)!;
-    return d.toLocaleDateString("es-AR", {
-        day: "2-digit",
-        month: "2-digit",
-        hour: "2-digit",
-        minute: "2-digit",
-    });
+    return formatDateTimeFull(date);
 }
 
 export function computeEarningsMetrics(settlements: SettlementPeriod[]) {
-    const monthTotal = settlements.reduce((sum, s) => sum + s.amount, 0);
-    const monthTrips = settlements.reduce((sum, s) => sum + s.trips, 0);
+    const periodTotal = settlements.reduce((sum, s) => sum + s.amount, 0);
+    const periodTrips = settlements.reduce((sum, s) => sum + s.trips, 0);
     return {
-        monthTotal,
-        monthTrips,
-        averagePerTrip: monthTrips > 0 ? Math.round(monthTotal / monthTrips) : 0,
+        periodTotal,
+        periodTrips,
+        averagePerTrip: periodTrips > 0 ? Math.round(periodTotal / periodTrips) : 0,
     };
 }

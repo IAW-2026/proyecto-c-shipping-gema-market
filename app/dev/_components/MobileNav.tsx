@@ -2,13 +2,12 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { BookOpen, Database, TerminalSquare, Terminal } from "lucide-react";
+import { BookOpen, Database, TerminalSquare } from "lucide-react";
 
 const NAV_ITEMS = [
     { id: "intro", label: "Intro", route: "/dev", icon: BookOpen },
     { id: "seed", label: "Seed", route: "/dev/seed", icon: Database },
     { id: "playground", label: "Playground", route: "/dev/playground", icon: TerminalSquare },
-    { id: "console", label: "Consola", route: "/dev/console", icon: Terminal },
 ];
 
 export function MobileNav() {

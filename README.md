@@ -14,12 +14,11 @@ Aplicación de logística y envíos del **Tipo C (Marketplace)** del [Proyecto I
 
 | Rol | Email | Contraseña |
 |-----|-------|------------|
-| Operador logístico (`logistics`) | `logisitcsoperator+clerk_test@unihousing.com` | Operator@4321 |
-| Administrador (`admin_logistics`) | `logisitcsadmin+clerk_test@unihousing.com` | AdminL@4321 |
+| Operador logístico (`logistics`) | `shipping.user+clerk_test@iaw.com` | iawuser# |
+| Administrador (`admin_logistics`) | `shipping.admin+clerk_test@iaw.com` | iawuser# |
 
 El código de verificacion por mail siempre es: 424242
 
-> Las contraseñas se gestionan a través de Clerk. Para acceder, registrarse con esos emails o usar los que defina el equipo en Clerk Dashboard.
 
 ## Descripción
 
@@ -34,40 +33,9 @@ La Shipping App es la interfaz para **operadores logísticos (fleteros)** y **ad
 waiting_for_courier → pending_pickup → picked_up → in_transit → delivered
 ```
 
-## Stack tecnológico
-
-| Capa | Tecnología |
-|------|-----------|
-| Full-stack | Next.js 16 (App Router) |
-| Base de datos | PostgreSQL (Supabase) |
-| ORM | Prisma |
-| Autenticación | Clerk v7 |
-| Mapas | Leaflet + OpenRouteService |
-| Gráficos | Recharts |
-| Estilos | Tailwind CSS 4 |
-
-## API propia
-
-Endpoints expuestos para el ecosistema inter-servicios:
-
-| Endpoint | Consumidor |
-|----------|-----------|
-| `POST /api/shipping/cotizaciones` | Buyer App |
-| `POST /api/shipping/cotizaciones/reservar` | Payments App |
-| `POST /api/shipping/cotizaciones/liberar-reserva` | Payments App |
-| `POST /api/shipping/envios` | Seller App |
-| `GET /api/shipping/envios/:order_id` | Buyer App, Seller App, Control Plane |
-| `POST /api/shipping/sellers/verificar-origen` | Seller App |
-
-## Variables de entorno
-
-Copiar `.env.example` a `.env.local` y completar los valores.
-
----
-
 ## Área de Desarrollo (Dev Center)
 
-El Dev Center es un conjunto de herramientas interactivas accesibles desde cualquier navegador sin necesidad de autenticación. Ideal para evaluadores y equipos de integración.
+Les dejo esta sección que hice con el fin de testear el sistema. El Dev Center es un conjunto de herramientas interactivas accesibles desde cualquier navegador sin necesidad de autenticación. Ideal para evaluadores y equipos de integración.
 
 **Acceso:** [`/dev`](https://proyecto-c-shipping-gema-market.vercel.app/dev)
 
@@ -75,70 +43,18 @@ El Dev Center es un conjunto de herramientas interactivas accesibles desde cualq
 |------|-------------|-------------|
 | `/dev` | **Testing Checklist** | Checklist interactivo con todos los flujos a probar (ciclo de envío, dashboard, gestión de drivers, tracking público, API playground, consola). El progreso se guarda en localStorage. |
 | `/dev/seed` | **Seed + DB Explorer** | Botón "Seedear Base de Datos" que crea envíos, tarifas, drivers y usuarios con datos realistas de Bahía Blanca (fechas relativas al momento de ejecución). El explorador permite seleccionar cualquier tabla y ver su contenido. |
-| `/dev/playground` | **API Playground** | Simula el flujo completo de integración entre aplicaciones: configurar origen/destino, cotizar, reservar, crear envío. Muestra el tráfico HTTP entre servicios en un log lateral. |
-| `/dev/console` | **Consola de Notificaciones** | Muestra en tiempo real todas las notificaciones enviadas a Seller API, Buyer API y llamadas internas (mock). Permite filtrar por tipo y limpiar el historial. |
+| `/dev/playground` | **API Playground** | Simula el flujo completo de integración con las aplicaciones de buyer y seller: configurar origen/destino, cotizar, reservar, crear envío. Muestra el tráfico HTTP entre servicios en un log lateral. |
 
-### Script CLI
+A pesar de que el usuario de prueba ya tiene pedidos. Les recomiendo encarecidamente que seeden la base de datos, esto va hacer que los pedidos de muestra creados tengan como referencia la fecha actual. 
 
-```bash
-bash scripts/api-tests.sh http://localhost:3000
-```
-
-Simula desde terminal las mismas llamadas que el API Playground (cotización, reserva, liberación, creación de envío).
-
-### Flujo recomendado para evaluar
-
-1. Ir a `/dev/seed` y hacer clic en **Seedear Base de Datos**
-2. Ir a `/dev` y seguir la checklist de **Ciclo completo de un envío**
-3. Explorar el panel de operador en `/dashboard` y admin en `/admin/dashboard`
-4. Probar el tracking público en `/track/BB-000001-2026`
-5. Usar el API Playground en `/dev/playground` para simular integración
-6. Monitorear las notificaciones en `/dev/console`
-
----
-
-## Notas técnicas
-
-### Estimación de días de entrega
-
-Siempre sumamos 1 día por procesamiento administrativo. Después, por cada 8 horas de viaje sumamos 1 día de tránsito (máximo 5). Para rutas urbanas esto da unos 2 días; si en el futuro se manejan rutas más largas, la cuenta escala sola.
-
-### Caché
-
-- **Sesión:** el `userId` interno se cachea en memoria con TTL de 30s. El dólar (USD/ARS) se cachea con TTL de 5 min.
-- **Queries:** las queries de Prisma se cachean con `'use cache'` y `cacheLife()` con TTLs graduados según volatilidad.
-- **Middleware-first Auth:** autenticación y autorización por rol en el middleware antes del renderizado.
-- **PPR:** `cacheComponents: true` — shell estático desde edge, contenido dinámico en streaming.
-
-### Bundle
-
-Leaflet y Recharts se cargan bajo demanda con `next/dynamic`.
 
 ---
 
 ## Arquitectura y Calidad de Software
 
-### Patrones de Diseño
-
-**Feature-based Architecture con capas internas:** El proyecto se organiza por dominio funcional (quote, shipment, admin, notification) en lugar de por tipo técnico. Cada feature encapsula su lógica de negocio, acciones de servidor y acceso a datos, facilitando la evolución independiente de cada módulo.
-
-```
-lib/features/
-  ├── quote/          # Cotización: cálculo de precio, reserva, liberación
-  ├── shipment/       # Envío: creación, transiciones de estado
-  ├── admin/          # Administración: gestión de drivers, tarifas, envíos
-  └── notification/   # Notificaciones cross-service a Buyer y Seller
-```
-
-**Client Adapter Pattern:** Las integraciones con APIs externas (Seller App, Buyer App, OpenRouteService, DolarAPI) están encapsuladas en clientes dedicados bajo `lib/clients/`. Cada cliente expone una interfaz uniforme (`ApiResult<T>`) y soporta modo mock vía headers o variable de entorno, permitiendo desarrollo y testing sin dependencias externas.
-
-**Single Source of Truth (SSOT) para constantes de dominio:** Los estados de envío, labels, variantes visuales y transiciones válidas se definen una sola vez en `lib/constants/shipment.ts` y se consumen en toda la aplicación. Esto elimina inconsistencias entre frontend y backend.
-
-**Server Actions con RBAC integrado:** Las mutaciones del sistema se implementan como Server Actions de Next.js (`"use server"`), con autorización por rol declarativa en la primera línea de cada función (`requireRole([ROLES.LOGISTICS])`).
-
-**Caché en memoria con TTL:** La sesión del usuario y la cotización del dólar se cachean en memoria con TTLs de 30s y 5min respectivamente, reduciendo llamadas redundantes a Clerk y a la API externa dentro del mismo ciclo de request.
-
 ### Decisiones de Dominio que Aportan Realismo
+
+- **Estimación de días de entrega:** Siempre sumamos 1 día por procesamiento administrativo. Después, por cada 8 horas de viaje sumamos 1 día de tránsito (máximo 5). Para rutas urbanas esto da unos 2 días; si en el futuro se manejan rutas más largas, la cuenta escala sola.
 
 - **Cotización en USD con conversión en tiempo real:** Las tarifas se almacenan en USD/km (moneda estable) y se convierten a ARS al momento de cotizar usando la cotización oficial de [DolarAPI](https://dolarapi.com). Esto refleja cómo operan las empresas de logística reales en economías inflacionarias.
 
@@ -152,77 +68,51 @@ lib/features/
 
 - **Notificaciones cross-service:** Cada transición de estado dispara notificaciones HTTP a la Seller App y/o Buyer App según corresponda, simulando un ecosistema de microservicios real con webhooks.
 
+### Decisiones que hacen al sistema robusto y mantenible
+
+- El proyecto está organizado por **dominios de negocio** (cotización, envío, administración, notificaciones) en lugar de por capas técnicas. Cada módulo vive en `lib/features/` con su propia lógica, sus acciones de servidor y su acceso a datos, lo que permite trabajar en uno sin romper otro.
+
+- Las **integraciones con APIs externas** (OpenRouteService, DolarAPI, Seller App, Buyer App) están aisladas en `lib/clients/`. Cada una tiene una interfaz uniforme y soporta un modo mock que se activa con un header o una variable de entorno, permitiendo desarrollar y testear sin depender de que esas APIs estén disponibles.
+
+- Los **estados de envío, etiquetas, colores y transiciones válidas** se definen una sola vez en `lib/constants/shipment.ts` y se consumen tanto en frontend como en backend. Es imposible que queden desincronizados.
+
+- Las **lecturas y escrituras a la base de datos** están separadas en directorios distintos (`lib/db/queries/` vs `lib/db/mutations/`). Las queries aprovechan el caché de Next.js con TTLs graduados según la volatilidad de cada dato. Las mutaciones usan transacciones explícitas y, cuando hace falta, aislamiento serializable para evitar condiciones de carrera.
+
+- La **seguridad está en capas**: el middleware de Clerk intercepta todas las rutas y redirige según el rol antes de renderizar cualquier página. Cada Server Action arranca con `requireRole()` como primera línea. Las llamadas entre servicios se autentican con API key validada mediante `crypto.timingSafeEqual`, previniendo ataques de timing.
+
+- Cuando una API externa falla, el sistema **no se cae**: usa valores por defecto sensatos.
+
+- Los **IDs de las entidades** usan un prefijo que las identifica (`usr_`, `shp_`, `qte_`, `trf_`) seguido de un ULID, único, ordenable por tiempo y URL-safe. Los códigos de seguimiento (`BB-000001-2026`) se generan con una secuencia atómica de PostgreSQL que garantiza unicidad incluso bajo concurrencia.
+
+- Las **rutas** se organizan con route groups que separan los dominios: `(auth)`, `(logistics)`, `admin/`, `api/shipping/` y `track/[code]/`. Cada ruta tiene su carpeta `_components/` con los componentes específicos de esa vista. Los componentes genéricos y reutilizables (Button, Card, Table, Badge, etc.) viven en `components/ui/` y se comparten entre todos los módulos, asegurando consistencia visual sin duplicación.
+
 ### Estructura del Proyecto
 
 ```
-├── app/                        # Next.js App Router
-│   ├── (auth)/                 # Route group: sign-in, sign-up
-│   ├── (logistics)/            # Route group: panel del operador
-│   │   ├── dashboard/          # Métricas operativas diarias
-│   │   ├── available/          # Envíos disponibles para tomar
-│   │   ├── courier/            # Envíos activos del operador
-│   │   ├── history/            # Historial de entregas
-│   │   ├── settlements/        # Liquidaciones semanales
-│   │   └── shipments/[id]/     # Detalle de envío individual
-│   ├── admin/                  # Panel de administración
-│   │   ├── dashboard/          # Métricas globales
-│   │   ├── drivers/            # Gestión de repartidores
-│   │   ├── rates/              # Gestión de tarifas
-│   │   └── shipments/          # Supervisión de envíos
-│   ├── api/shipping/           # API REST para ecosistema
-│   │   ├── cotizaciones/       # Cotizar, reservar, liberar
-│   │   ├── envios/             # Crear y consultar envíos
-│   │   └── sellers/            # Verificar origen
-│   └── track/[code]/           # Tracking público (sin auth)
+├── app/
+│   ├── (auth)/               # Sign-in, sign-up
+│   ├── (logistics)/           # Panel del operador
+│   ├── admin/                 # Panel de administración
+│   ├── api/shipping/          # API REST del ecosistema
+│   ├── dev/                   # Dev Center
+│   ├── track/[code]/          # Tracking público
+│   └── unauthorized/          # Página 403
 ├── lib/
-│   ├── auth/                   # Autenticación y autorización
-│   │   ├── api-key.ts          # Validación de API key (SHA-256)
-│   │   ├── rbac.ts             # Control de acceso por rol
-│   │   ├── user-cache.ts       # Caché de sesión en memoria
-│   │   └── get-current-user-id.ts  # Sincronización Clerk ↔ DB
-│   ├── clients/                # Adaptadores de APIs externas
-│   │   ├── buyer-api/          # Cliente de la Buyer App
-│   │   ├── seller-api/         # Cliente de la Seller App
-│   │   ├── exchange-rate/      # Cotización USD→ARS
-│   │   └── maps/               # Geocoding, distancias, rutas
+│   ├── auth/                  # Autenticación y autorización
+│   ├── clients/               # Adaptadores de APIs externas
+│   ├── config/                # Navegación y constantes de config
+│   ├── constants/             # SSOT estados, labels
 │   ├── db/
-│   │   ├── queries/            # Capa de lectura (con caché)
-│   │   │   ├── logistics/      # Queries del operador
-│   │   │   ├── admin/          # Queries del administrador
-│   │   │   ├── public/         # Queries públicas (tracking)
-│   │   │   └── shared.ts       # Selects y mappers compartidos
-│   │   └── mutations/          # Capa de escritura
-│   ├── features/               # Lógica de negocio por dominio
-│   │   ├── quote/              # Servicio de cotización
-│   │   ├── shipment/           # Servicio de envíos + actions
-│   │   ├── admin/              # Actions de administración
-│   │   └── notification/       # Servicio de notificaciones
-│   ├── schemas/                # Validación con Zod
-│   │   ├── api/                # Schemas de request/response
-│   │   └── domain/             # Schemas de entidades de dominio
-│   ├── constants/              # SSOT: estados, labels, config
-│   ├── types/                  # Tipos TypeScript compartidos
-│   └── utils/                  # Utilidades puras
-├── components/ui/              # Design system (Button, Card, Table, Badge...)
+│   │   ├── queries/           # Lecturas con caché
+│   │   └── mutations/         # Escrituras con transacciones
+│   ├── features/              # Lógica de negocio por dominio
+│   ├── hooks/                 # Custom hooks
+│   ├── schemas/               # Validación Zod
+│   ├── types/                 # Tipos compartidos
+│   └── utils/                 # Utilidades
+├── components/ui/             # Design system
 ├── prisma/
-│   └── schema.prisma           # Modelo de datos
-└── middleware.ts               # Auth + RBAC a nivel de ruta
+│   ├── schema.prisma
+│   └── seed.ts
+└── middleware.ts
 ```
-
-### Funcionalidades Destacadas
-
-- **Sistema de caché multinivel:** Queries de Prisma con `"use cache"` + `cacheLife()` (Next.js 16), caché en memoria para sesión y dólar, y PPR (Partial Pre-Rendering) para shell estático con streaming de contenido dinámico.
-
-- **Streaming SSR con Suspense boundaries:** Cada sección del dashboard se renderiza de forma independiente con su propio skeleton, permitiendo que el contenido llegue al usuario a medida que está listo (streaming HTML).
-
-- **Mapas interactivos con carga diferida:** Leaflet y Recharts se cargan bajo demanda con `next/dynamic`, evitando inflar el bundle JavaScript de páginas que no los necesitan.
-
-- **Liquidaciones con SQL nativo:** Las consultas de liquidaciones semanales usan `$queryRaw` de Prisma con `date_trunc` de PostgreSQL para agrupación eficiente por semana ISO, evitando post-procesamiento en JavaScript.
-
-- **API Playground para desarrollo:** Panel interactivo en `/dev/playground` que permite probar todos los endpoints de la API con payloads predefinidos, headers mock y modo debug, facilitando la integración con otros equipos del ecosistema.
-
-- **Transacciones con aislamiento serializable:** La creación de tarifas usa `isolationLevel: "Serializable"` para prevenir condiciones de carrera al validar solapamiento de rangos de peso.
-
----
-
-Enunciado completo: <https://iaw-2026.github.io/proyecto/>

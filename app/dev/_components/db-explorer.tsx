@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
-import { RefreshCw } from "lucide-react";
+import { RefreshCw, ArrowUpDown, ArrowUp, ArrowDown, Search } from "lucide-react";
 import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from "@/components/ui/table";
 import { dbExplorerAction } from "./db-explorer-action";
 
@@ -12,6 +12,9 @@ export function DbExplorer() {
     const [columns, setColumns] = useState<string[]>([]);
     const [rows, setRows] = useState<Record<string, unknown>[]>([]);
     const [loading, setLoading] = useState(false);
+    const [sortColumn, setSortColumn] = useState<string | null>(null);
+    const [sortDirection, setSortDirection] = useState<"asc" | "desc">("asc");
+    const [searchId, setSearchId] = useState("");
 
     const fetchData = useCallback(async (table: string) => {
         setLoading(true);
@@ -23,11 +26,39 @@ export function DbExplorer() {
 
     useEffect(() => {
         fetchData(selectedTable);
+        setSortColumn(null);
+        setSearchId("");
     }, [selectedTable, fetchData]);
 
     const handleRefresh = () => {
         fetchData(selectedTable);
     };
+
+    const handleSort = (col: string) => {
+        if (sortColumn === col) {
+            setSortDirection(sortDirection === "asc" ? "desc" : "asc");
+        } else {
+            setSortColumn(col);
+            setSortDirection("asc");
+        }
+    };
+
+    const idColumn = columns.find(c => c.endsWith("_id") || c === "id");
+
+    const filteredAndSortedRows = [...rows]
+        .filter(row => {
+            if (!searchId || !idColumn) return true;
+            return String(row[idColumn] ?? "").toLowerCase().includes(searchId.toLowerCase());
+        })
+        .sort((a, b) => {
+            if (!sortColumn) return 0;
+            const aVal = a[sortColumn];
+            const bVal = b[sortColumn];
+            if (aVal === null || aVal === undefined) return 1;
+            if (bVal === null || bVal === undefined) return -1;
+            const comparison = aVal < bVal ? -1 : aVal > bVal ? 1 : 0;
+            return sortDirection === "asc" ? comparison : -comparison;
+        });
 
     function cellValue(col: string, value: unknown): React.ReactNode {
         if (value === null || value === undefined) {
@@ -41,14 +72,7 @@ export function DbExplorer() {
             );
         }
         if (col === "status") {
-            const statusColor: Record<string, string> = {
-                delivered: "text-success",
-                in_transit: "text-cocoa",
-                picked_up: "text-cocoa",
-                pending_pickup: "text-ink-2",
-                waiting_for_courier: "text-ink-3",
-            };
-            return <span className={`font-semibold ${statusColor[String(value)] || "text-ink-2"}`}>{String(value)}</span>;
+            return <span className="font-semibold text-ink">{String(value)}</span>;
         }
         if (col === "price" || col === "price_per_km") {
             return <span className="text-ink-2">${String(value)}</span>;
@@ -66,11 +90,16 @@ export function DbExplorer() {
         return <span className="text-ink-2">{str}</span>;
     }
 
+    const SortIcon = ({ col }: { col: string }) => {
+        if (sortColumn !== col) return <ArrowUpDown size={12} className="ml-1 opacity-40" />;
+        return sortDirection === "asc" ? <ArrowUp size={12} className="ml-1" /> : <ArrowDown size={12} className="ml-1" />;
+    };
+
     return (
         <div className="bg-paper border border-line rounded-r3 overflow-hidden">
             <div className="px-5 py-4 border-b border-line flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                 <h3 className="text-sm font-semibold text-ink">Explorador de Base de Datos</h3>
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-2 flex-wrap">
                     <select
                         value={selectedTable}
                         onChange={(e) => setSelectedTable(e.target.value)}
@@ -80,6 +109,18 @@ export function DbExplorer() {
                             <option key={t} value={t}>{t}</option>
                         ))}
                     </select>
+                    {idColumn && (
+                        <div className="relative">
+                            <Search size={13} className="absolute left-2.5 top-1/2 -translate-y-1/2 text-ink-3" />
+                            <input
+                                type="text"
+                                placeholder={`Buscar por ${idColumn}...`}
+                                value={searchId}
+                                onChange={(e) => setSearchId(e.target.value)}
+                                className="bg-cream border border-line rounded-xl pl-7 pr-3 py-1.5 text-xs font-mono text-ink placeholder:text-ink-3 focus:border-clay focus:outline-none transition-colors w-48"
+                            />
+                        </div>
+                    )}
                     <button
                         onClick={handleRefresh}
                         disabled={loading}
@@ -97,21 +138,26 @@ export function DbExplorer() {
                         <RefreshCw size={20} className="text-ink-3 animate-spin" />
                         <span className="text-sm text-ink-3 ml-2">Cargando...</span>
                     </div>
-                ) : rows.length === 0 ? (
+                ) : filteredAndSortedRows.length === 0 ? (
                     <div className="py-12 text-center text-sm text-ink-3">
-                        No hay datos en la tabla {selectedTable}.
+                        {rows.length === 0 ? `No hay datos en la tabla ${selectedTable}.` : "No se encontraron resultados."}
                     </div>
                 ) : (
                     <Table>
                         <TableHeader>
                             <TableRow>
                                 {columns.map((col) => (
-                                    <TableHead key={col}>{col}</TableHead>
+                                    <TableHead key={col} onClick={() => handleSort(col)} className="cursor-pointer select-none hover:bg-cream/50">
+                                        <div className="flex items-center">
+                                            {col}
+                                            <SortIcon col={col} />
+                                        </div>
+                                    </TableHead>
                                 ))}
                             </TableRow>
                         </TableHeader>
                         <TableBody>
-                            {rows.map((row, i) => (
+                            {filteredAndSortedRows.map((row, i) => (
                                 <TableRow key={i}>
                                     {columns.map((col) => (
                                         <TableCell key={col}>

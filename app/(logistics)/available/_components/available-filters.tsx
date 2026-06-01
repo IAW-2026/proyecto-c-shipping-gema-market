@@ -65,12 +65,12 @@ export function AvailableFiltersDialog() {
 
     if (!isOpen) return null;
 
-    const sectionPadding = "px-7 py-6";
+    const sectionPadding = "px-5 lgx:px-7 py-5 lgx:py-6";
 
     return (
-        <div className="fixed inset-0 z-[1100] flex items-center justify-center p-4">
+        <div className="fixed inset-0 z-[1100] flex items-center justify-center p-3 lgx:p-4">
             <div className="absolute inset-0 bg-black/40" onClick={closeDialog} />
-            <div className="relative bg-paper rounded-[22px] w-full max-w-lg max-h-[90vh] overflow-y-auto overflow-x-hidden shadow-xl border border-line">
+            <div className="relative bg-paper rounded-[22px] w-full max-w-lg max-h-[90vh] overflow-y-auto shadow-xl border border-line">
                 <div className={`flex items-center justify-between ${sectionPadding} border-b border-line`}>
                     <h2 className="text-lg font-bold text-ink">Filtros</h2>
                     <button onClick={closeDialog} className="text-ink-3 hover:text-ink transition-colors">
@@ -80,7 +80,7 @@ export function AvailableFiltersDialog() {
 
                 <div className={`${sectionPadding} space-y-6`}>
                     <Section label="Peso (kg)">
-                        <div className="flex gap-3">
+                        <div className="flex flex-col lgx:flex-row gap-3">
                             <NumberInput
                                 placeholder="Mín"
                                 value={weightMin}
@@ -95,7 +95,7 @@ export function AvailableFiltersDialog() {
                     </Section>
 
                     <Section label="Valor ($)">
-                        <div className="flex gap-3">
+                        <div className="flex flex-col lgx:flex-row gap-3">
                             <NumberInput
                                 placeholder="Mín"
                                 value={priceMin}
@@ -110,7 +110,7 @@ export function AvailableFiltersDialog() {
                     </Section>
 
                     <Section label="Distancia (km)">
-                        <div className="flex gap-3">
+                        <div className="flex flex-col lgx:flex-row gap-3">
                             <NumberInput
                                 placeholder="Mín"
                                 value={distanceMin}

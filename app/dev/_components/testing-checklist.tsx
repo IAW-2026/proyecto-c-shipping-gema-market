@@ -1,13 +1,15 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { ChevronDown, ChevronUp, Repeat, BarChart3, Users, Package, Globe, Gamepad2, Radio } from "lucide-react";
+import Link from "next/link";
+import { ChevronDown, ChevronUp, Repeat, BarChart3, Users, Package, Globe, Gamepad2 } from "lucide-react";
 
 const STORAGE_KEY = "dev-testing-checklist";
 
 interface ChecklistItem {
     id: string;
     label: string;
+    href?: string;
 }
 
 interface ChecklistSection {
@@ -29,7 +31,6 @@ const SECTIONS: ChecklistSection[] = [
             { id: "fc-4", label: "Ir a Modo repartidor - Click \"Marcar entregado\"" },
             { id: "fc-5", label: "Ver en Historial que el envío aparece" },
             { id: "fc-6", label: "Ver en Liquidaciones la liquidación semanal" },
-            { id: "fc-7", label: "Ir a Consola - Ver las notificaciones enviadas" },
         ],
     },
     {
@@ -53,7 +54,7 @@ const SECTIONS: ChecklistSection[] = [
             { id: "fdr-3", label: "Banear un driver (Logistics Operator)" },
             { id: "fdr-4", label: "Ver que el driver baneado no puede tomar envios" },
             { id: "fdr-5", label: "Desbanear un driver" },
-            { id: "fdr-6", label: "Eliminar un driver (Ana Torres) con reasignacion de envios" },
+            { id: "fdr-6", label: "Eliminar un driver (Ana Torres)" },
         ],
     },
     {
@@ -72,9 +73,10 @@ const SECTIONS: ChecklistSection[] = [
         title: "Tracking publico",
         icon: Globe,
         items: [
-            { id: "ft-1", label: "Ir a /track/BB-000001-2026 - Ver entregado con ruta en mapa" },
-            { id: "ft-2", label: "Ir a /track/BB-000002-2026 - Ver en transito" },
-            { id: "ft-3", label: "Ir a /track/BB-000003-2026 - Ver pendiente de retiro" },
+            { id: "ft-1", label: "Ir a /track/BB-000041-2026 - Ver pendiente de retiro", href: "/track/BB-000041-2026" },
+            { id: "ft-2", label: "Ir a /track/BB-000042-2026 - Ver retirado", href: "/track/BB-000042-2026" },
+            { id: "ft-3", label: "Ir a /track/BB-000043-2026 - Ver en transito", href: "/track/BB-000043-2026" },
+            { id: "ft-4", label: "Ir a /track/BB-000044-2026 - Ver entregado con ruta en mapa", href: "/track/BB-000044-2026" },
         ],
     },
     {
@@ -86,19 +88,6 @@ const SECTIONS: ChecklistSection[] = [
             { id: "fp-2", label: "Cotizar un envio" },
             { id: "fp-3", label: "Reservar la cotizacion" },
             { id: "fp-4", label: "Crear el envio" },
-            { id: "fp-5", label: "Ver el trafico en el log" },
-        ],
-    },
-    {
-        id: "flow-console",
-        title: "Consola de notificaciones",
-        icon: Radio,
-        items: [
-            { id: "fco-1", label: "Ver notificaciones enviadas a Seller" },
-            { id: "fco-2", label: "Ver notificaciones enviadas a Buyer" },
-            { id: "fco-3", label: "Ver llamadas API mock (origen vendedor, datos comprador)" },
-            { id: "fco-4", label: "Filtrar por tipo (Seller/Buyer/API)" },
-            { id: "fco-5", label: "Limpiar consola" },
         ],
     },
 ];
@@ -161,7 +150,17 @@ function SectionAccordion({ section, checked, onToggle }: {
                                 checked.has(item.id) ? "text-ink-3 line-through" : "text-ink-2 group-hover:text-ink"
                             }`}>
                                 <span className="text-ink-3 mr-1.5 font-mono text-xs">{idx + 1}.</span>
-                                {item.label}
+                                {item.href ? (
+                                    <Link
+                                        href={item.href}
+                                        onClick={(e) => e.stopPropagation()}
+                                        className="text-blue-600 hover:text-blue-700 underline underline-offset-2"
+                                    >
+                                        {item.label}
+                                    </Link>
+                                ) : (
+                                    item.label
+                                )}
                             </span>
                         </label>
                     ))}

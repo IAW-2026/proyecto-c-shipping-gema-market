@@ -1,4 +1,4 @@
-import { Database, TerminalSquare, Terminal, Users, BarChart3, Package, Truck, History, Clock, Repeat, Globe, Gamepad2, Radio, ArrowRight } from "lucide-react";
+import { Database, TerminalSquare, Users, BarChart3, Package, Truck, History, Clock, Repeat, Globe, Gamepad2, ArrowRight } from "lucide-react";
 import { TestingChecklist } from "./_components/testing-checklist";
 
 const PAGES_INFO = [
@@ -13,12 +13,6 @@ const PAGES_INFO = [
         route: "/dev/playground",
         icon: TerminalSquare,
         description: "Simula el flujo completo de integracion: cotizar un envio, reservar la cotizacion, crear el envio. Configura direcciones de origen/destino, dimensiones del paquete y datos del comprador. Visualiza el trafico entre aplicaciones en el log lateral.",
-    },
-    {
-        name: "Consola",
-        route: "/dev/console",
-        icon: Terminal,
-        description: "Visualiza en tiempo real todas las notificaciones enviadas a la Seller API y Buyer API, como tambien las llamadas internas para obtener datos del comprador y direccion del vendedor. Filtra por tipo y limpia la consola cuando necesites.",
     },
 ];
 
@@ -52,7 +46,7 @@ export default function DevIntroPage() {
                     </div>
                     <div className="p-5">
                         <p className="text-base text-ink-2 leading-relaxed">
-                            El Dev Center centraliza todas las herramientas necesarias para probar y demostrar las funcionalidades del sistema de logistica. Desde aca podes seedear la base de datos con datos realistas, explorar el contenido de cada tabla, simular el flujo completo de creacion de envios y monitorear las notificaciones entre servicios en tiempo real.
+                            El Dev Center centraliza todas las herramientas necesarias para probar y demostrar las funcionalidades del sistema de logistica. Desde aca podes seedear la base de datos con datos realistas, explorar el contenido de cada tabla y simular el flujo completo de creacion de envios.
                         </p>
                     </div>
                 </div>

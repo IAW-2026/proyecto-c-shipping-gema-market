@@ -2,8 +2,8 @@ import { MetricCard } from "@/components/ui/metric-card";
 
 interface EarningsMetricsProps {
     metrics: {
-        monthTotal: number;
-        monthTrips: number;
+        periodTotal: number;
+        periodTrips: number;
         averagePerTrip: number;
     };
 }
@@ -12,13 +12,13 @@ export function EarningsMetrics({ metrics }: EarningsMetricsProps) {
     return (
         <div className="grid gap-4 mb-6 grid-cols-1 sm:grid-cols-3">
             <MetricCard
-                title="Este mes"
-                value={`$${metrics.monthTotal.toLocaleString("es-AR")}`}
+                title="Últimas 6 semanas"
+                value={`$${metrics.periodTotal.toLocaleString("es-AR")}`}
             />
 
             <MetricCard
-                title="Viajes del mes"
-                value={metrics.monthTrips}
+                title="Viajes (6 semanas)"
+                value={metrics.periodTrips}
             />
 
             <MetricCard

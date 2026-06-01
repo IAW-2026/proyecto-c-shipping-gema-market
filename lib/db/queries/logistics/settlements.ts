@@ -19,8 +19,8 @@ export async function getSettlements(
 
     const rows = await prisma.$queryRaw<WeeklySettlementRaw[]>`
         SELECT
-            date_trunc('week', delivered_at)::date AS week_start,
-            (date_trunc('week', delivered_at) + interval '6 days')::date AS week_end,
+            date_trunc('week', delivered_at AT TIME ZONE 'America/Argentina/Buenos_Aires')::date AS week_start,
+            (date_trunc('week', delivered_at AT TIME ZONE 'America/Argentina/Buenos_Aires') + interval '6 days')::date AS week_end,
             COUNT(*)::bigint AS trips,
             SUM(price)::text AS amount
         FROM "Shipment"
@@ -28,7 +28,7 @@ export async function getSettlements(
           AND delivered_at >= ${dateFrom}
           AND delivered_at <= ${dateTo}
           AND status = 'delivered'
-        GROUP BY date_trunc('week', delivered_at)
+        GROUP BY date_trunc('week', delivered_at AT TIME ZONE 'America/Argentina/Buenos_Aires')
         ORDER BY week_start DESC
     `;
 
@@ -72,9 +72,9 @@ export async function getSettlementsDetail(
 
     const rows = await prisma.$queryRaw<SettlementsDetailRaw[]>`
         SELECT
-            date_trunc('week', delivered_at)::date AS week_start,
-            (date_trunc('week', delivered_at) + interval '6 days')::date AS week_end,
-            date_trunc('day', delivered_at)::date AS day,
+            date_trunc('week', delivered_at AT TIME ZONE 'America/Argentina/Buenos_Aires')::date AS week_start,
+            (date_trunc('week', delivered_at AT TIME ZONE 'America/Argentina/Buenos_Aires') + interval '6 days')::date AS week_end,
+            date_trunc('day', delivered_at AT TIME ZONE 'America/Argentina/Buenos_Aires')::date AS day,
             COUNT(*)::bigint AS trips,
             SUM(price)::text AS amount,
             JSON_AGG(
@@ -85,13 +85,14 @@ export async function getSettlementsDetail(
                     'picked_up_at', picked_up_at,
                     'delivered_at', delivered_at
                 )
+                ORDER BY delivered_at DESC
             ) AS orders
         FROM "Shipment"
         WHERE logistics_id = ${logisticsId}
           AND delivered_at >= ${dateFrom}
           AND delivered_at <= ${dateTo}
           AND status = 'delivered'
-        GROUP BY date_trunc('week', delivered_at), date_trunc('day', delivered_at)
+        GROUP BY date_trunc('week', delivered_at AT TIME ZONE 'America/Argentina/Buenos_Aires'), date_trunc('day', delivered_at AT TIME ZONE 'America/Argentina/Buenos_Aires')
         ORDER BY week_start DESC, day DESC
     `;
 
@@ -121,7 +122,7 @@ export async function getSettlementsDetail(
         settlement.trips += trips;
         settlement.amount = Number((settlement.amount + amount).toFixed(2));
 
-        const dayLabel = row.day.toLocaleDateString('es-AR', { weekday: 'short', day: 'numeric' });
+        const dayLabel = row.day.toLocaleDateString('es-AR', { weekday: 'short', day: 'numeric', timeZone: 'UTC' });
 
         dailyByWeek[weekKey].push({
             date: row.day,
@@ -145,7 +146,7 @@ export async function getSettlementsDetail(
 export type SettlementsDetail = Awaited<ReturnType<typeof getSettlementsDetail>>;
 
 function formatWeekPeriod(start: Date, end: Date): string {
-    const opts: Intl.DateTimeFormatOptions = { day: 'numeric', month: 'short' };
+    const opts: Intl.DateTimeFormatOptions = { day: 'numeric', month: 'short', timeZone: 'UTC' };
     const startStr = start.toLocaleDateString('es-AR', opts);
     const endStr = end.toLocaleDateString('es-AR', opts);
     return `${startStr} al ${endStr}`;

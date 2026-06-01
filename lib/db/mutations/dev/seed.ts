@@ -193,7 +193,7 @@ const WEIGHT_TIERS: WeightTier[] = [
 
 // ─── User IDs ───
 
-const OPERATOR_ID = "usr_01KSTWBKD7VFMD9JQ5FNXMPM5J";
+const OPERATOR_ID = "usr_01KT27KCG3MXET3RA9KCSKHWQ4";
 const CARLOS_ID = "usr_carlos_mendez";
 const ANA_ID = "usr_ana_torres";
 
@@ -408,15 +408,22 @@ export async function seedDatabase() {
         shipmentsCreated++;
     }
 
-    // ── Group 5: Carlos Mendez historical (6) ──
-    for (let i = 0; i < 6; i++) {
+    // ── Group 5: Carlos Mendez (6) ──
+    const carlosStatuses: { status: string; daysBack: number; pickedUp: boolean; delivered: boolean }[] = [
+        { status: "pending_pickup", daysBack: 1,  pickedUp: false, delivered: false },
+        { status: "picked_up",      daysBack: 2,  pickedUp: true,  delivered: false },
+        { status: "in_transit",     daysBack: 3,  pickedUp: true,  delivered: false },
+        { status: "delivered",      daysBack: 5,  pickedUp: true,  delivered: true },
+        { status: "delivered",      daysBack: 9,  pickedUp: true,  delivered: true },
+        { status: "delivered",      daysBack: 13, pickedUp: true,  delivered: true },
+    ];
+    for (const c of carlosStatuses) {
         const pair = nextPair();
-        const daysBack = 5 + i * 4;
-        const created = daysAgo(daysBack);
-        const pickedUp = new Date(created.getTime() + 2 * 3600000);
-        const delivered = new Date(created.getTime() + 6 * 3600000);
+        const created = hoursAgo(c.daysBack * 24);
+        const pickedUp = c.pickedUp ? new Date(created.getTime() + 2 * 3600000) : null;
+        const delivered = c.delivered ? new Date(created.getTime() + 6 * 3600000) : null;
         await prisma.shipment.create({
-            data: createShipmentData(pair, "delivered", CARLOS_ID, created, pickedUp, delivered),
+            data: createShipmentData(pair, c.status, CARLOS_ID, created, pickedUp, delivered),
         });
         shipmentsCreated++;
     }
