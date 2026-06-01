@@ -45,8 +45,7 @@ Les dejo esta sección que hice con el fin de testear el sistema. El Dev Center 
 | `/dev/seed` | **Seed + DB Explorer** | Botón "Seedear Base de Datos" que crea envíos, tarifas, drivers y usuarios con datos realistas de Bahía Blanca (fechas relativas al momento de ejecución). El explorador permite seleccionar cualquier tabla y ver su contenido. |
 | `/dev/playground` | **API Playground** | Simula el flujo completo de integración con las aplicaciones de buyer y seller: configurar origen/destino, cotizar, reservar, crear envío. Muestra el tráfico HTTP entre servicios en un log lateral. |
 
-A pesar de que el usuario de prueba ya tiene pedidos. Les recomiendo encarecidamente que seeden la base de datos, esto va hacer que los pedidos de muestra creados tengan como referencia la fecha actual. 
-
+A pesar de que el usuario de prueba ya tiene pedidos, les **recomiendo encarecidamente que ejectuten el seed de la base de datos**. Esto va a hacer que los pedidos de muestra creados tengan como referencia la fecha actual.
 
 ---
 
@@ -83,6 +82,8 @@ A pesar de que el usuario de prueba ya tiene pedidos. Les recomiendo encarecidam
 - Cuando una API externa falla, el sistema **no se cae**: usa valores por defecto sensatos.
 
 - Los **IDs de las entidades** usan un prefijo que las identifica (`usr_`, `shp_`, `qte_`, `trf_`) seguido de un ULID, único, ordenable por tiempo y URL-safe. Los códigos de seguimiento (`BB-000001-2026`) se generan con una secuencia atómica de PostgreSQL que garantiza unicidad incluso bajo concurrencia.
+
+- **Generación atómica de códigos de tracking:** El código de seguimiento público (`BB-000001-2026`) es independiente del ID interno. Se genera mediante una secuencia atómica directamente en PostgreSQL utilizando `INSERT ... ON CONFLICT DO UPDATE`, asegurando que los códigos sean correlativos, amigables para el usuario y completamente inmunes a condiciones de carrera bajo alta concurrencia.
 
 - Las **rutas** se organizan con route groups que separan los dominios: `(auth)`, `(logistics)`, `admin/`, `api/shipping/` y `track/[code]/`. Cada ruta tiene su carpeta `_components/` con los componentes específicos de esa vista. Los componentes genéricos y reutilizables (Button, Card, Table, Badge, etc.) viven en `components/ui/` y se comparten entre todos los módulos, asegurando consistencia visual sin duplicación.
 
