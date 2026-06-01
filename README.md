@@ -45,7 +45,11 @@ Les dejo esta sección que hice con el fin de testear el sistema. El Dev Center 
 | `/dev/seed` | **Seed + DB Explorer** | Botón "Seedear Base de Datos" que crea envíos, tarifas, drivers y usuarios con datos realistas de Bahía Blanca (fechas relativas al momento de ejecución). El explorador permite seleccionar cualquier tabla y ver su contenido. |
 | `/dev/playground` | **API Playground** | Simula el flujo completo de integración con las aplicaciones de buyer y seller: configurar origen/destino, cotizar, reservar, crear envío. Muestra el tráfico HTTP entre servicios en un log lateral. |
 
-A pesar de que el usuario de prueba ya tiene pedidos, les **recomiendo encarecidamente que ejectuten el seed de la base de datos**. Esto va a hacer que los pedidos de muestra creados tengan como referencia la fecha actual.
+#### Recomendaciones para las pruebas:
+
+Inicialización: A pesar de que el usuario de prueba ya viene con pedidos preexistentes, se recomienda encarecidamente ejecutar el seed de la base de datos desde esta sección. Esto garantizará que los pedidos de muestra se generen tomando como referencia la fecha y hora actual.
+
+Persistencia en el API Playground: Una vez creado un envío de prueba, los intentos posteriores de creación fallarán debido a que el playground utiliza identificadores fijos de orden y cotización para simplificar el flujo. Si desea realizar múltiples pruebas consecutivas, restablezca el estado ejecutando el seed nuevamente o elimine el pedido existente desde el panel de administración.
 
 ---
 
