@@ -1,7 +1,7 @@
 import { ChevronRight } from "lucide-react";
 import { cn } from "@/lib/utils/classnames";
 import { Card } from "@/components/ui/card";
-import { formatDateKey, formatDateTime } from "./earnings-list-utils";
+import { formatDateKey } from "./earnings-list-utils";
 import type { EarningsViewProps } from "./earnings-list";
 import type { DailyEarnings, DayOrder } from "@/lib/types/shipments";
 
@@ -15,7 +15,7 @@ function DayOrdersMobile({ orders }: { orders: DayOrder[] }) {
                     </div>
                     <div className="flex justify-between text-ink-2 mt-0.5">
                         <span>${order.price.toLocaleString("es-AR")}</span>
-                        <span>Entrega: {formatDateTime(order.deliveredAt)}</span>
+                        <span>Entrega: {order.deliveredAtFormatted}</span>
                     </div>
                 </div>
             ))}

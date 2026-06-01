@@ -1,12 +1,7 @@
-import { formatDateTimeFull } from "@/lib/utils/date-utils";
 import type { SettlementPeriod } from "@/lib/types/shipments";
 
 export function formatDateKey(date: Date): string {
     return new Date(date).toISOString().split("T")[0];
-}
-
-export function formatDateTime(date: Date | string | null): string {
-    return formatDateTimeFull(date);
 }
 
 export function computeEarningsMetrics(settlements: SettlementPeriod[]) {

@@ -18,4 +18,5 @@ export interface DayOrder {
     price: number;
     pickedUpAt: Date | null;
     deliveredAt: Date | null;
+    deliveredAtFormatted: string;
 }
