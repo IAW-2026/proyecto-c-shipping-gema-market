@@ -1,6 +1,5 @@
 import prisma from "@/lib/db/prisma";
 import type { SettlementPeriod, DailyEarnings, DayOrder } from "@/lib/types/shipments";
-import { formatDateTimeFull } from "@/lib/utils/date-utils";
 import { cacheLife } from "next/cache";
 
 interface WeeklySettlementRaw {
@@ -138,7 +137,6 @@ export async function getSettlementsDetail(
             price: Number(o.price),
             pickedUpAt: o.picked_up_at ? new Date(o.picked_up_at) : null,
             deliveredAt: o.delivered_at ? new Date(o.delivered_at) : null,
-            deliveredAtFormatted: o.delivered_at ? formatDateTimeFull(o.delivered_at) : "-",
         }));
     }
 

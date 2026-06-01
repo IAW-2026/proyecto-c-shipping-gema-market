@@ -2,7 +2,7 @@ import { ChevronRight } from "lucide-react";
 import { cn } from "@/lib/utils/classnames";
 import { Card } from "@/components/ui/card";
 import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from "@/components/ui/table";
-import { formatDateKey } from "./earnings-list-utils";
+import { formatDateKey, formatDateTime } from "./earnings-list-utils";
 import type { EarningsViewProps } from "./earnings-list";
 import type { DailyEarnings, DayOrder } from "@/lib/types/shipments";
 
@@ -24,7 +24,7 @@ function DayOrdersDesktop({ orders }: { orders: DayOrder[] }) {
                         ${order.price.toLocaleString("es-AR")}
                     </span>
                     <span className="text-right text-ink-2 text-xs">
-                        {order.deliveredAtFormatted}
+                        {formatDateTime(order.deliveredAt)}
                     </span>
                 </div>
             ))}
