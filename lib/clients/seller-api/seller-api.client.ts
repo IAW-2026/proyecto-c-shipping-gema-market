@@ -28,7 +28,7 @@ export const sellerApiClient = {
         if (process.env.MOCK_EXTERNAL_APIS === "true") {
             console.log(`[SELLER CLIENT MOCK] GET /api/seller/productos/${productId}/direccion-origen`);
             return {
-                data: { origin_address: { street: "Calle Mock", number: "123", zip: "1406" } },
+                data: { origin_address: { street: "San Martin", number: "123", zip: "8000" } },
                 status: 200,
             };
         }
