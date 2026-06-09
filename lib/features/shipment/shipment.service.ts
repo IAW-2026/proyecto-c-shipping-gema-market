@@ -16,15 +16,14 @@ export interface CreateShipmentResult {
 }
 
 export async function createShipment(
-    data: CreateShipmentRequest,
-    req?: Request
+    data: CreateShipmentRequest
 ): Promise<CreateShipmentResult> {
     const { order_id, seller_id, buyer_id } = data;
     let { receiver_name, receiver_phone } = data;
 
     if (!receiver_name || !receiver_phone) {
         try {
-            const buyerResult = await buyerApiClient.getBuyerData(buyer_id, req);
+            const buyerResult = await buyerApiClient.getBuyerData(buyer_id);
             console.log(`[API] BUYER DATA → ${buyerResult.status} | /api/buyer/${buyer_id}`);
 
             if (buyerResult.data) {
@@ -36,7 +35,7 @@ export async function createShipment(
         }
         if (!receiver_name || !receiver_phone) {
             throw Object.assign(
-                new Error("Datos del comprador incompletos: se require receiver_name y receiver_phone, o X-Mock-Buyer-* en los headers"),
+                new Error("Datos del comprador incompletos: se requiere receiver_name y receiver_phone."),
                 { statusCode: 400, code: "BAD_REQUEST" }
             );
         }

@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { validateApiKey } from "@/lib/auth/api-key";
 import { reserveQuoteSchema } from "@/lib/schemas/api/quote";
 import { reserveQuote } from "@/lib/features/quote";
+import { logIncomingRequest, logIncomingResponse } from "@/lib/utils/api-logger";
 
 /**
  * POST /api/shipping/cotizaciones/reservar
@@ -9,33 +10,44 @@ import { reserveQuote } from "@/lib/features/quote";
  * Reserva una cotización para una orden, evitando que sea utilizada por otra.
  */
 export async function POST(request: NextRequest) {
+    const start = Date.now();
+    const endpoint = "POST /api/shipping/cotizaciones/reservar";
+
     if (!validateApiKey(request)) {
+        logIncomingResponse(endpoint, 401, { error: "Unauthorized" }, Date.now() - start);
         return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
     try {
         const body = await request.json();
+        logIncomingRequest(endpoint, "POST", body);
+
         const parsed = reserveQuoteSchema.safeParse(body);
 
         if (!parsed.success) {
-            return NextResponse.json(
-                { error: "Datos inválidos", details: parsed.error.flatten() },
-                { status: 400 }
-            );
+            const response = { error: "Datos inválidos", details: parsed.error.flatten() };
+            logIncomingResponse(endpoint, 400, response, Date.now() - start);
+            return NextResponse.json(response, { status: 400 });
         }
 
         const { quote_id, order_id } = parsed.data;
         const result = await reserveQuote(quote_id, order_id);
 
-        return NextResponse.json({ ok: true, reserved_until: result.reserved_until }, { status: 200 });
+        const response = { ok: true, reserved_until: result.reserved_until };
+        logIncomingResponse(endpoint, 200, response, Date.now() - start);
+        return NextResponse.json(response, { status: 200 });
 
     } catch (error) {
         const err = error as Error & { statusCode?: number; code?: string };
         console.error("[RESERVAR] Error:", err.message);
 
         if (err.statusCode) {
-            return NextResponse.json({ error: err.message }, { status: err.statusCode });
+            const response = { error: err.message };
+            logIncomingResponse(endpoint, err.statusCode, response, Date.now() - start);
+            return NextResponse.json(response, { status: err.statusCode });
         }
 
-        return NextResponse.json({ error: "Error interno del servidor" }, { status: 500 });
+        const response = { error: "Error interno del servidor" };
+        logIncomingResponse(endpoint, 500, response, Date.now() - start);
+        return NextResponse.json(response, { status: 500 });
     }
 }

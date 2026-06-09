@@ -1,79 +1,55 @@
 import { ApiResult } from "../types";
 import { BuyerStatusUpdate, BuyerNotificationResponse, BuyerDataResponse } from "./buyer-api.types";
 import { hashApiKey } from "@/lib/auth/api-key";
+import { logOutgoingRequest, logOutgoingResponse } from "@/lib/utils/api-logger";
 
 const BUYER_API_URL = process.env.BUYER_API_URL;
 const API_KEY_HASH = hashApiKey(process.env.INTERNAL_API_KEY ?? "");
 
 export const buyerApiClient = {
-    getBuyerData: async (buyerId: string, _req?: Request): ApiResult<BuyerDataResponse> => {
-        const mockName = _req?.headers.get("X-Mock-Buyer-Name");
-        const mockPhone = _req?.headers.get("X-Mock-Buyer-Phone");
-
-        if (mockName && mockPhone) {
-            return {
-                data: {
-                    id: buyerId,
-                    full_name: mockName,
-                    phone_number: mockPhone,
-                    email: `${mockName.toLowerCase().replace(/\s+/g, ".")}@email.com`,
-                    address: { street: "", number: "", zip: "" },
-                    created_at: new Date().toISOString(),
-                },
-                status: 200,
-            };
-        }
-
-        if (process.env.MOCK_EXTERNAL_APIS === "true") {
-            console.log(`[BUYER CLIENT MOCK] POST /api/buyer/${buyerId}`);
-            return {
-                data: {
-                    id: buyerId,
-                    full_name: "Mock User",
-                    phone_number: "1234567890",
-                    email: "mock@email.com",
-                    address: { street: "", number: "", zip: "" },
-                    created_at: new Date().toISOString(),
-                },
-                status: 200,
-            };
-        }
+    getBuyerData: async (buyerId: string): ApiResult<BuyerDataResponse> => {
+        const url = `${BUYER_API_URL}/api/buyer/${buyerId}`;
+        logOutgoingRequest("BUYER", "POST", url);
 
         try {
-            const res = await fetch(`${BUYER_API_URL}/api/buyer/${buyerId}`, {
+            const res = await fetch(url, {
                 method: "POST",
                 headers: { "x-api-key-hash": API_KEY_HASH },
             });
             if (!res.ok) {
+                logOutgoingResponse("BUYER", res.status, { error: `Buyer API error: ${res.status}` });
                 return { error: { message: `Buyer API error: ${res.status}` }, status: res.status };
             }
             const data = await res.json();
+            logOutgoingResponse("BUYER", res.status, data);
             return { data, status: res.status };
         } catch (error) {
             console.error("[BUYER CLIENT] getBuyerData error:", error);
+            logOutgoingResponse("BUYER", 503, { error: "Error contacting Buyer API" });
             return { error: { message: "Error contacting Buyer API" }, status: 503 };
         }
     },
 
     notifyStatusChange: async (orderId: string, payload: BuyerStatusUpdate): ApiResult<BuyerNotificationResponse> => {
-        if (process.env.MOCK_EXTERNAL_APIS === "true") {
-            console.log(`[BUYER CLIENT MOCK] POST /api/buyer/ordenes/${orderId}/estado-envio`, payload);
-            return { data: { received: true, order_id: orderId }, status: 200 };
-        }
+        const url = `${BUYER_API_URL}/api/buyer/ordenes/${orderId}/estado-envio`;
+        logOutgoingRequest("BUYER", "POST", url);
 
         try {
-            const res = await fetch(`${BUYER_API_URL}/api/buyer/ordenes/${orderId}/estado-envio`, {
+            const res = await fetch(url, {
                 method: "POST",
                 headers: { "Content-Type": "application/json", "x-api-key-hash": API_KEY_HASH },
                 body: JSON.stringify(payload),
             });
             if (!res.ok) {
+                logOutgoingResponse("BUYER", res.status, { error: `Buyer API error: ${res.status}` });
                 return { error: { message: `Buyer API error: ${res.status}` }, status: res.status };
             }
             const data = await res.json();
+            logOutgoingResponse("BUYER", res.status, data);
             return { data, status: res.status };
         } catch (error) {
             console.error("[BUYER CLIENT] notifyStatusChange error:", error);
+            logOutgoingResponse("BUYER", 503, { error: "Error contacting Buyer API" });
             return { error: { message: "Error contacting Buyer API" }, status: 503 };
         }
     }

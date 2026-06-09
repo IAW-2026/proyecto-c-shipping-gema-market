@@ -1,13 +1,18 @@
 import { NextRequest, NextResponse } from "next/server";
 import { validateApiKey } from "@/lib/auth/api-key";
 import { getShipmentByOrderId } from "@/lib/db/queries/public/shipment-by-order";
+import { logIncomingResponse } from "@/lib/utils/api-logger";
 
 interface RouteParams {
     params: Promise<{ order_id: string }>;
 }
 
 export async function GET(request: NextRequest, { params }: RouteParams) {
+    const start = Date.now();
+    const endpoint = `GET /api/shipping/envios/{order_id}`;
+
     if (!validateApiKey(request)) {
+        logIncomingResponse(endpoint, 401, { error: "Unauthorized" }, Date.now() - start);
         return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
     try {
@@ -16,15 +21,14 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
         const shipment = await getShipmentByOrderId(order_id);
 
         if (!shipment) {
-            return NextResponse.json(
-                { error: "Envío no encontrado" },
-                { status: 404 }
-            );
+            const response = { error: "Envío no encontrado" };
+            logIncomingResponse(endpoint, 404, response, Date.now() - start);
+            return NextResponse.json(response, { status: 404 });
         }
 
         const origin = new URL(request.url).origin;
 
-        return NextResponse.json({
+        const response = {
             shipping_id: shipment.id,
             order_id: shipment.order_id,
             status: shipment.status,
@@ -35,12 +39,13 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
             price: shipment.price,
             picked_up_at: shipment.picked_up_at?.toISOString() ?? null,
             delivered_at: shipment.delivered_at?.toISOString() ?? null,
-        });
+        };
+        logIncomingResponse(endpoint, 200, response, Date.now() - start);
+        return NextResponse.json(response);
     } catch (error) {
         console.error("[ENVIOS_API] Error:", error);
-        return NextResponse.json(
-            { error: "Error interno del servidor" },
-            { status: 500 }
-        );
+        const response = { error: "Error interno del servidor" };
+        logIncomingResponse(endpoint, 500, response, Date.now() - start);
+        return NextResponse.json(response, { status: 500 });
     }
 }

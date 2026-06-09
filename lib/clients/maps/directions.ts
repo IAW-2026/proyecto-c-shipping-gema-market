@@ -1,4 +1,5 @@
 import { getApiKey, getOrsBaseUrl, type ORSCoordinate } from "./config";
+import { logOutgoingRequest, logOutgoingResponse } from "@/lib/utils/api-logger";
 
 interface ORSFeatureCollection {
   features: Array<{
@@ -15,6 +16,8 @@ export interface ORSRouteResult {
 export async function getRoute(origin: ORSCoordinate, destination: ORSCoordinate): Promise<ORSRouteResult> {
   const apiKey = getApiKey();
   const url = `${getOrsBaseUrl()}/v2/directions/driving-car/geojson?api_key=${apiKey}`;
+  logOutgoingRequest("ORS", "POST", url);
+
   const res = await fetch(url, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
@@ -24,6 +27,7 @@ export async function getRoute(origin: ORSCoordinate, destination: ORSCoordinate
   if (!res.ok) {
     const text = await res.text();
     console.error("[ORS] Directions error:", res.status, text);
+    logOutgoingResponse("ORS", res.status, { error: text.slice(0, 200) });
     throw Object.assign(new Error(`Error al obtener la ruta: ${res.status}`), { statusCode: 502, code: "ORS_ERROR" });
   }
 
@@ -34,8 +38,11 @@ export async function getRoute(origin: ORSCoordinate, destination: ORSCoordinate
     throw Object.assign(new Error("No se encontró una ruta entre las direcciones"), { statusCode: 422, code: "NO_ROUTE" });
   }
 
-  return {
+  const result = {
     geometry: feature.geometry,
     summary: feature.properties.summary,
   };
+  logOutgoingResponse("ORS", 200, { summary: result.summary });
+
+  return result;
 }
