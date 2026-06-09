@@ -9,11 +9,11 @@ const API_KEY_HASH = hashApiKey(process.env.INTERNAL_API_KEY ?? "");
 export const buyerApiClient = {
     getBuyerData: async (buyerId: string): ApiResult<BuyerDataResponse> => {
         const url = `${BUYER_API_URL}/api/buyer/${buyerId}`;
-        logOutgoingRequest("BUYER", "POST", url);
+        logOutgoingRequest("BUYER", "GET", url);
 
         try {
             const res = await fetch(url, {
-                method: "POST",
+                method: "GET",
                 headers: { "x-api-key-hash": API_KEY_HASH },
             });
             if (!res.ok) {
@@ -32,7 +32,7 @@ export const buyerApiClient = {
 
     notifyStatusChange: async (orderId: string, payload: BuyerStatusUpdate): ApiResult<BuyerNotificationResponse> => {
         const url = `${BUYER_API_URL}/api/buyer/ordenes/${orderId}/estado-envio`;
-        logOutgoingRequest("BUYER", "POST", url);
+        logOutgoingRequest("BUYER", "GET", url);
 
         try {
             const res = await fetch(url, {

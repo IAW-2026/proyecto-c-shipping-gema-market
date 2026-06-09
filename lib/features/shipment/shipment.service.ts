@@ -35,7 +35,7 @@ export async function createShipment(
         }
         if (!receiver_name || !receiver_phone) {
             throw Object.assign(
-                new Error("Datos del comprador incompletos: se requiere receiver_name y receiver_phone."),
+                new Error("No se pudieron obtener los datos del comprador desde la Buyer App. Incluí el nombre y teléfono del receptor en la solicitud o asegurate de que la Buyer App esté disponible."),
                 { statusCode: 400, code: "BAD_REQUEST" }
             );
         }
