@@ -1,4 +1,5 @@
 import type { ORSCoordinate } from "./config";
+import { logOutgoingRequest, logOutgoingResponse } from "@/lib/utils/api-logger";
 
 export interface GeocodeResult {
     coordinates: ORSCoordinate;
@@ -32,6 +33,7 @@ export async function getCoordinatesFromAddress(
   }
 
   const url = `https://nominatim.openstreetmap.org/search?${params.toString()}`;
+  logOutgoingRequest("NOMINATIM", "GET", url);
   const maxRetries = 3;
 
   for (let attempt = 0; attempt <= maxRetries; attempt++) {
@@ -41,11 +43,16 @@ export async function getCoordinatesFromAddress(
 
     if (res.ok) {
       const data = await res.json();
-      if (!data?.length) return null;
-      return {
-        coordinates: [parseFloat(data[0].lon), parseFloat(data[0].lat)],
+      if (!data?.length) {
+        logOutgoingResponse("NOMINATIM", 200, { result: "no_data" });
+        return null;
+      }
+      const result = {
+        coordinates: [parseFloat(data[0].lon), parseFloat(data[0].lat)] as ORSCoordinate,
         displayName: data[0].display_name ?? "",
       };
+      logOutgoingResponse("NOMINATIM", 200, { display_name: result.displayName.slice(0, 100) });
+      return result;
     }
 
     if (res.status === 429 && attempt < maxRetries) {
@@ -56,6 +63,7 @@ export async function getCoordinatesFromAddress(
     }
 
     console.error("[Nominatim] Geocode error:", res.status, await res.text());
+    logOutgoingResponse("NOMINATIM", res.status, { error: "geocode_failed" });
     return null;
   }
 

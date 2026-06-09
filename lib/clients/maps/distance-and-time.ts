@@ -1,4 +1,5 @@
 import { getApiKey, getOrsBaseUrl, type ORSCoordinate } from "./config";
+import { logOutgoingRequest, logOutgoingResponse } from "@/lib/utils/api-logger";
 
 interface ORSMatrixResponse {
   distances?: number[][];
@@ -13,6 +14,7 @@ export async function getMatrixDistance(
 ): Promise<{ distance_km: number; duration_seconds: number | null }> {
   const apiKey = getApiKey();
   const url = `${getOrsBaseUrl()}/v2/matrix/driving-car?api_key=${apiKey}`;
+  logOutgoingRequest("ORS", "POST", url);
 
   const res = await fetch(url, {
     method: "POST",
@@ -29,13 +31,16 @@ export async function getMatrixDistance(
   if (!res.ok) {
     const text = await res.text();
     console.error("[ORS] Matrix error:", res.status, text);
+    logOutgoingResponse("ORS", res.status, { error: text.slice(0, 200) });
     throw Object.assign(new Error(`Error al calcular distancia: ${res.status}`), { statusCode: 502, code: "ORS_ERROR" });
   }
 
   const data: ORSMatrixResponse = await res.json();
-
-  return {
+  const result = {
     distance_km: data.distances?.[0]?.[0] ?? 0,
     duration_seconds: data.durations?.[0]?.[0] ?? null,
   };
+  logOutgoingResponse("ORS", 200, { distance_km: result.distance_km, duration_seconds: result.duration_seconds });
+
+  return result;
 }

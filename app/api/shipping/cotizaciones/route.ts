@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { validateApiKey } from "@/lib/auth/api-key";
 import { quoteRequestSchema } from "@/lib/schemas/api/quote";
 import { calculateQuote } from "@/lib/features/quote";
-import { createTraceIfDebug, withTrace } from "@/lib/utils/api-handler";
+import { logIncomingRequest, logIncomingResponse } from "@/lib/utils/api-logger";
 
 /**
  * POST /api/shipping/cotizaciones
@@ -10,33 +10,43 @@ import { createTraceIfDebug, withTrace } from "@/lib/utils/api-handler";
  * Calcula el costo y tiempo estimado de envío logístico entre dos domicilios.
  */
 export async function POST(request: NextRequest) {
+    const start = Date.now();
+    const endpoint = "POST /api/shipping/cotizaciones";
+
     if (!validateApiKey(request)) {
+        logIncomingResponse(endpoint, 401, { error: "Unauthorized" }, Date.now() - start);
         return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
     try {
         const body = await request.json();
+        logIncomingRequest(endpoint, "POST", body);
+
         const parsed = quoteRequestSchema.safeParse(body);
 
         if (!parsed.success) {
-            return NextResponse.json(
-                { error: "Datos de cotización inválidos", details: parsed.error.flatten() },
-                { status: 400 }
-            );
+            const response = { error: "Datos de cotización inválidos", details: parsed.error.flatten() };
+            logIncomingResponse(endpoint, 400, response, Date.now() - start);
+            return NextResponse.json(response, { status: 400 });
         }
 
-        const trace = createTraceIfDebug(request);
-        const result = await calculateQuote(parsed.data, trace, request);
+        const result = await calculateQuote(parsed.data);
 
-        return NextResponse.json(withTrace(result, trace), { status: 200 });
+        logIncomingResponse(endpoint, 200, result, Date.now() - start);
+        return NextResponse.json(result, { status: 200 });
 
     } catch (error) {
         const err = error as Error & { statusCode?: number; code?: string };
         console.error("[COTIZACIONES] Error:", err.message);
+        console.error("[COTIZACIONES] Stack:", err.stack);
 
         if (err.statusCode) {
-            return NextResponse.json({ error: err.message }, { status: err.statusCode });
+            const response = { error: err.message };
+            logIncomingResponse(endpoint, err.statusCode, response, Date.now() - start);
+            return NextResponse.json(response, { status: err.statusCode });
         }
 
-        return NextResponse.json({ error: "Error interno del servidor" }, { status: 500 });
+        const response = { error: "Error interno del servidor" };
+        logIncomingResponse(endpoint, 500, response, Date.now() - start);
+        return NextResponse.json(response, { status: 500 });
     }
 }

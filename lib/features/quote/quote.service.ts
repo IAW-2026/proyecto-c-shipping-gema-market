@@ -1,7 +1,6 @@
 /** Orquestador del flujo de cotización: coordina API externa, geocoding, pricing y persistencia. */
 import { sellerApiClient } from "@/lib/clients/seller-api/seller-api.client";
 import { getCoordinatesFromAddress, getMatrixDistance } from "@/lib/clients/maps";
-import type { ApiTrace } from "@/lib/utils/api-trace";
 import type { z } from "zod";
 import type { quoteRequestSchema } from "@/lib/schemas/api/quote";
 import { calculateVolume, calculateVolumetricWeight, calculateBillableWeight, calculatePrice, calculateEstimatedDays, getDefaultPricePerKm, CURRENCY, DEFAULT_DISTANCE_KM } from "./price-and-time-calculator";
@@ -22,14 +21,14 @@ function validateGeocode(
 ): [number, number] {
     if (!result) {
         if (labelOrigen) {
-            throwWithStatus("No se pudo calcular la cotización", 400);
+            throwWithStatus("No se pudo calcular la cotización: no se pudo geocodificar la dirección de origen del vendedor. Verifique que la dirección exista.", 400);
         } else {
             throwWithStatus("La dirección de destino ingresada no existe. Revisá los datos.", 400);
         }
     }
     if (!result.displayName.includes(COVERAGE_CITY)) {
         if (labelOrigen) {
-            throwWithStatus("El producto está fuera del área de cobertura.", 400);
+            throwWithStatus("El producto está fuera del área de cobertura (Bahía Blanca). El vendedor debe actualizar la dirección de origen.", 400);
         } else {
             throwWithStatus("La dirección de destino está fuera del área de cobertura (Bahía Blanca).", 400);
         }
@@ -48,18 +47,16 @@ export interface QuoteResult {
 }
 
 export async function calculateQuote(
-    data: QuoteRequest,
-    trace?: ApiTrace,
-    req?: Request
+    data: QuoteRequest
 ): Promise<QuoteResult> {
     const { destination_address, product_id, weight_kg, height_cm, width_cm, depth_cm } = data;
 
-    const originResult = await sellerApiClient.getOriginAddress(product_id, trace, req);
+    const originResult = await sellerApiClient.getOriginAddress(product_id);
     console.log(`[API] SELLER ORIGIN → ${originResult.status} | /api/seller/productos/${product_id}/direccion-origen`);
 
     if (!originResult?.data) {
         throw Object.assign(
-            new Error("No se pudo calcular la cotización"),
+            new Error(`No se pudo calcular la cotización: la Seller App no responde o devolvió error (${originResult.status}).`),
             { statusCode: 502, code: "UPSTREAM_ERROR" }
         );
     }
