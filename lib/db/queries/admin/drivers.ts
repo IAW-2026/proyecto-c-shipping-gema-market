@@ -101,3 +101,89 @@ export async function getDriverShipments(
         totalPages: Math.ceil(total / pageSize),
     };
 }
+
+// ─── Admin API queries ───
+
+interface AdminDriverItem {
+    user_id: string;
+    full_name: string;
+    email: string;
+    banned: boolean;
+    active_shipments: number;
+    created_at: string;
+}
+
+interface AdminDriverListResult {
+    items: AdminDriverItem[];
+    page: number;
+    page_size: number;
+    total: number;
+    sort_by: string;
+    order: string;
+}
+
+export async function getAdminDrivers(
+    q?: string,
+    banned?: string,
+    sortBy: string = "created_at",
+    sortOrder: string = "desc",
+    page: number = 1,
+    pageSize: number = 20,
+): Promise<AdminDriverListResult> {
+    "use cache";
+    cacheLife("minutes");
+
+    const where: Prisma.UserWhereInput = { role: "logistics" };
+    if (q) {
+        where.OR = [
+            { full_name: { contains: q, mode: "insensitive" } },
+            { email: { contains: q, mode: "insensitive" } },
+        ];
+    }
+    if (banned === "true") where.banned = true;
+    else if (banned === "false") where.banned = false;
+
+    const dir = sortOrder === "asc" ? "asc" : "desc";
+    const orderBy: Record<string, unknown> = sortBy === "full_name"
+        ? { full_name: dir }
+        : { [sortBy]: dir };
+
+    const [drivers, total] = await Promise.all([
+        prisma.user.findMany({
+            where,
+            orderBy,
+            skip: (page - 1) * pageSize,
+            take: pageSize,
+        }),
+        prisma.user.count({ where }),
+    ]);
+
+    const items = await Promise.all(
+        drivers.map(async (d) => {
+            const activeShipments = await prisma.shipment.count({
+                where: {
+                    logistics_id: d.id,
+                    status: { not: "delivered" },
+                },
+            });
+
+            return {
+                user_id: d.id,
+                full_name: d.full_name,
+                email: d.email,
+                banned: d.banned,
+                active_shipments: activeShipments,
+                created_at: d.created_at.toISOString(),
+            };
+        }),
+    );
+
+    return {
+        items,
+        page,
+        page_size: pageSize,
+        total,
+        sort_by: sortBy,
+        order: sortOrder,
+    };
+}

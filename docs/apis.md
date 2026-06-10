@@ -774,13 +774,13 @@ Estados soportados (mapeo Mercado Pago Sandbox): `pending`, `in_process`, `appro
 
 ### Shipping App — Admin
 
-> **Nota**: los endpoints administrativos (`GET /api/shipping/admin/envios`, `GET /api/shipping/admin/stats`) no están implementados en esta etapa. Se documentan aquí como referencia para la Etapa 3.
+> **Autenticación**: `x-api-key-hash` (service-to-service). Todos los endpoints de esta sección validan `INTERNAL_API_KEY`.
 
 #### `GET /api/shipping/admin/envios`
 
 - **Consumido por**: Control Plane, Analytics Dashboard.
 - **Descripción**: listado paginado de todos los envíos.
-- **Query params**: `logistics_id`, `status`, `date_from`, `date_to`, `sort_by`, `order`, `page`, `page_size`.
+- **Query params**: `logistics_id`, `status`, `date_from`, `date_to`, `sort_by` (`created_at`, `price`, `status`), `order` (`asc`, `desc`), `page`, `page_size` (max 100).
 - **Response 200**:
 
 ```json
@@ -789,11 +789,15 @@ Estados soportados (mapeo Mercado Pago Sandbox): `pending`, `in_process`, `appro
     {
       "shipping_id": "shp_01HXYZ...",
       "order_id": "ord_01HXYZ...",
+      "buyer_id": "usr_01HXYZ...",
+      "seller_id": "usr_01HXYZ...",
+      "logistics_id": "usr_01HXYZ...",
       "status": "delivered",
       "tracking_code": "BB-0001-2026",
       "price": 3500.0,
       "picked_up_at": "2026-04-17T14:00:00Z",
-      "delivered_at": "2026-04-17T16:30:00Z"
+      "delivered_at": "2026-04-17T16:30:00Z",
+      "created_at": "2026-04-17T13:00:00Z"
     }
   ],
   "page": 1,
@@ -803,6 +807,107 @@ Estados soportados (mapeo Mercado Pago Sandbox): `pending`, `in_process`, `appro
   "order": "desc"
 }
 ```
+
+#### `GET /api/shipping/admin/envios/:shipping_id`
+
+- **Consumido por**: Control Plane.
+- **Descripción**: detalle completo de un envío por `shipping_id`.
+- **Response 200**:
+
+```json
+{
+  "shipping_id": "shp_01HXYZ...",
+  "order_id": "ord_01HXYZ...",
+  "quote_id": "qte_01HXYZ...",
+  "buyer_id": "usr_01HXYZ...",
+  "seller_id": "usr_01HXYZ...",
+  "logistics_id": "usr_01HXYZ...",
+  "receiver_name": "Juan Pérez",
+  "receiver_phone": "2911234567",
+  "status": "delivered",
+  "tracking_code": "BB-0001-2026",
+  "price": 3500.0,
+  "pickup_address": { "street": "San Martín", "number": "123", "zip": "8000" },
+  "delivery_address": { "street": "Alsina", "number": "456", "floor": "7B", "zip": "8000" },
+  "pickup_lat": -38.716,
+  "pickup_lng": -62.266,
+  "delivery_lat": -38.730,
+  "delivery_lng": -62.280,
+  "route_distance": 4.2,
+  "route_duration": 900,
+  "route_geometry": null,
+  "weight": 15.0,
+  "dimensions": { "width": 100, "height": 80, "depth": 50 },
+  "picked_up_at": "2026-04-17T14:00:00Z",
+  "delivered_at": "2026-04-17T16:30:00Z",
+  "created_at": "2026-04-17T13:00:00Z"
+}
+```
+
+- **Response 404**: `{ "error": "Envío no encontrado" }`
+
+#### `PATCH /api/shipping/admin/envios/:shipping_id`
+
+- **Consumido por**: Control Plane.
+- **Descripción**: reasignar o desasignar el courier de un envío.
+- **Request body**: `{ "logistics_id": "usr_01HXYZ..." | null }`
+  - `logistics_id = null` → desasigna el courier y resetea el estado a `waiting_for_courier`.
+  - `logistics_id = "usr_..."` → asigna el courier y cambia el estado a `pending_pickup`.
+- **Response 200**:
+
+```json
+{
+  "shipping_id": "shp_01HXYZ...",
+  "status": "pending_pickup",
+  "logistics_id": "usr_01HXYZ..."
+}
+```
+
+- **Response 404**: Envío no encontrado.
+- **Response 422**: Fletero no existe, está suspendido o no tiene rol `logistics`.
+
+#### `GET /api/shipping/admin/drivers`
+
+- **Consumido por**: Control Plane, Analytics Dashboard.
+- **Descripción**: listado paginado de couriers (usuarios con `role = "logistics"`).
+- **Query params**: `q` (busca `full_name` o `email`), `banned` (`true`, `false`), `sort_by` (`created_at`, `full_name`), `order`, `page`, `page_size`.
+- **Response 200**:
+
+```json
+{
+  "items": [
+    {
+      "user_id": "usr_01HXYZ...",
+      "full_name": "Pedro Ruiz",
+      "email": "p@r.com",
+      "banned": false,
+      "active_shipments": 3,
+      "created_at": "2026-04-10T10:00:00Z"
+    }
+  ],
+  "page": 1,
+  "page_size": 20,
+  "total": 12,
+  "sort_by": "created_at",
+  "order": "desc"
+}
+```
+
+#### `PATCH /api/shipping/admin/drivers/:user_id`
+
+- **Consumido por**: Control Plane.
+- **Descripción**: suspender o rehabilitar un courier.
+- **Request body**: `{ "banned": true | false }`
+- **Response 200**:
+
+```json
+{
+  "user_id": "usr_01HXYZ...",
+  "banned": true
+}
+```
+
+- **Response 404**: Usuario no encontrado.
 
 #### `GET /api/shipping/admin/stats`
 
@@ -822,6 +927,49 @@ Estados soportados (mapeo Mercado Pago Sandbox): `pending`, `in_process`, `appro
     "delivered": 155
   },
   "average_delivery_hours": 4.2
+}
+```
+
+#### `GET /api/shipping/admin/stats/timeseries`
+
+- **Consumido por**: Analytics Dashboard.
+- **Descripción**: serie temporal de envíos o entregas por bucket (día, semana, mes).
+- **Query params**: `date_from`, `date_to`, `granularity` (`day`, `week`, `month`), `metric` (`shipments`, `delivered`).
+- **Response 200**:
+
+```json
+{
+  "granularity": "day",
+  "series": [
+    { "bucket": "2026-06-01", "value": 4 },
+    { "bucket": "2026-06-02", "value": 7 }
+  ]
+}
+```
+
+#### `GET /api/shipping/admin/usuarios`
+
+- **Consumido por**: Control Plane, Analytics Dashboard.
+- **Descripción**: listado de usuarios locales (cache de Clerk) con rol `logistics`.
+- **Query params**: `page`, `page_size`.
+- **Response 200**:
+
+```json
+{
+  "items": [
+    {
+      "user_id": "usr_01HXYZ...",
+      "clerk_user_id": "user_2abc...",
+      "email": "p@r.com",
+      "full_name": "Pedro Ruiz",
+      "role": "logistics",
+      "banned": false,
+      "created_at": "2026-04-10T10:00:00Z"
+    }
+  ],
+  "page": 1,
+  "page_size": 20,
+  "total": 12
 }
 ```
 
