@@ -51,16 +51,14 @@ export async function getAvailableShipments(params?: ShipmentFilterParams): Prom
         ? buildOrderBy(params.sortBy, params.sortOrder)
         : { created_at: 'desc' as const };
 
-    const [shipments, total] = await Promise.all([
-        prisma.shipment.findMany({
-            where,
-            orderBy,
-            select: offerSelect,
-            skip: (page - 1) * pageSize,
-            take: pageSize,
-        }),
-        prisma.shipment.count({ where }),
-    ]);
+    const shipments = await prisma.shipment.findMany({
+        where,
+        orderBy,
+        select: offerSelect,
+        skip: (page - 1) * pageSize,
+        take: pageSize,
+    });
+    const total = await prisma.shipment.count({ where });
 
     return {
         data: shipments.map(toShipmentOffer),

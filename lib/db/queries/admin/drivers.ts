@@ -18,16 +18,14 @@ export async function getAllDrivers(
     if (bannedFilter === "banned") where.banned = true;
     else if (bannedFilter === "active") where.banned = false;
 
-    const [drivers, total] = await Promise.all([
-        prisma.user.findMany({
-            where,
-            include: { _count: { select: { shipments: true } } },
-            orderBy: { created_at: "desc" },
-            skip: (page - 1) * pageSize,
-            take: pageSize,
-        }),
-        prisma.user.count({ where }),
-    ]);
+    const drivers = await prisma.user.findMany({
+        where,
+        include: { _count: { select: { shipments: true } } },
+        orderBy: { created_at: "desc" },
+        skip: (page - 1) * pageSize,
+        take: pageSize,
+    });
+    const total = await prisma.user.count({ where });
 
     return {
         data: drivers.map((d) => ({
@@ -76,15 +74,13 @@ export async function getDriverShipments(
 
     const where: Prisma.ShipmentWhereInput = { logistics_id: driverId };
 
-    const [shipments, total] = await Promise.all([
-        prisma.shipment.findMany({
-            where,
-            orderBy: { created_at: "desc" },
-            skip: (page - 1) * pageSize,
-            take: pageSize,
-        }),
-        prisma.shipment.count({ where }),
-    ]);
+    const shipments = await prisma.shipment.findMany({
+        where,
+        orderBy: { created_at: "desc" },
+        skip: (page - 1) * pageSize,
+        take: pageSize,
+    });
+    const total = await prisma.shipment.count({ where });
 
     return {
         data: shipments.map((e) => ({
@@ -148,15 +144,13 @@ export async function getAdminDrivers(
         ? { full_name: dir }
         : { [sortBy]: dir };
 
-    const [drivers, total] = await Promise.all([
-        prisma.user.findMany({
-            where,
-            orderBy,
-            skip: (page - 1) * pageSize,
-            take: pageSize,
-        }),
-        prisma.user.count({ where }),
-    ]);
+    const drivers = await prisma.user.findMany({
+        where,
+        orderBy,
+        skip: (page - 1) * pageSize,
+        take: pageSize,
+    });
+    const total = await prisma.user.count({ where });
 
     // Obtener conteos de envíos activos en una sola query (evita N+1)
     const driverIds = drivers.map((d) => d.id);

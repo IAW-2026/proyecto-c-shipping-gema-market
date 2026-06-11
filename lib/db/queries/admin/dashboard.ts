@@ -12,6 +12,13 @@ function endOfToday(): Date {
     return new Date(now.getFullYear(), now.getMonth(), now.getDate(), 23, 59, 59, 999);
 }
 
+interface DashboardRaw {
+    total_drivers: bigint;
+    total_shipments: bigint;
+    shipments_today: bigint;
+    total_rates: bigint;
+}
+
 export async function getAdminDashboardMetrics(): Promise<AdminDashboardMetrics> {
     "use cache";
     cacheLife("minutes");
@@ -19,27 +26,21 @@ export async function getAdminDashboardMetrics(): Promise<AdminDashboardMetrics>
     const todayStart = startOfToday();
     const todayEnd = endOfToday();
 
-    const [
-        totalDrivers,
-        totalShipments,
-        shipmentsByStatus,
-        shipmentsToday,
-        totalRates,
-    ] = await Promise.all([
-        prisma.user.count({ where: { role: "logistics" } }),
-        prisma.shipment.count(),
-        prisma.shipment.groupBy({
-            by: ["status"],
-            _count: { id: true },
-        }),
-        prisma.shipment.count({
-            where: { created_at: { gte: todayStart, lte: todayEnd } },
-        }),
-        prisma.rate.count(),
-    ]);
+    const [aggregates] = await prisma.$queryRaw<DashboardRaw[]>`
+        SELECT
+            (SELECT COUNT(*) FROM "User" WHERE role = 'logistics') AS total_drivers,
+            (SELECT COUNT(*) FROM "Shipment") AS total_shipments,
+            (SELECT COUNT(*) FROM "Shipment" WHERE created_at >= ${todayStart} AND created_at <= ${todayEnd}) AS shipments_today,
+            (SELECT COUNT(*) FROM "Rate") AS total_rates
+    `;
+
+    const statusCounts = await prisma.shipment.groupBy({
+        by: ["status"],
+        _count: { id: true },
+    });
 
     const byStatus: Record<string, number> = {};
-    for (const group of shipmentsByStatus) {
+    for (const group of statusCounts) {
         byStatus[group.status] = group._count.id;
     }
 
@@ -49,11 +50,11 @@ export async function getAdminDashboardMetrics(): Promise<AdminDashboardMetrics>
         .reduce((sum, [, count]) => sum + count, 0);
 
     return {
-        totalDrivers,
-        totalShipments,
+        totalDrivers: Number(aggregates.total_drivers),
+        totalShipments: Number(aggregates.total_shipments),
         shipmentsByStatus: byStatus,
-        shipmentsToday,
-        totalRates,
+        shipmentsToday: Number(aggregates.shipments_today),
+        totalRates: Number(aggregates.total_rates),
         activeShipments,
     };
 }

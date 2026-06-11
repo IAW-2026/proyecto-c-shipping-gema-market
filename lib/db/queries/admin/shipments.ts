@@ -32,16 +32,14 @@ export async function getAllShipments(
         ? { operator: { full_name: dir } }
         : { [field]: dir };
 
-    const [shipments, total] = await Promise.all([
-        prisma.shipment.findMany({
-            where,
-            orderBy,
-            include: { operator: { select: { full_name: true } } },
-            skip: (page - 1) * pageSize,
-            take: pageSize,
-        }),
-        prisma.shipment.count({ where }),
-    ]);
+    const shipments = await prisma.shipment.findMany({
+        where,
+        orderBy,
+        include: { operator: { select: { full_name: true } } },
+        skip: (page - 1) * pageSize,
+        take: pageSize,
+    });
+    const total = await prisma.shipment.count({ where });
 
     const mapped = shipments.map((e) => ({
         id: e.id,
@@ -124,15 +122,13 @@ export async function getAdminShipments(
     const dir = sortOrder === "asc" ? "asc" : "desc";
     const orderBy: Record<string, unknown> = { [sortBy]: dir };
 
-    const [shipments, total] = await Promise.all([
-        prisma.shipment.findMany({
-            where,
-            orderBy,
-            skip: (page - 1) * pageSize,
-            take: pageSize,
-        }),
-        prisma.shipment.count({ where }),
-    ]);
+    const shipments = await prisma.shipment.findMany({
+        where,
+        orderBy,
+        skip: (page - 1) * pageSize,
+        take: pageSize,
+    });
+    const total = await prisma.shipment.count({ where });
 
     const items = shipments.map((s) => ({
         shipping_id: s.id,
