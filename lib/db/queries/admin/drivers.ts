@@ -158,25 +158,32 @@ export async function getAdminDrivers(
         prisma.user.count({ where }),
     ]);
 
-    const items = await Promise.all(
-        drivers.map(async (d) => {
-            const activeShipments = await prisma.shipment.count({
-                where: {
-                    logistics_id: d.id,
-                    status: { not: "delivered" },
-                },
-            });
+    // Obtener conteos de envíos activos en una sola query (evita N+1)
+    const driverIds = drivers.map((d) => d.id);
+    const activeCounts = await prisma.shipment.groupBy({
+        by: ["logistics_id"],
+        where: {
+            logistics_id: { in: driverIds },
+            status: { not: "delivered" },
+        },
+        _count: { logistics_id: true },
+    });
 
-            return {
-                user_id: d.id,
-                full_name: d.full_name,
-                email: d.email,
-                banned: d.banned,
-                active_shipments: activeShipments,
-                created_at: d.created_at.toISOString(),
-            };
-        }),
-    );
+    const countMap: Record<string, number> = {};
+    for (const c of activeCounts) {
+        if (c.logistics_id) {
+            countMap[c.logistics_id] = c._count.logistics_id;
+        }
+    }
+
+    const items = drivers.map((d) => ({
+        user_id: d.id,
+        full_name: d.full_name,
+        email: d.email,
+        banned: d.banned,
+        active_shipments: countMap[d.id] ?? 0,
+        created_at: d.created_at.toISOString(),
+    }));
 
     return {
         items,
