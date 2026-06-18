@@ -1,10 +1,12 @@
 import prisma from "@/lib/db/prisma";
 import { cacheLife } from "next/cache";
+import { ADMIN_DAYS, SECONDS_PER_TRANSIT_DAY, MAX_TRANSIT_DAYS } from "@/lib/constants/shipment";
 
 interface ShippingAdminStats {
     total_shipments: number;
     shipments_by_status: Record<string, number>;
     average_delivery_hours: number | null;
+    on_time_rate: number;
 }
 
 interface TimeseriesPoint {
@@ -82,10 +84,36 @@ export async function getShippingAdminStats(
         average_delivery_hours = Math.round(average_delivery_hours * 10) / 10;
     }
 
+    // --- on_time_rate calculation ---
+    const onTimeDelivered = await prisma.shipment.findMany({
+        where: { ...deliveredWhere },
+        select: { created_at: true, delivered_at: true, route_duration: true },
+    });
+
+    let onTimeCount = 0;
+    for (const s of onTimeDelivered) {
+        if (!s.delivered_at) continue;
+        let estimatedDays: number;
+        if (s.route_duration && s.route_duration > 0) {
+            const transitDays = Math.ceil(s.route_duration / SECONDS_PER_TRANSIT_DAY);
+            estimatedDays = ADMIN_DAYS + Math.min(transitDays, MAX_TRANSIT_DAYS);
+        } else {
+            estimatedDays = 2; // default matching calculateEstimatedDays(undefined)
+        }
+        const deadline = new Date(s.created_at.getTime() + estimatedDays * 86400000);
+        if (s.delivered_at <= deadline) {
+            onTimeCount++;
+        }
+    }
+    const on_time_rate = onTimeDelivered.length > 0
+        ? Math.round((onTimeCount / onTimeDelivered.length) * 1000) / 1000
+        : 0;
+
     return {
         total_shipments,
         shipments_by_status,
         average_delivery_hours,
+        on_time_rate,
     };
 }
 

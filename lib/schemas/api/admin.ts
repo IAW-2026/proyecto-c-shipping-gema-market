@@ -112,6 +112,7 @@ export const AdminStatsResponseSchema = z.object({
     total_shipments: z.number(),
     shipments_by_status: z.record(z.string(), z.number()),
     average_delivery_hours: z.number().nullable(),
+    on_time_rate: z.number(),
 });
 
 export const AdminTimeseriesResponseSchema = z.object({
