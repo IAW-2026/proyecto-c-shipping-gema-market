@@ -23,6 +23,13 @@ export const AdminDriversQuerySchema = z.object({
     page_size: z.coerce.number().int().min(1).max(100).default(20),
 });
 
+export const AdminUsersQuerySchema = z.object({
+    page: z.coerce.number().int().min(1).default(1),
+    page_size: z.coerce.number().int().min(1).max(100).default(20),
+    sort_by: z.enum(["created_at"]).default("created_at"),
+    order: z.enum(["asc", "desc"]).default("desc"),
+});
+
 export const AdminStatsQuerySchema = z.object({
     date_from: z.string().datetime().optional(),
     date_to: z.string().datetime().optional(),
