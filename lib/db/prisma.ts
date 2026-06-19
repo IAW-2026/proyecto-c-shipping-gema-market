@@ -3,8 +3,12 @@ import { Pool } from 'pg';
 import { PrismaPg } from '@prisma/adapter-pg';
 
 const prismaClientSingleton = () => {
+  const directUrl = process.env.DIRECT_URL!;
+  const separator = directUrl.includes('?') ? '&' : '?';
+  const connectionString = `${directUrl}${separator}options=${encodeURIComponent('-c TimeZone=-3')}`;
+
   const pool = new Pool({
-    connectionString: process.env.DIRECT_URL,
+    connectionString,
     max: 5,
     idleTimeoutMillis: 1000,
   });
