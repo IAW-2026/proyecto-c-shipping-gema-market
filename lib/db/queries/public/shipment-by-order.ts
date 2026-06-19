@@ -27,15 +27,18 @@ const orderShipmentSelect = {
 
 export async function getShipmentByOrderId(orderId: string): Promise<ShipmentByOrder | null> {
     "use cache";
-    cacheLife("minutes");
 
     const shipment = await prisma.shipment.findUnique({
         where: { order_id: orderId },
         select: orderShipmentSelect,
     });
 
-    if (!shipment) return null;
+    if (!shipment) {
+        cacheLife("seconds");
+        return null;
+    }
 
+    cacheLife("minutes");
     return {
         id: shipment.id,
         order_id: shipment.order_id,
