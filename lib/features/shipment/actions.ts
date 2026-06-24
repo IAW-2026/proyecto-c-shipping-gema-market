@@ -94,13 +94,16 @@ export async function transitionShipmentAction(
             newStatus = 'picked_up';
             updateData.status = newStatus;
             updateData.picked_up_at = now;
+            revalidatePath(`/shipments/${shipmentId}`);
         } else if (transition === 'transit') {
             newStatus = 'in_transit';
             updateData.status = newStatus;
+            revalidatePath(`/shipments/${shipmentId}`);
         } else if (transition === 'deliver') {
             newStatus = 'delivered';
             updateData.status = newStatus;
             updateData.delivered_at = now;
+            revalidatePath(`/shipments/${shipmentId}`);
         } else if (transition === 'cancel') {
             newStatus = 'waiting_for_courier';
             updateData.status = newStatus;
