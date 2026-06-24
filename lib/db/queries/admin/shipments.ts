@@ -83,6 +83,8 @@ interface AdminShipmentItem {
     status: string;
     tracking_code: string;
     price: number;
+    pickup_address: unknown;
+    delivery_address: unknown;
     picked_up_at: string | null;
     delivered_at: string | null;
     created_at: string;
@@ -139,6 +141,8 @@ export async function getAdminShipments(
         status: s.status,
         tracking_code: s.tracking_code,
         price: Number(s.price),
+        pickup_address: s.pickup_address,
+        delivery_address: s.delivery_address,
         picked_up_at: s.picked_up_at?.toISOString() ?? null,
         delivered_at: s.delivered_at?.toISOString() ?? null,
         created_at: s.created_at.toISOString(),

@@ -63,6 +63,8 @@ export const AdminShipmentItemSchema = z.object({
     status: z.string(),
     tracking_code: z.string(),
     price: z.number(),
+    pickup_address: z.record(z.string(), z.unknown()),
+    delivery_address: z.record(z.string(), z.unknown()),
     picked_up_at: z.string().nullable(),
     delivered_at: z.string().nullable(),
     created_at: z.string(),

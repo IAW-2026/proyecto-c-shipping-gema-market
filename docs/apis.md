@@ -795,6 +795,8 @@ Estados soportados (mapeo Mercado Pago Sandbox): `pending`, `in_process`, `appro
       "status": "delivered",
       "tracking_code": "BB-0001-2026",
       "price": 3500.0,
+      "pickup_address": { "street": "San Martín", "number": "123", "zip": "8000" },
+      "delivery_address": { "street": "Alsina", "number": "456", "floor": "7B", "zip": "8000" },
       "picked_up_at": "2026-04-17T14:00:00Z",
       "delivered_at": "2026-04-17T16:30:00Z",
       "created_at": "2026-04-17T13:00:00Z"
