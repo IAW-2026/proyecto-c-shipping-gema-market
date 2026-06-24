@@ -66,10 +66,8 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
         const pickupAddr = shipment.pickup_address as AddressWithCity;
         const deliveryAddr = shipment.delivery_address as AddressWithCity;
 
-        const [originCoords, destCoords] = await Promise.all([
-            getCoordinatesFromAddress(pickupAddr),
-            getCoordinatesFromAddress(deliveryAddr),
-        ]);
+        const originCoords = await getCoordinatesFromAddress(pickupAddr);
+        const destCoords = await getCoordinatesFromAddress(deliveryAddr);
 
         if (!originCoords || !destCoords) {
             return NextResponse.json(

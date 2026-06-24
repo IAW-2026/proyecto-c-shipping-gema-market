@@ -66,14 +66,12 @@ export async function calculateQuote(
         street: addr.street, number: addr.number, zip: addr.zip
     });
 
-    const [originGeocode, destGeocode] = await Promise.all([
-        getCoordinatesFromAddress(toAddressInput(origin)),
-        getCoordinatesFromAddress({
-            street: destination_address.street,
-            number: destination_address.number,
-            zip: destination_address.zip,
-        }),
-    ]);
+    const originGeocode = await getCoordinatesFromAddress(toAddressInput(origin));
+    const destGeocode = await getCoordinatesFromAddress({
+        street: destination_address.street,
+        number: destination_address.number,
+        zip: destination_address.zip,
+    });
 
     const originCoords = validateGeocode(originGeocode, true);
     const destCoords = validateGeocode(destGeocode, false);
